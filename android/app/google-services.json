@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1033232401585",
+    "firebase_url": "https://splitify-a6ff8-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "splitify-a6ff8",
+    "storage_bucket": "splitify-a6ff8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033232401585:android:446d1478b99160f0370e90",
+        "android_client_info": {
+          "package_name": "com.Splitify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1033232401585-7rrq2pcq6e9f5fk9v0gh7nt9ts03182c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.Splitify",
+            "certificate_hash": "0f3f9339adc7c31a661aaf0ba0e61298a4aed1b1"
+          }
+        },
+        {
+          "client_id": "1033232401585-e8asn84vvttntrl3ju2la44cani0cjd5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTGNjpUaQPbjsmCU-7HI9QNfWk2l7EzNY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1033232401585-e8asn84vvttntrl3ju2la44cani0cjd5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
