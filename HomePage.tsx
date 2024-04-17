@@ -5,7 +5,18 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+  SafeAreaView,
+  StatusBar,
+} from "react-native";
 import { MinSpacer } from "./Spacers";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "./FirebaseConfig";
 import { getDoc, doc } from "firebase/firestore";
@@ -16,13 +27,13 @@ import { LineChart, Grid } from "react-native-svg-charts";
 import { Shadow, Gradient } from "./ChartAdds";
 import * as shape from "d3-shape";
 import { Button } from "react-native-paper";
-import { Line } from "react-native-svg";
+import { Svg, Line } from "react-native-svg";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 export default function Home() {
   const [count, setCount] = useState(0);
   const [recentCount, setRecentCount] = useState(0);
-
+  const [title, setTitle] = useState("");
   const [total, setTotal] = useState(0);
   const [selection, setSelection] = useState(1);
   const [stampDiff, setStampDiff] = useState(0);
@@ -128,9 +139,6 @@ export default function Home() {
   };
   const generateRecentList = (expensesArray) => {
     setRecentList([]);
-    console.log("----------------");
-
-    console.log(expensesArray);
 
     if (expensesArray.length < 2) {
       setRecentCount(1);
@@ -148,12 +156,7 @@ export default function Home() {
     for (let index = 0; index < recentCount; index++) {
       const element = expensesArray[index];
       setRecentList((recentList) => [...recentList, element]);
-      console.log(recentList);
     }
-
-    console.log("list lenght:");
-    console.log(recentList);
-    console.log(recentCount);
   };
   // useEffect to call calculateTotal whenever selection or expensesArray changes
   useEffect(() => {
@@ -174,122 +177,275 @@ export default function Home() {
       setCount(1);
     }
   }, []);
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "flex-start",
-        alignItems: "center",
-        paddingTop: 100,
-      }}
-    >
-      <SelectDropdown
-        defaultValueByIndex={1}
-        data={selectionData}
-        onSelect={(selectedItem, index) => {
-          setSelection(index);
 
-          calculateTotal();
-        }}
-        renderButton={(selectedItem, isOpened) => {
-          return (
-            <View style={styles.dropdownButtonStyle}>
-              <Text style={styles.dropdownButtonTxtStyle}>
-                {selectedItem && selectedItem.title}
-              </Text>
-              <Icon
-                name={isOpened ? "chevron-up" : "chevron-down"}
-                style={styles.dropdownButtonArrowStyle}
-              />
-            </View>
-          );
-        }}
-        renderItem={(item, index, isSelected) => {
-          return (
-            <View
-              style={{
-                ...styles.dropdownItemStyle,
-                ...(isSelected && { backgroundColor: "#f2f2f2" }),
-              }}
-            >
-              <Text style={styles.dropdownItemTxtStyle}>{item.title}</Text>
-            </View>
-          );
-        }}
-        showsVerticalScrollIndicator={false}
-        dropdownStyle={styles.dropdownMenuStyle}
-      />
-
-      <View style={styles.totalExpensesContainer}>
-        <Text style={{ fontSize: 18 }}>Total Expenses</Text>
-        <Text style={{ fontSize: 55 }}>{total}₺</Text>
-      </View>
-
-      <LineChart
-        style={{ height: 200, width: Dimensions.get("window").width + 20 }}
-        gridMin={20}
-        gridMax={40000}
-        data={monthlyArray}
-        curve={shape.curveBundle.beta(1)}
-        svg={{
-          strokeWidth: 7,
-          stroke: "url(#gradient)",
-        }}
-        contentInset={{ top: 20, bottom: 20 }}
-      >
-        <Shadow />
-        <Gradient />
-      </LineChart>
-      <Text style={{ fontSize: 12 }}>Last 6 month</Text>
-      <View
-        style={{
-          height: 20,
-          width: Dimensions.get("window").width,
-          borderBottomColor: "black",
-          borderBottomWidth: StyleSheet.hairlineWidth,
-        }}
-      />
-
-      {expensesArray.length > 0 ? (
-        <View>
-          <View style={styles.recentTransectionHeader}>
-            <Text style={{ fontSize: 18, flex: 1 }}>Recent Transections</Text>
-            <Button
-              onPress={() => {}}
-              style={{ backgroundColor: "rgb(222, 110, 235)" }}
-            >
-              <Text style={{ fontSize: 16, color: "white" }}>See All</Text>
-            </Button>
-          </View>
-          <View style={styles.recentTransectionBody}>
-            <FlatList
-              data={recentList}
-              renderItem={({ item }) => <Text>{item.type}</Text>}
+  const CardView = ({
+    imageSource,
+    title,
+    description,
+    onPress,
+    price,
+    date,
+  }) => {
+    imageSource = parseInt(imageSource);
+    console.log(imageSource);
+    const day = date.split("T")[0].split("-")[2];
+    const month = date.split("T")[0].split("-")[1];
+    const year = date.split("T")[0].split("-")[0];
+    return (
+      <TouchableOpacity onPress={onPress} style={styles.card}>
+        <View style={styles.cardContent}>
+          {imageSource == 1 ? (
+            <Image
+              style={styles.recentTransactionsImage}
+              source={require("./assets/bill.png")}
             />
+          ) : imageSource == 2 ? (
+            <Image
+              style={styles.recentTransactionsImage}
+              source={require("./assets/food.png")}
+            />
+          ) : imageSource == 3 ? (
+            <Image
+              style={styles.recentTransactionsImage}
+              source={require("./assets/healthcare.png")}
+            />
+          ) : imageSource == 4 ? (
+            <Image
+              style={styles.recentTransactionsImage}
+              source={require("./assets/entertainment.png")}
+            />
+          ) : imageSource == 5 ? (
+            <Image
+              style={styles.recentTransactionsImage}
+              source={require("./assets/shop.png")}
+            />
+          ) : (
+            <Image
+              style={styles.recentTransactionsImage}
+              source={require("./assets/book.png")}
+            />
+          )}
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "column",
+              justifyContent: "flex-start",
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text style={styles.cardTitle}>
+              {imageSource == 1
+                ? "Utilities"
+                : imageSource == 2
+                ? "Food & Groceries"
+                : imageSource == 3
+                ? "Healthcare"
+                : imageSource == 4
+                ? "Entertainment"
+                : imageSource == 5
+                ? "Shopping"
+                : imageSource == 6
+                ? "Education"
+                : "Other Expenses"}
+            </Text>
+            <Text style={styles.cardDescription}>{description}</Text>
+            <Text style={styles.cardDate}>
+              {day + "/" + month + "/" + year}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "flex-end",
+              flexDirection: "column",
+              justifyContent: "flex-start",
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text style={styles.cardPrice}>{price}₺</Text>
           </View>
         </View>
-      ) : (
-        <View></View>
-      )}
-    </View>
+      </TouchableOpacity>
+    );
+  };
+  const handleCardPress = () => {
+    console.log("Card pressed!");
+  };
+  return (
+    <ScrollView style={styles.scrollView}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "flex-start",
+          alignItems: "center",
+          paddingTop: 100,
+        }}
+      >
+        <SelectDropdown
+          defaultValueByIndex={1}
+          data={selectionData}
+          onSelect={(selectedItem, index) => {
+            setSelection(index);
+
+            calculateTotal();
+          }}
+          renderButton={(selectedItem, isOpened) => {
+            return (
+              <View style={styles.dropdownButtonStyle}>
+                <Text style={styles.dropdownButtonTxtStyle}>
+                  {selectedItem && selectedItem.title}
+                </Text>
+                <Icon
+                  name={isOpened ? "chevron-up" : "chevron-down"}
+                  style={styles.dropdownButtonArrowStyle}
+                />
+              </View>
+            );
+          }}
+          renderItem={(item, index, isSelected) => {
+            return (
+              <View
+                style={{
+                  ...styles.dropdownItemStyle,
+                  ...(isSelected && { backgroundColor: "#f2f2f2" }),
+                }}
+              >
+                <Text style={styles.dropdownItemTxtStyle}>{item.title}</Text>
+              </View>
+            );
+          }}
+          showsVerticalScrollIndicator={false}
+          dropdownStyle={styles.dropdownMenuStyle}
+        />
+
+        <View style={styles.totalExpensesContainer}>
+          <Text style={{ fontSize: 18 }}>Total Expenses</Text>
+          <Text style={{ fontSize: 55 }}>{total}₺</Text>
+        </View>
+
+        <LineChart
+          style={{ height: 200, width: Dimensions.get("window").width + 20 }}
+          gridMin={20}
+          gridMax={40000}
+          data={monthlyArray}
+          curve={shape.curveBundle.beta(1)}
+          svg={{
+            strokeWidth: 7,
+            stroke: "url(#gradient)",
+          }}
+          contentInset={{ top: 20, bottom: 20 }}
+        >
+          <Shadow />
+          <Gradient />
+        </LineChart>
+        <Text style={{ fontSize: 12 }}>Last 6 month</Text>
+        <View
+          style={{
+            height: 20,
+            width: Dimensions.get("window").width,
+            borderBottomColor: "black",
+            borderBottomWidth: StyleSheet.hairlineWidth,
+          }}
+        />
+
+        {expensesArray.length > 0 ? (
+          <View>
+            <View style={styles.recentTransactionsHeader}>
+              <Text style={{ fontSize: 18, flex: 1 }}>Last Transactions</Text>
+              <Button
+                onPress={() => {}}
+                style={{ backgroundColor: "rgb(222, 110, 235)" }}
+              >
+                <Text style={{ fontSize: 16, color: "white" }}>See All</Text>
+              </Button>
+            </View>
+            <View style={styles.recentTransactionsBody}>
+              <FlatList
+                scrollEnabled={false}
+                style={{ width: "100%" }}
+                data={recentList}
+                renderItem={({ item }) => (
+                  <View>
+                    <View style={{ height: 12 }}></View>
+                    <CardView
+                      imageSource={item.type}
+                      title={item.note}
+                      description={item.note}
+                      onPress={handleCardPress}
+                      price={item.total}
+                      date={item.date}
+                    />
+                  </View>
+                )}
+              />
+            </View>
+          </View>
+        ) : (
+          <View></View>
+        )}
+      </View>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
-  recentTransectionHeader: {
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 3.04,
+    elevation: 5,
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  cardContent: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 1,
+  },
+  cardPrice: {
+    fontSize: 20,
+    fontWeight: "300",
+    marginBottom: 1,
+  },
+  cardDescription: {
+    fontSize: 14,
+    lineHeight: 24,
+  },
+  cardDate: {
+    fontSize: 10,
+  },
+  recentTransactionsHeader: {
     width: Dimensions.get("window").width,
     paddingTop: 10,
-    padding: 25,
+    paddingHorizontal: 20,
+    paddingBottom: 0,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "flex-end",
   },
-  recentTransectionBody: {
+  recentTransactionsBody: {
     width: Dimensions.get("window").width,
-    paddingTop: 10,
-    padding: 25,
+    paddingTop: 0,
+    padding: 20,
     alignItems: "center",
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "flex-end",
+  },
+  recentTransactionsImage: {
+    height: 40,
+    width: 40,
   },
 
   dropdownButtonStyle: {
@@ -360,5 +516,11 @@ const styles = StyleSheet.create({
     height: 150,
     backgroundColor: "green",
     flex: 2,
+  },
+  container2: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
   },
 });
