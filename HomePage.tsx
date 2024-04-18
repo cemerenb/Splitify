@@ -17,18 +17,16 @@ import {
   SafeAreaView,
   StatusBar,
 } from "react-native";
-import { MinSpacer } from "./Spacers";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "./FirebaseConfig";
 import { getDoc, doc } from "firebase/firestore";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import moment from "moment";
 import { LineChart, Grid } from "react-native-svg-charts";
 import { Shadow, Gradient } from "./ChartAdds";
 import * as shape from "d3-shape";
 import { Button } from "react-native-paper";
-import { Svg, Line } from "react-native-svg";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import { TabBar } from "./TabBar/TabBar";
+import { MaxSpacer } from "./Spacers";
 
 export default function Home() {
   const [count, setCount] = useState(0);
@@ -38,14 +36,17 @@ export default function Home() {
   const [selection, setSelection] = useState(1);
   const [stampDiff, setStampDiff] = useState(0);
   const [expensesArray, setArray] = useState([]);
-  const [monthlyArray, setMonthlyArray] = useState([]);
+  const [lastSixMonthArray, setLastSixMonthArray] = useState([]);
+  const [lastMonthArray, setLastMonthArray] = useState([]);
+  const [lastWeekArray, setLastWeekArray] = useState([]);
+
   const [recentList, setRecentList] = useState([]);
   const data2 = [80, 10, 95, 48, 24, 67, 51, 12, 33, 0, 24, 20, 50];
 
   const selectionData = [
     { title: "Last Week" },
     { title: "Last Month" },
-    { title: "All Times" },
+    { title: "Last 6 Months" },
   ];
 
   const getTotalExpenses = async () => {
@@ -77,66 +78,70 @@ export default function Home() {
         subTotal = subTotal + element.total;
       }
     }
+    const sortedData = expensesArray.sort((a, b) => a.timeStamp - b.timeStamp);
+    setArray(expensesArray.reverse());
 
     setTotal(subTotal); // Set the total after calculating based on the updated stampDiff
   };
 
-  const calculateGraphData = (expensesArray) => {
-    let one = 0;
-    let two = 0;
-    let three = 0;
-    let four = 0;
-    let five = 0;
-    let six = 0;
+  const calculateLastSevenDaysData = (expensesArray) => {
+    const now = Date.now();
+    const parts = Array.from({ length: 7 }, (_, i) => i);
 
-    const day = parseInt(new Date().toISOString().split("T")[0].split("-")[2]);
-    const thisMonthsDays = day * 86400000;
-    const first = Date.now() - thisMonthsDays;
-    const second = first - 2629743000;
-    const third = second - 2629743000;
-    const fourth = third - 2629743000;
-    const fifth = fourth - 2629743000;
-    const sixth = fifth - 2629743000;
+    const partTotals = parts.map((part) => {
+      const partStart = now - (part + 1) * 86400000;
+      const partEnd = now - part * 86400000;
 
-    for (let index = 0; index < expensesArray.length; index++) {
-      const element = expensesArray[index];
-      if (element.timeStamp > first) {
-        one = one + element.total;
-      }
-    }
-    for (let index = 0; index < expensesArray.length; index++) {
-      const element = expensesArray[index];
-      if (second < element.timeStamp && element.timeStamp < first - 1) {
-        two = two + element.total;
-      }
-    }
-    for (let index = 0; index < expensesArray.length; index++) {
-      const element = expensesArray[index];
-      if (third < element.timeStamp && element.timeStamp < second - 1) {
-        three = three + element.total;
-      }
-    }
-    for (let index = 0; index < expensesArray.length; index++) {
-      const element = expensesArray[index];
-      if (fourth < element.timeStamp && element.timeStamp < third - 1) {
-        four = four + element.total;
-      }
-    }
-    for (let index = 0; index < expensesArray.length; index++) {
-      const element = expensesArray[index];
-      if (fifth < element.timeStamp && element.timeStamp < fourth - 1) {
-        five = five + element.total;
-      }
-    }
-    for (let index = 0; index < expensesArray.length; index++) {
-      const element = expensesArray[index];
-      if (sixth < element.timeStamp && element.timeStamp < fifth - 1) {
-        six = six + element.total;
-      }
-    }
+      return expensesArray.reduce((total, expense) => {
+        if (expense.timeStamp >= partStart && expense.timeStamp < partEnd) {
+          return total + expense.total;
+        }
+        return total;
+      }, 0);
+    });
 
-    setMonthlyArray([one, two, three, four, five, six]);
+    setLastWeekArray(partTotals.reverse());
   };
+
+  const calculateLastMonthData = (expensesArray) => {
+    const now = Date.now();
+    const daysInPart = 5; // Number of days in each part
+    const parts = Array.from({ length: 6 }, (_, i) => i);
+
+    const partTotals = parts.map((part) => {
+      const partStart = now - (part + 1) * daysInPart * 86400000;
+      const partEnd = now - part * daysInPart * 86400000;
+
+      return expensesArray.reduce((total, expense) => {
+        if (expense.timeStamp >= partStart && expense.timeStamp < partEnd) {
+          return total + expense.total;
+        }
+        return total;
+      }, 0);
+    });
+
+    setLastMonthArray(partTotals);
+  };
+
+  const calculateSixMonthData = (expensesArray) => {
+    const now = Date.now();
+    const months = Array.from({ length: 6 }, (_, i) => i);
+
+    const monthlyTotals = months.map((month) => {
+      const monthStart = now - (month + 1) * 2629743000;
+      const monthEnd = now - month * 2629743000;
+
+      return expensesArray.reduce((total, expense) => {
+        if (expense.timeStamp >= monthStart && expense.timeStamp < monthEnd) {
+          return total + expense.total;
+        }
+        return total;
+      }, 0);
+    });
+
+    setLastSixMonthArray(monthlyTotals);
+  };
+
   const generateRecentList = (expensesArray) => {
     setRecentList([]);
 
@@ -164,7 +169,13 @@ export default function Home() {
   }, [selection, expensesArray]);
 
   useEffect(() => {
-    calculateGraphData(expensesArray);
+    calculateSixMonthData(expensesArray);
+  }, [expensesArray]);
+  useEffect(() => {
+    calculateLastMonthData(expensesArray);
+  }, [expensesArray]);
+  useEffect(() => {
+    calculateLastSevenDaysData(expensesArray);
   }, [expensesArray]);
 
   useEffect(() => {
@@ -187,92 +198,116 @@ export default function Home() {
     date,
   }) => {
     imageSource = parseInt(imageSource);
-    console.log(imageSource);
     const day = date.split("T")[0].split("-")[2];
     const month = date.split("T")[0].split("-")[1];
     const year = date.split("T")[0].split("-")[0];
     return (
       <TouchableOpacity onPress={onPress} style={styles.card}>
-        <View style={styles.cardContent}>
-          {imageSource == 1 ? (
-            <Image
-              style={styles.recentTransactionsImage}
-              source={require("./assets/bill.png")}
-            />
-          ) : imageSource == 2 ? (
-            <Image
-              style={styles.recentTransactionsImage}
-              source={require("./assets/food.png")}
-            />
-          ) : imageSource == 3 ? (
-            <Image
-              style={styles.recentTransactionsImage}
-              source={require("./assets/healthcare.png")}
-            />
-          ) : imageSource == 4 ? (
-            <Image
-              style={styles.recentTransactionsImage}
-              source={require("./assets/entertainment.png")}
-            />
-          ) : imageSource == 5 ? (
-            <Image
-              style={styles.recentTransactionsImage}
-              source={require("./assets/shop.png")}
-            />
-          ) : (
-            <Image
-              style={styles.recentTransactionsImage}
-              source={require("./assets/book.png")}
-            />
-          )}
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              paddingHorizontal: 20,
-            }}
-          >
-            <Text style={styles.cardTitle}>
-              {imageSource == 1
-                ? "Utilities"
-                : imageSource == 2
-                ? "Food & Groceries"
-                : imageSource == 3
-                ? "Healthcare"
-                : imageSource == 4
-                ? "Entertainment"
-                : imageSource == 5
-                ? "Shopping"
-                : imageSource == 6
-                ? "Education"
-                : "Other Expenses"}
-            </Text>
-            <Text style={styles.cardDescription}>{description}</Text>
-            <Text style={styles.cardDate}>
-              {day + "/" + month + "/" + year}
-            </Text>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View>
+            {imageSource == 1 ? (
+              <Image
+                style={styles.recentTransactionsImage}
+                source={require("./assets/bill.png")}
+              />
+            ) : imageSource == 2 ? (
+              <Image
+                style={styles.recentTransactionsImage}
+                source={require("./assets/food.png")}
+              />
+            ) : imageSource == 3 ? (
+              <Image
+                style={styles.recentTransactionsImage}
+                source={require("./assets/healthcare.png")}
+              />
+            ) : imageSource == 4 ? (
+              <Image
+                style={styles.recentTransactionsImage}
+                source={require("./assets/entertainment.png")}
+              />
+            ) : imageSource == 5 ? (
+              <Image
+                style={styles.recentTransactionsImage}
+                source={require("./assets/shop.png")}
+              />
+            ) : imageSource == 6 ? (
+              <Image
+                style={styles.recentTransactionsImage}
+                source={require("./assets/book.png")}
+              />
+            ) : imageSource == 7 ? (
+              <Image
+                style={styles.recentTransactionsImage}
+                source={require("./assets/transportation.png")}
+              />
+            ) : imageSource == 8 ? (
+              <Image
+                style={styles.recentTransactionsImage}
+                source={require("./assets/personalcare.png")}
+              />
+            ) : (
+              <Image
+                style={styles.recentTransactionsImage}
+                source={require("./assets/miscellaneous.png")}
+              />
+            )}
           </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "flex-end",
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              paddingHorizontal: 20,
-            }}
-          >
-            <Text style={styles.cardPrice}>{price}₺</Text>
-          </View>
+        </View>
+        <View
+          style={{
+            flex: 3,
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            paddingHorizontal: 20,
+          }}
+        >
+          <Text style={styles.cardTitle}>
+            {imageSource == 1
+              ? "Utilities"
+              : imageSource == 2
+              ? "Food & Groceries"
+              : imageSource == 3
+              ? "Healthcare"
+              : imageSource == 4
+              ? "Entertainment"
+              : imageSource == 5
+              ? "Shopping"
+              : imageSource == 6
+              ? "Education"
+              : imageSource == 7
+              ? "Transportation"
+              : imageSource == 8
+              ? "Personal Care"
+              : "Miscellaneous"}
+          </Text>
+          <Text style={styles.cardDescription}>{description}</Text>
+          <Text style={styles.cardDate}>{day + "/" + month + "/" + year}</Text>
+        </View>
+        <View
+          style={{
+            flex: 2,
+            alignItems: "flex-end",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            paddingHorizontal: 20,
+          }}
+        >
+          <Text style={styles.cardPrice}>{price}₺</Text>
         </View>
       </TouchableOpacity>
     );
   };
-  const handleCardPress = () => {
-    console.log("Card pressed!");
-  };
+  const handleCardPress = () => {};
+  const [maxWidth, setMaxWidth] = useState(Dimensions.get("window").width);
   return (
-    <ScrollView style={styles.scrollView}>
+    <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
       <View
         style={{
           flex: 1,
@@ -326,8 +361,14 @@ export default function Home() {
         <LineChart
           style={{ height: 200, width: Dimensions.get("window").width + 20 }}
           gridMin={20}
-          gridMax={40000}
-          data={monthlyArray}
+          gridMax={400}
+          data={
+            selection == 0
+              ? lastWeekArray
+              : selection == 1
+              ? lastMonthArray
+              : lastSixMonthArray
+          }
           curve={shape.curveBundle.beta(1)}
           svg={{
             strokeWidth: 7,
@@ -338,15 +379,6 @@ export default function Home() {
           <Shadow />
           <Gradient />
         </LineChart>
-        <Text style={{ fontSize: 12 }}>Last 6 month</Text>
-        <View
-          style={{
-            height: 20,
-            width: Dimensions.get("window").width,
-            borderBottomColor: "black",
-            borderBottomWidth: StyleSheet.hairlineWidth,
-          }}
-        />
 
         {expensesArray.length > 0 ? (
           <View>
@@ -384,6 +416,7 @@ export default function Home() {
           <View></View>
         )}
       </View>
+      <View style={{ height: 100 }}></View>
     </ScrollView>
   );
 }
@@ -391,25 +424,22 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    padding: 15,
-    shadowColor: "#000",
+    padding: 10,
+    shadowColor: "000",
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 1,
     },
     shadowOpacity: 0.12,
-    shadowRadius: 3.04,
+    shadowRadius: 0.04,
     elevation: 5,
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
   },
 
-  cardContent: {
-    flex: 1,
-    flexDirection: "row",
-  },
   cardTitle: {
+    width: Dimensions.get("window").width * 0.5,
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 1,
@@ -430,7 +460,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     paddingTop: 10,
     paddingHorizontal: 20,
-    paddingBottom: 0,
+    paddingBottom: 10,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -449,7 +479,7 @@ const styles = StyleSheet.create({
   },
 
   dropdownButtonStyle: {
-    width: 150,
+    width: 180,
     height: 40,
     backgroundColor: "transparent",
     borderRadius: 20,

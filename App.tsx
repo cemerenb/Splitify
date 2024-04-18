@@ -1,34 +1,68 @@
-import React, { useLayoutEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import Login from './Login';
-import Register from './Register';
-import './FirebaseConfig'
-import Home from './HomePage';
-import PersonalExpenses from './PersonalExpensesEntry';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import Login from "./Login";
+import Register from "./Register";
+import { TabBar } from "./TabBar/TabBar";
+import PersonalExpensEntry from "./PersonalExpensesEntry";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
   Register: undefined;
-  Home: undefined;
-  PersonalExpenses: undefined;
+  TabBar: undefined;
+  AddExpense: undefined;
 };
-
 
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
 
-export default function App() {
-  
+const App: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={Login} options={{ gestureEnabled: false }}/>
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Home" component={Home} options={{ gestureEnabled: true, headerShown: false,
-  headerLeft: () => <></>, }} />
-        <Stack.Screen name="PersonalExpenses" component={PersonalExpenses} options={{ gestureEnabled: true, headerShown: true, headerTitleStyle:{color:"transparent"}
-  }}/>
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          options={{ gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="AddExpense"
+          component={PersonalExpensEntry}
+          options={{
+            headerStyle: {
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+              backgroundColor: "rgb(253,60,74)",
+              borderColor: "transparent",
+            },
+            gestureEnabled: false,
+            headerBackTitle: "Back",
+            headerBackTitleStyle: { fontWeight: "500" },
+            headerTintColor: "white",
+            headerTitle: "Expense",
+            headerTitleStyle: {
+              fontSize: 20,
+              color: "white",
+            },
+          }}
+        />
+        <Stack.Screen
+          name="TabBar"
+          component={TabBar}
+          options={{
+            gestureEnabled: true,
+            headerShown: false,
+            headerLeft: () => null, // Remove the back button
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default App;
