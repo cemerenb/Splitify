@@ -1,10 +1,11 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
@@ -13,40 +14,56 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { TouchableHighlight } from "react-native-gesture-handler";
 import { MidSpacer } from "../Utils/Spacers";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackNavigatorParamsList } from "../App";
 
 export default function Groups() {
   const [count, setCount] = useState(0);
   const [groups, setGroups] = useState([]);
   const [loading, setLoadingStatus] = useState(true);
 
+  const navigation =
+    useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
+
   const getGroupIds = async () => {
     setGroups([]);
     let uid = FIREBASE_AUTH.currentUser.uid;
     const docRef = doc(FIRESTORE_DB, "personal", uid);
     const userData = await getDoc(docRef);
+    console.log(userData.data().groups);
 
     setGroups((groups) => [...groups, userData.data().groups]);
     setLoadingStatus(false);
     console.log(groups);
   };
-  useLayoutEffect(() => {
+
+  useEffect(() => {
     if (count == 0) {
       getGroupIds();
-
-      setCount(1);
     }
-  }, []);
-  return (
-    <SafeAreaView>
-      <MidSpacer></MidSpacer>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "space-between",
-          paddingHorizontal: 20,
-        }}
-      >
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+    setCount(1);
+  }, [groups]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
+      </View>
+    );
+  } else {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <MidSpacer></MidSpacer>
+
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: 20,
+          }}
+        >
           <TouchableOpacity activeOpacity={0.7}>
             <View style={styles.groupContainer}>
               <Ionicons
@@ -61,7 +78,12 @@ export default function Groups() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={0.7}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => {
+              navigation.navigate("CreateGroup");
+            }}
+          >
             <View style={styles.groupContainer}>
               <Ionicons
                 name={"add"}
@@ -75,11 +97,20 @@ export default function Groups() {
             </View>
           </TouchableOpacity>
         </View>
-        <Text>{groups}</Text>
-        <Text> Groups Page</Text>
-      </View>
-    </SafeAreaView>
-  );
+        <View
+          style={{
+            flex: 20,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingHorizontal: 20,
+          }}
+        >
+          <Text>{groups}</Text>
+          <Text>You don't have any groups</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 }
 const styles = StyleSheet.create({
   groupContainer: {

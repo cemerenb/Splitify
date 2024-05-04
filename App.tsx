@@ -7,6 +7,7 @@ import { TabBar } from "./TabBar/TabBar";
 import PersonalExpensEntry from "./Pages/PersonalExpensesEntry";
 import ExpenseEntry from "./Pages/ExpensDetails";
 import Groups from "./Pages/Groups";
+import CreateGroup from "./Pages/CreateGroup";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
@@ -15,6 +16,7 @@ export type RootStackNavigatorParamsList = {
   Groups: undefined;
   AddExpense: undefined;
   ExpenseEntry: undefined;
+  CreateGroup: undefined;
 };
 
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
@@ -39,6 +41,24 @@ const App: React.FC = () => {
           options={{
             gestureEnabled: false,
             headerShown: true,
+          }}
+        />
+        <Stack.Screen
+          name="CreateGroup"
+          component={CreateGroup}
+          options={{
+            headerStyle: {
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+              backgroundColor: "rgb(0,168,107)",
+              borderColor: "transparent",
+            },
+            gestureEnabled: false,
+            headerBackTitle: "Back",
+            headerBackTitleStyle: { fontWeight: "500" },
+            headerTintColor: "white",
+            headerTitle: "",
           }}
         />
         <Stack.Screen

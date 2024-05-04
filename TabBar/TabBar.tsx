@@ -55,7 +55,7 @@ const renderTabBar = ({ routeName, selectedTab, navigate }) => {
     </TouchableOpacity>
   );
 };
-export const TabBar: React.FC<Props> = ({ barColor }) => (
+export const TabBar: React.FC<Props> = ({}) => (
   <CurvedBottomBarExpo.Navigator
     type="DOWN"
     style={styles.bottomBar}
