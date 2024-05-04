@@ -13,10 +13,12 @@ import {
 } from "@react-navigation/bottom-tabs";
 import { CurvedBottomBarExpo } from "react-native-curved-bottom-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Profile from "../Profile";
-import Home from "../HomePage";
-import PersonalExpensEntry from "../PersonalExpensesEntry";
-import PersonalExpensesEntry from "../PersonalExpensesEntry";
+import Profile from "../Pages/Profile";
+import Home from "../Pages/HomePage";
+import PersonalExpensEntry from "../Pages/PersonalExpensesEntry";
+import PersonalExpensesEntry from "../Pages/PersonalExpensesEntry";
+import Groups from "../Pages/Groups";
+import Stats from "../Pages/Stats";
 
 const BottomBar = createBottomTabNavigator();
 
@@ -28,18 +30,17 @@ const renderTabBar = ({ routeName, selectedTab, navigate }) => {
   const renderIcon = (routeName, selectedTab) => {
     let icon = "";
 
-    switch (routeName) {
-      case "title1":
-        icon = "ios-home-outline";
-        break;
-      case "title2":
-        icon = "settings-outline";
-        break;
-    }
-
     return (
       <Ionicons
-        name={routeName == "title1" ? "home-outline" : "person-outline"}
+        name={
+          routeName == "homepage"
+            ? "home-outline"
+            : routeName == "profile"
+            ? "person-outline"
+            : routeName == "groups"
+            ? "grid-outline"
+            : "bar-chart"
+        }
         size={25}
         color={routeName === selectedTab ? "rgb(222, 110, 235)" : "gray"}
       />
@@ -62,7 +63,7 @@ export const TabBar: React.FC<Props> = ({ barColor }) => (
     height={75}
     circleWidth={60}
     bgColor="white"
-    initialRouteName="title1"
+    initialRouteName="homepage"
     screenOptions={{ headerShown: false }}
     borderTopLeftRight
     renderCircle={({ selectedTab, navigate }) => (
@@ -80,13 +81,23 @@ export const TabBar: React.FC<Props> = ({ barColor }) => (
     tabBar={renderTabBar}
   >
     <CurvedBottomBarExpo.Screen
-      name="title1"
+      name="homepage"
       position="LEFT"
       component={Home}
     />
+    <CurvedBottomBarExpo.Screen
+      name="groups"
+      position="LEFT"
+      component={Groups}
+    />
+    <CurvedBottomBarExpo.Screen
+      name="stats"
+      position="RIGHT"
+      component={Stats}
+    />
 
     <CurvedBottomBarExpo.Screen
-      name="title2"
+      name="profile"
       component={Profile}
       position="RIGHT"
     />

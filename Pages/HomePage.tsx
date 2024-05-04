@@ -5,7 +5,10 @@ import React, {
   useState,
   useEffect,
 } from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
 import {
+  ActivityIndicator,
   Image,
   Dimensions,
   FlatList,
@@ -16,17 +19,23 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
+  ImageBackground,
 } from "react-native";
-import { FIREBASE_AUTH, FIRESTORE_DB } from "./FirebaseConfig";
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { getDoc, doc } from "firebase/firestore";
 import SelectDropdown from "react-native-select-dropdown";
+import * as SecureStore from "expo-secure-store";
+
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { LineChart, Grid } from "react-native-svg-charts";
-import { Shadow, Gradient } from "./ChartAdds";
+import { Shadow, Gradient } from "../ChartAdds";
 import * as shape from "d3-shape";
 import { Button } from "react-native-paper";
-import { TabBar } from "./TabBar/TabBar";
-import { MaxSpacer } from "./Spacers";
+import { TabBar } from "../TabBar/TabBar";
+import { MaxSpacer, MidSpacer } from "../Utils/Spacers";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackNavigatorParamsList } from "../App";
 
 export default function Home() {
   const [count, setCount] = useState(0);
@@ -39,23 +48,32 @@ export default function Home() {
   const [lastSixMonthArray, setLastSixMonthArray] = useState([]);
   const [lastMonthArray, setLastMonthArray] = useState([]);
   const [lastWeekArray, setLastWeekArray] = useState([]);
-
+  const [loading, setLoadingStatus] = useState(true);
   const [recentList, setRecentList] = useState([]);
   const data2 = [80, 10, 95, 48, 24, 67, 51, 12, 33, 0, 24, 20, 50];
-
+  const items = {
+    date: null,
+    imageUrl: "",
+    timeStamp: null,
+    note: "",
+    total: 0,
+  };
   const selectionData = [
     { title: "Last Week" },
     { title: "Last Month" },
     { title: "Last 6 Months" },
   ];
-
+  const navigation =
+    useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
   const getTotalExpenses = async () => {
     setTotal(0);
     let uid = FIREBASE_AUTH.currentUser.uid;
     const docRef = doc(FIRESTORE_DB, "personal", uid);
     const userData = await getDoc(docRef);
 
-    setArray(userData.data()!.expenses || []);
+    setArray(userData.data()?.expenses ?? []);
+    setLoadingStatus(false);
+    console.log(expensesArray);
   };
 
   const calculateTotal = () => {
@@ -120,7 +138,7 @@ export default function Home() {
       }, 0);
     });
 
-    setLastMonthArray(partTotals);
+    setLastMonthArray(partTotals.reverse());
   };
 
   const calculateSixMonthData = (expensesArray) => {
@@ -139,31 +157,20 @@ export default function Home() {
       }, 0);
     });
 
-    setLastSixMonthArray(monthlyTotals);
+    setLastSixMonthArray(monthlyTotals.reverse());
   };
 
-  const generateRecentList = (expensesArray) => {
+  const generateRecentList = async () => {
     setRecentList([]);
 
-    if (expensesArray.length < 2) {
-      setRecentCount(1);
-    }
-    if (expensesArray.length < 3) {
-      setRecentCount(2);
-    }
-    if (expensesArray.length < 4) {
-      setRecentCount(3);
-    }
-    if (expensesArray.length < 5) {
-      setRecentCount(4);
-    }
+    let lenght = expensesArray.length < 5 ? expensesArray.length : 4;
 
-    for (let index = 0; index < recentCount; index++) {
+    for (let index = 0; index < lenght; index++) {
       const element = expensesArray[index];
       setRecentList((recentList) => [...recentList, element]);
     }
   };
-  // useEffect to call calculateTotal whenever selection or expensesArray changes
+
   useEffect(() => {
     calculateTotal();
   }, [selection, expensesArray]);
@@ -179,8 +186,9 @@ export default function Home() {
   }, [expensesArray]);
 
   useEffect(() => {
-    generateRecentList(expensesArray);
+    generateRecentList();
   }, [expensesArray]);
+
   useLayoutEffect(() => {
     if (count == 0) {
       getTotalExpenses();
@@ -215,47 +223,47 @@ export default function Home() {
             {imageSource == 1 ? (
               <Image
                 style={styles.recentTransactionsImage}
-                source={require("./assets/bill.png")}
+                source={require("../assets/bill.png")}
               />
             ) : imageSource == 2 ? (
               <Image
                 style={styles.recentTransactionsImage}
-                source={require("./assets/food.png")}
+                source={require("../assets/food.png")}
               />
             ) : imageSource == 3 ? (
               <Image
                 style={styles.recentTransactionsImage}
-                source={require("./assets/healthcare.png")}
+                source={require("../assets/healthcare.png")}
               />
             ) : imageSource == 4 ? (
               <Image
                 style={styles.recentTransactionsImage}
-                source={require("./assets/entertainment.png")}
+                source={require("../assets/entertainment.png")}
               />
             ) : imageSource == 5 ? (
               <Image
                 style={styles.recentTransactionsImage}
-                source={require("./assets/shop.png")}
+                source={require("../assets/shop.png")}
               />
             ) : imageSource == 6 ? (
               <Image
                 style={styles.recentTransactionsImage}
-                source={require("./assets/book.png")}
+                source={require("../assets/book.png")}
               />
             ) : imageSource == 7 ? (
               <Image
                 style={styles.recentTransactionsImage}
-                source={require("./assets/transportation.png")}
+                source={require("../assets/transportation.png")}
               />
             ) : imageSource == 8 ? (
               <Image
                 style={styles.recentTransactionsImage}
-                source={require("./assets/personalcare.png")}
+                source={require("../assets/personalcare.png")}
               />
             ) : (
               <Image
                 style={styles.recentTransactionsImage}
-                source={require("./assets/miscellaneous.png")}
+                source={require("../assets/miscellaneous.png")}
               />
             )}
           </View>
@@ -306,119 +314,173 @@ export default function Home() {
   };
   const handleCardPress = () => {};
   const [maxWidth, setMaxWidth] = useState(Dimensions.get("window").width);
-  return (
-    <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "flex-start",
-          alignItems: "center",
-          paddingTop: 100,
-        }}
-      >
-        <SelectDropdown
-          defaultValueByIndex={1}
-          data={selectionData}
-          onSelect={(selectedItem, index) => {
-            setSelection(index);
-
-            calculateTotal();
-          }}
-          renderButton={(selectedItem, isOpened) => {
-            return (
-              <View style={styles.dropdownButtonStyle}>
-                <Text style={styles.dropdownButtonTxtStyle}>
-                  {selectedItem && selectedItem.title}
-                </Text>
-                <Icon
-                  name={isOpened ? "chevron-up" : "chevron-down"}
-                  style={styles.dropdownButtonArrowStyle}
-                />
-              </View>
-            );
-          }}
-          renderItem={(item, index, isSelected) => {
-            return (
-              <View
-                style={{
-                  ...styles.dropdownItemStyle,
-                  ...(isSelected && { backgroundColor: "#f2f2f2" }),
-                }}
-              >
-                <Text style={styles.dropdownItemTxtStyle}>{item.title}</Text>
-              </View>
-            );
-          }}
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
+      </View>
+    );
+  } else {
+    if (expensesArray.length > 0) {
+      return (
+        <ScrollView
           showsVerticalScrollIndicator={false}
-          dropdownStyle={styles.dropdownMenuStyle}
-        />
-
-        <View style={styles.totalExpensesContainer}>
-          <Text style={{ fontSize: 18 }}>Total Expenses</Text>
-          <Text style={{ fontSize: 55 }}>{total}₺</Text>
-        </View>
-
-        <LineChart
-          style={{ height: 200, width: Dimensions.get("window").width + 20 }}
-          gridMin={20}
-          gridMax={400}
-          data={
-            selection == 0
-              ? lastWeekArray
-              : selection == 1
-              ? lastMonthArray
-              : lastSixMonthArray
-          }
-          curve={shape.curveBundle.beta(1)}
-          svg={{
-            strokeWidth: 7,
-            stroke: "url(#gradient)",
-          }}
-          contentInset={{ top: 20, bottom: 20 }}
+          style={styles.scrollView}
         >
-          <Shadow />
-          <Gradient />
-        </LineChart>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "flex-start",
+              alignItems: "center",
+              paddingTop: 100,
+            }}
+          >
+            <SelectDropdown
+              defaultValueByIndex={1}
+              data={selectionData}
+              onSelect={(selectedItem, index) => {
+                setSelection(index);
 
-        {expensesArray.length > 0 ? (
-          <View>
-            <View style={styles.recentTransactionsHeader}>
-              <Text style={{ fontSize: 18, flex: 1 }}>Last Transactions</Text>
-              <Button
-                onPress={() => {}}
-                style={{ backgroundColor: "rgb(222, 110, 235)" }}
-              >
-                <Text style={{ fontSize: 16, color: "white" }}>See All</Text>
-              </Button>
-            </View>
-            <View style={styles.recentTransactionsBody}>
-              <FlatList
-                scrollEnabled={false}
-                style={{ width: "100%" }}
-                data={recentList}
-                renderItem={({ item }) => (
-                  <View>
-                    <View style={{ height: 12 }}></View>
-                    <CardView
-                      imageSource={item.type}
-                      title={item.note}
-                      description={item.note}
-                      onPress={handleCardPress}
-                      price={item.total}
-                      date={item.date}
+                calculateTotal();
+              }}
+              renderButton={(selectedItem, isOpened) => {
+                return (
+                  <View style={styles.dropdownButtonStyle}>
+                    <Text style={styles.dropdownButtonTxtStyle}>
+                      {selectedItem && selectedItem.title}
+                    </Text>
+                    <Icon
+                      name={isOpened ? "chevron-up" : "chevron-down"}
+                      style={styles.dropdownButtonArrowStyle}
                     />
                   </View>
-                )}
-              />
+                );
+              }}
+              renderItem={(item, index, isSelected) => {
+                return (
+                  <View
+                    style={{
+                      ...styles.dropdownItemStyle,
+                      ...(isSelected && { backgroundColor: "#f2f2f2" }),
+                    }}
+                  >
+                    <Text style={styles.dropdownItemTxtStyle}>
+                      {item.title}
+                    </Text>
+                  </View>
+                );
+              }}
+              showsVerticalScrollIndicator={false}
+              dropdownStyle={styles.dropdownMenuStyle}
+            />
+
+            <View style={styles.totalExpensesContainer}>
+              <Text style={{ fontSize: 18 }}>Total Expenses</Text>
+              <Text style={{ fontSize: 55 }}>{total}₺</Text>
+            </View>
+
+            <LineChart
+              style={{
+                height: 200,
+                width: Dimensions.get("window").width + 20,
+              }}
+              gridMin={20}
+              gridMax={400}
+              data={
+                selection == 0
+                  ? lastWeekArray
+                  : selection == 1
+                  ? lastMonthArray
+                  : lastSixMonthArray
+              }
+              curve={shape.curveBundle.beta(1)}
+              svg={{
+                strokeWidth: 7,
+                stroke: "url(#gradient)",
+              }}
+              contentInset={{ top: 20, bottom: 20 }}
+            >
+              <Shadow />
+              <Gradient />
+            </LineChart>
+
+            <View>
+              <View style={styles.recentTransactionsHeader}>
+                <Text style={{ fontSize: 18, flex: 1 }}>Last Transactions</Text>
+                <Button
+                  onPress={() => {}}
+                  style={{ backgroundColor: "rgb(222, 110, 235)" }}
+                >
+                  <Text style={{ fontSize: 16, color: "white" }}>See All</Text>
+                </Button>
+              </View>
+              <View style={styles.recentTransactionsBody}>
+                <FlatList
+                  scrollEnabled={false}
+                  style={{ width: "100%" }}
+                  data={recentList}
+                  renderItem={({ item }) => (
+                    <View>
+                      <View style={{ height: 12 }}></View>
+                      <CardView
+                        imageSource={item.type}
+                        title={item.note}
+                        description={item.note}
+                        onPress={() => {
+                          navigation.navigate("ExpenseEntry", item);
+                        }}
+                        price={item.total}
+                        date={item.date}
+                      />
+                    </View>
+                  )}
+                />
+              </View>
             </View>
           </View>
-        ) : (
-          <View></View>
-        )}
-      </View>
-      <View style={{ height: 100 }}></View>
-    </ScrollView>
-  );
+          <View style={{ height: 100 }}></View>
+        </ScrollView>
+      );
+    } else {
+      return (
+        <ScrollView>
+          <SafeAreaView>
+            <MidSpacer></MidSpacer>
+            <View style={{ flexDirection: "row", paddingHorizontal: 20 }}>
+              <Text style={{ fontSize: 25, fontWeight: "500" }}>Welcome</Text>
+              <Text style={{ fontSize: 25, fontWeight: "300" }}>
+                {" "}
+                {FIREBASE_AUTH.currentUser.displayName}
+              </Text>
+            </View>
+            <MaxSpacer></MaxSpacer>
+            <View>
+              <ImageBackground
+                blurRadius={6}
+                source={require("../assets/bg-chart.png")}
+                style={{
+                  height: 200,
+                  width: Dimensions.get("window").width,
+                }}
+              ></ImageBackground>
+              <Text
+                style={{
+                  fontSize: 25,
+                  height: 200,
+                  flex: 1,
+                  alignContent: "center",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}
+              >
+                Your spending history is clear
+              </Text>
+            </View>
+          </SafeAreaView>
+        </ScrollView>
+      );
+    }
+  }
 }
 const styles = StyleSheet.create({
   card: {

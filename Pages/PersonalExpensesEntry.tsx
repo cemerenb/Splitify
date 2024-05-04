@@ -15,16 +15,16 @@ import {
   Keyboard,
   Modal,
   Platform,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import * as permissions from "react-native-permissions";
 import { request, PERMISSIONS } from "react-native-permissions";
 
-import { FIREBASE_AUTH, FIRESTORE_DB } from "./FirebaseConfig";
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackNavigatorParamsList } from "./App";
-import * as SecureStore from "expo-secure-store";
+import { RootStackNavigatorParamsList } from "../App";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 
 import {
@@ -37,9 +37,9 @@ import {
 } from "firebase/firestore";
 import { Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TabBar } from "./TabBar/TabBar";
+import { TabBar } from "../TabBar/TabBar";
 import SelectDropdown from "react-native-select-dropdown";
-import { MidSpacer } from "./Spacers";
+import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
 import { TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
@@ -75,9 +75,7 @@ export default function PersonalExpensEntry() {
       quality: 1,
     });
 
-    console.log(result);
     setResultCode(result.assets[0].fileSize > 0);
-    console.log(result.assets[0].fileSize > 0);
     setModalVisible(false);
 
     if (!result.canceled) {
@@ -86,8 +84,6 @@ export default function PersonalExpensEntry() {
   };
   useEffect(() => {
     const status = ImagePicker.requestCameraPermissionsAsync();
-    console.log(status);
-    console.log("deneme");
   });
   const selectionData = [
     { title: "Utilities" },
@@ -101,46 +97,37 @@ export default function PersonalExpensEntry() {
     { title: "Miscellaneous" },
   ];
   const handleAddExpense = async () => {
-    try {
-      let uid = FIREBASE_AUTH.currentUser.uid;
-      const docRef = doc(FIRESTORE_DB, "personal", uid);
-      console.log("1");
+    if (parseInt(totalPrice) > 0) {
+      try {
+        let uid = FIREBASE_AUTH.currentUser.uid;
+        const docRef = doc(FIRESTORE_DB, "personal", uid);
 
-      const userData = await getDoc(docRef);
-      console.log("2");
+        const userData = await getDoc(docRef);
 
-      let expensesArray = userData.data()!.expenses || [];
-      console.log(expensesArray);
+        let expensesArray = userData.data()!.expenses || [];
 
-      const newExpense = {
-        imageUrl: imageUri,
-        date: new Date().toISOString(),
-        timeStamp: Date.now(),
-        total: parseFloat(totalPrice),
-        note: note,
-      };
-      expensesArray.push(newExpense);
-      setDoc(docRef, { expenses: expensesArray });
-      navigation.replace("TabBar");
-    } catch (error) {
-      console.error("Error creating document: ", error);
-      console.log("Failed to create document. Please try again.");
+        const newExpense = {
+          imageUrl: imageUri,
+          type: selection + 1,
+          date: new Date().toISOString(),
+          timeStamp: Date.now(),
+          total: parseInt(totalPrice),
+          note: note,
+        };
+        expensesArray.push(newExpense);
+        setDoc(docRef, { expenses: expensesArray });
+        navigation.replace("TabBar");
+      } catch (error) {
+        console.error("Error creating document: ", error);
+        console.log("Failed to create document. Please try again.");
+      }
+    } else {
+      Alert.alert("You must enter the spending amount");
     }
   };
 
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
-
-  const signOut = async () => {
-    try {
-      await SecureStore.deleteItemAsync("email");
-      await SecureStore.deleteItemAsync("password");
-      await FIREBASE_AUTH.signOut();
-      navigation.replace("Login");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
 
   return (
     <SafeAreaView
@@ -196,7 +183,7 @@ export default function PersonalExpensEntry() {
           placeholder="Note"
           value={note}
           onChangeText={setNote}
-          keyboardType="email-address"
+          keyboardType="default"
         />
 
         <SelectDropdown
@@ -204,7 +191,6 @@ export default function PersonalExpensEntry() {
           data={selectionData}
           onSelect={(selectedItem, index) => {
             setSelection(index);
-            console.log(selection);
           }}
           renderButton={(selectedItem, isOpened) => {
             return (
@@ -242,7 +228,6 @@ export default function PersonalExpensEntry() {
               onPress={() => {
                 setImage(null);
                 setResultCode(false);
-                console.log("cem");
               }}
               style={styles.removeIcon}
             >
@@ -268,12 +253,21 @@ export default function PersonalExpensEntry() {
             </View>
           </TouchableOpacity>
         )}
+        {imageUri ? (
+          <View>
+            <MaxSpacer></MaxSpacer>
+            <MidSpacer></MidSpacer>
+            <MidSpacer></MidSpacer>
+          </View>
+        ) : (
+          <View></View>
+        )}
+        <MinSpacer></MinSpacer>
         <TouchableOpacity onPress={() => handleAddExpense()}>
           <View
             style={{
               height: 65,
-              top: Dimensions.get("window").height * 0.18,
-
+              marginTop: 50,
               borderWidth: StyleSheet.hairlineWidth,
               borderRadius: 10,
               alignSelf: "center",
@@ -299,14 +293,12 @@ export default function PersonalExpensEntry() {
               <TouchableOpacity
                 style={styles.modalCard}
                 onPress={() => {
-                  console.log("pressed");
-
                   pickImage();
                 }}
               >
                 <View style={styles.modalCard}>
                   <Image
-                    source={require("./assets/gallery.png")}
+                    source={require("../assets/gallery.png")}
                     style={styles.cameraIcon}
                   ></Image>
                   <Text style={styles.modalOption}>Gallery</Text>
@@ -316,20 +308,18 @@ export default function PersonalExpensEntry() {
                 <TouchableOpacity
                   style={styles.modalCard}
                   onPress={() => {
-                    console.log("pressed");
-
                     pickCameraImage();
                   }}
                 >
                   <Image
-                    source={require("./assets/camera.png")}
+                    source={require("../assets/camera.png")}
                     style={styles.cameraIcon}
                   ></Image>
                   <Text style={styles.modalOption}>Camera</Text>
                 </TouchableOpacity>
               </View>
             </View>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
               <View
                 style={{
                   borderRadius: 3,
@@ -476,12 +466,13 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     paddingHorizontal: 12,
+    marginBottom: 10,
   },
   priceArea: {
     paddingHorizontal: 20,
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.3,
-    top: Dimensions.get("window").height * 0.1,
+    height: Dimensions.get("window").height * 0.2,
+    top: Dimensions.get("window").height * 0.05,
 
     justifyContent: "center",
     flexDirection: "column",
@@ -490,7 +481,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopRightRadius: 40,
     borderTopLeftRadius: 40,
-    height: Dimensions.get("window").height * 0.7,
+    height: Dimensions.get("window").height * 0.8,
     width: "100%",
     backgroundColor: "white",
   },

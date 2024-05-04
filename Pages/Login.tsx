@@ -6,17 +6,21 @@ import {
   TouchableOpacity,
   TextInput,
   Button,
+  Image,
+  Dimensions,
 } from "react-native";
 import { useLayoutEffect, useState } from "react";
-import { MinSpacer } from "./Spacers";
+import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import Modal from "react-native-modal";
-import { FIREBASE_APP, FIREBASE_AUTH } from "./FirebaseConfig";
+import { FIREBASE_APP, FIREBASE_AUTH } from "../FirebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackNavigatorParamsList } from "./App";
+import { RootStackNavigatorParamsList } from "../App";
 import * as SecureStore from "expo-secure-store";
+import React from "react";
+import Svg from "react-native-svg";
 
 export default function Login() {
   const [password, setPassword] = useState("");
@@ -42,7 +46,7 @@ export default function Login() {
         password
       );
       if (response) {
-        if (FIREBASE_AUTH.currentUser!.emailVerified) {
+        if (!FIREBASE_AUTH.currentUser.emailVerified) {
           setIsVerificateModalVisible(true);
         }
         if (FIREBASE_AUTH.currentUser!.emailVerified) {
@@ -97,21 +101,40 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Welcome</Text>
+      <MaxSpacer></MaxSpacer>
+      <Image
+        style={{
+          width: "70%",
+          height: "12%",
+          resizeMode: "stretch",
+        }}
+        source={require("../assets/logo-center.png")}
+      />
+      <MinSpacer></MinSpacer>
       <View style={styles.loginarea}>
         <View style={styles.inputStyle}>
           <TextInput
             style={styles.inputText}
+            keyboardType="email-address"
             placeholder="Email"
             onChangeText={setEmail}
             inputMode="email"
             autoComplete="email"
+            autoCapitalize="none"
             value={email}
+            returnKeyType="next"
+            onSubmitEditing={() => {
+              this.secondTextInput.focus();
+            }}
           />
         </View>
         <MinSpacer />
         <View style={styles.inputStyle}>
           <TextInput
+            ref={(input) => {
+              this.secondTextInput = input;
+            }}
+            returnKeyType="done"
             style={styles.inputText}
             secureTextEntry={!showPassword}
             value={password}
@@ -119,7 +142,7 @@ export default function Login() {
             placeholder="Password"
           />
           <MaterialCommunityIcons
-            name={showPassword ? "eye-off" : "eye"}
+            name={!showPassword ? "eye-off" : "eye"}
             size={24}
             color="#aaa"
             style={styles.icon}
@@ -130,15 +153,16 @@ export default function Login() {
           <Text onPress={() => {}}>Forgot Password</Text>
         </View>
       </View>
+      <MinSpacer></MinSpacer>
       <View style={styles.button}>
         <TouchableOpacity onPress={signIn} style={styles.button}>
-          <Text style={{ fontSize: 22, color: "white" }}>Login</Text>
+          <Text style={{ fontSize: 20, color: "white" }}>Login</Text>
         </TouchableOpacity>
       </View>
       <Text></Text>
       <Text style={styles.signUp}>
         Don't have an account?{" "}
-        <Text onPress={onHandlePress} style={{ color: "purple" }}>
+        <Text onPress={onHandlePress} style={{ color: "rgb(180,24,113)" }}>
           Sign Up
         </Text>
       </Text>
@@ -211,6 +235,7 @@ const styles = StyleSheet.create({
   inputText: {
     flex: 1,
     color: "#333",
+    height: 55,
     paddingVertical: 10,
     paddingRight: 10,
     fontSize: 18,
@@ -229,10 +254,10 @@ const styles = StyleSheet.create({
   button: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f59e5f",
+    backgroundColor: "rgb(180,24,113)",
     width: "80%",
-    height: 50,
-    borderRadius: 20,
+    height: 55,
+    borderRadius: 10,
   },
   signUp: {
     fontSize: 16,
