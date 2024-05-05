@@ -16,6 +16,7 @@ import {
   Modal,
   Platform,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import * as permissions from "react-native-permissions";
@@ -46,6 +47,7 @@ import * as ImagePicker from "expo-image-picker";
 export default function PersonalExpensEntry() {
   const [totalPrice, setTotalPrice] = useState("");
   const [selection, setSelection] = useState(1);
+  const [loading, setLoadingStatus] = useState(false);
   const [resultCode, setResultCode] = useState(false);
   const [note, setNote] = useState("");
   const [categoriesVisibility, changeCategoriesVisibility] = useState(false);
@@ -263,7 +265,13 @@ export default function PersonalExpensEntry() {
           <View></View>
         )}
         <MinSpacer></MinSpacer>
-        <TouchableOpacity onPress={() => handleAddExpense()}>
+        <TouchableOpacity
+          onPress={async () => {
+            setLoadingStatus(true);
+            await handleAddExpense();
+            setLoadingStatus(false);
+          }}
+        >
           <View
             style={{
               height: 65,
@@ -277,7 +285,13 @@ export default function PersonalExpensEntry() {
               backgroundColor: "rgb(253,60,74)",
             }}
           >
-            <Text style={{ color: "white", fontSize: 20 }}>Add Expense</Text>
+            {loading ? (
+              <View style={{ flex: 1, justifyContent: "center" }}>
+                <ActivityIndicator size="large" color="white" />
+              </View>
+            ) : (
+              <Text style={{ color: "white", fontSize: 20 }}>Add Expense</Text>
+            )}
           </View>
         </TouchableOpacity>
       </View>

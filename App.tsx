@@ -8,6 +8,7 @@ import PersonalExpensEntry from "./Pages/PersonalExpensesEntry";
 import ExpenseEntry from "./Pages/ExpensDetails";
 import Groups from "./Pages/Groups";
 import CreateGroup from "./Pages/CreateGroup";
+import ResetPassword from "./Pages/ResetPassword";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
@@ -17,6 +18,7 @@ export type RootStackNavigatorParamsList = {
   AddExpense: undefined;
   ExpenseEntry: undefined;
   CreateGroup: undefined;
+  ResetPassword: undefined;
 };
 
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
@@ -34,6 +36,15 @@ const App: React.FC = () => {
           name="Register"
           component={Register}
           options={{ gestureEnabled: false, headerShown: false }}
+        />
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPassword}
+          options={{
+            gestureEnabled: false,
+            headerShown: true,
+            headerTitle: "",
+          }}
         />
         <Stack.Screen
           name="ExpenseEntry"

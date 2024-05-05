@@ -12,7 +12,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { TouchableHighlight } from "react-native-gesture-handler";
+import { FlatList, TouchableHighlight } from "react-native-gesture-handler";
 import { MidSpacer } from "../Utils/Spacers";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -31,11 +31,8 @@ export default function Groups() {
     let uid = FIREBASE_AUTH.currentUser.uid;
     const docRef = doc(FIRESTORE_DB, "personal", uid);
     const userData = await getDoc(docRef);
-    console.log(userData.data().groups);
-
-    setGroups((groups) => [...groups, userData.data().groups]);
+    setGroups(userData.data().groups);
     setLoadingStatus(false);
-    console.log(groups);
   };
 
   useEffect(() => {
@@ -105,8 +102,14 @@ export default function Groups() {
             paddingHorizontal: 20,
           }}
         >
-          <Text>{groups}</Text>
-          <Text>You don't have any groups</Text>
+          {groups.length > 0 ? (
+            <View>
+              <Text>{groups[0]}</Text>
+              <Text>{groups[1]}</Text>
+            </View>
+          ) : (
+            <Text>You don't have any groups</Text>
+          )}
         </View>
       </SafeAreaView>
     );

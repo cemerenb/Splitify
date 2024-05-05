@@ -150,7 +150,13 @@ export default function Login() {
           />
         </View>
         <View style={styles.forgotPassword}>
-          <Text onPress={() => {}}>Forgot Password</Text>
+          <Text
+            onPress={() => {
+              navigation.navigate("ResetPassword");
+            }}
+          >
+            Forgot Password
+          </Text>
         </View>
       </View>
       <MinSpacer></MinSpacer>
