@@ -8,6 +8,7 @@ import {
   Button,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { useLayoutEffect, useState } from "react";
 import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
@@ -162,7 +163,13 @@ export default function Login() {
       <MinSpacer></MinSpacer>
       <View style={styles.button}>
         <TouchableOpacity onPress={signIn} style={styles.button}>
-          <Text style={{ fontSize: 20, color: "white" }}>Login</Text>
+          {loading ? (
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
+            </View>
+          ) : (
+            <Text style={{ fontSize: 20, color: "white" }}>Login</Text>
+          )}
         </TouchableOpacity>
       </View>
       <Text></Text>

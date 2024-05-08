@@ -19,14 +19,16 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import * as permissions from "react-native-permissions";
-import { request, PERMISSIONS } from "react-native-permissions";
+import { PERMISSIONS, check } from "react-native-permissions";
+import ImageResizer from "@bam.tech/react-native-image-resizer";
 
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import { DATABASE } from "../FirebaseConfig"; // Make sure to define this in your FirebaseConfig
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import {
   getDoc,
@@ -54,12 +56,34 @@ export default function PersonalExpensEntry() {
   const [imageUri, setImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const uploadImageToFirebase = async (imageUri) => {
+    console.log("girdi");
+
+    const storage = getStorage();
+    const storageRef = ref(
+      storage,
+      `expenseImages/${FIREBASE_AUTH.currentUser.uid}-${Date.now()}.jpg`
+    ); // Unique file name
+
+    // Fetch the image data as a Blob
+    const response = await fetch(imageUri);
+    const blob = await response.blob();
+
+    // Upload the Blob to Firebase Storage
+    await uploadBytes(storageRef, blob);
+
+    // Get the download URL for the uploaded file
+    const downloadUrl = await getDownloadURL(storageRef);
+
+    return downloadUrl;
+  };
+
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 1,
+      quality: 0.05,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -74,7 +98,7 @@ export default function PersonalExpensEntry() {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 1,
+      quality: 0.05,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -101,27 +125,38 @@ export default function PersonalExpensEntry() {
   const handleAddExpense = async () => {
     if (parseInt(totalPrice) > 0) {
       try {
+        setLoadingStatus(true);
+
         let uid = FIREBASE_AUTH.currentUser.uid;
         const docRef = doc(FIRESTORE_DB, "personal", uid);
 
-        const userData = await getDoc(docRef);
+        let imageUrl = null;
 
-        let expensesArray = userData.data()!.expenses || [];
+        if (imageUri) {
+          // Resize the image to control the file size
+          // Upload the resized image and get the URL
+          imageUrl = await uploadImageToFirebase(imageUri);
+        }
 
         const newExpense = {
-          imageUrl: imageUri,
+          imageUrl: imageUrl,
           type: selection + 1,
           date: new Date().toISOString(),
           timeStamp: Date.now(),
           total: parseInt(totalPrice),
           note: note,
         };
-        expensesArray.push(newExpense);
-        setDoc(docRef, { expenses: expensesArray });
+
+        await updateDoc(docRef, {
+          expenses: arrayUnion(newExpense),
+        });
+
         navigation.replace("TabBar");
       } catch (error) {
         console.error("Error creating document: ", error);
-        console.log("Failed to create document. Please try again.");
+        Alert.alert("Failed to create document. Please try again.");
+      } finally {
+        setLoadingStatus(false);
       }
     } else {
       Alert.alert("You must enter the spending amount");

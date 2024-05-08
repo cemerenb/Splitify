@@ -27,7 +27,7 @@ import { RootStackNavigatorParamsList } from "../App";
 
 export default function CreateGroup() {
   const [groupName, setGroupName] = useState("");
-  const [selection, setSelection] = useState(1);
+  const [selection, setSelection] = useState(0);
   const [loading, setLoadingStatus] = useState(false);
   const [groups, setGroups] = useState([]);
 
@@ -64,6 +64,8 @@ export default function CreateGroup() {
     console.log(groups);
   };
   const createDocument = async (uid) => {
+    console.log(selection);
+
     let id = generateRandomString();
     const personalDocRef = doc(FIRESTORE_DB, "personal", uid);
     try {
@@ -72,8 +74,11 @@ export default function CreateGroup() {
         name: groupName,
         creationDate: new Date().toISOString(),
         timeStamp: Date.now(),
-        members: [{ uid: uid, role: 1 }],
+        members: [uid],
+        admins: [uid],
+        ownerUid: uid,
         expenses: [{}],
+        type: selection,
       };
       await setDoc(docRef, data);
 
@@ -186,7 +191,7 @@ export default function CreateGroup() {
           >
             {loading ? (
               <View style={{ flex: 1, justifyContent: "center" }}>
-                <ActivityIndicator size="large" color="white" />
+                <ActivityIndicator size="small" color="white" />
               </View>
             ) : (
               <Text style={{ color: "white", fontSize: 20 }}>Create Group</Text>

@@ -393,7 +393,7 @@ export default function Home() {
                   ? lastMonthArray
                   : lastSixMonthArray
               }
-              curve={shape.curveBundle.beta(1)}
+              curve={shape.curveBasis}
               svg={{
                 strokeWidth: 7,
                 stroke: "url(#gradient)",

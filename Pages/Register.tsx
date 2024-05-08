@@ -107,10 +107,17 @@ export default function Register() {
   const createDocument = async (uid: string) => {
     try {
       const docRef = doc(FIRESTORE_DB, "personal", uid);
+      const nameDocRef = doc(FIRESTORE_DB, "users", uid);
+
       const data = {
         expenses: [],
+        groups: [],
+      };
+      const nameData = {
+        name: fullName,
       };
       await setDoc(docRef, data);
+      await setDoc(nameDocRef, nameData);
       console.log("Document created successfully!");
     } catch (error) {
       console.error("Error creating document: ", error);

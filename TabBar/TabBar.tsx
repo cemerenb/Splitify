@@ -2,6 +2,7 @@ import React from "react";
 import {
   Alert,
   Animated,
+  Dimensions,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -19,6 +20,7 @@ import PersonalExpensEntry from "../Pages/PersonalExpensesEntry";
 import PersonalExpensesEntry from "../Pages/PersonalExpensesEntry";
 import Groups from "../Pages/Groups";
 import Stats from "../Pages/Stats";
+import { LinearGradient } from "expo-linear-gradient";
 
 const BottomBar = createBottomTabNavigator();
 
@@ -68,14 +70,26 @@ export const TabBar: React.FC<Props> = ({}) => (
     borderTopLeftRight
     renderCircle={({ selectedTab, navigate }) => (
       <Animated.View style={styles.btnCircleUp}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            navigate("AddExpense");
+        <LinearGradient
+          colors={["rgba(130, 67, 255, 1)", "rgba(221, 50, 52, 1)"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 200,
+            alignItems: "center",
           }}
         >
-          <Ionicons name={"add-sharp"} color={"white"} size={35} />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              navigate("AddExpense");
+            }}
+          >
+            <Ionicons name={"add-sharp"} color={"white"} size={35} />
+          </TouchableOpacity>
+        </LinearGradient>
       </Animated.View>
     )}
     tabBar={renderTabBar}
