@@ -3,6 +3,7 @@ package cemerenb.splitify.com
 import android.app.Application
 import android.content.res.Configuration
 import androidx.annotation.NonNull
+import com.RNFetchBlob.RNFetchBlobPackage;                                                                                 
 
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication

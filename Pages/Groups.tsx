@@ -97,7 +97,11 @@ const Groups = () => {
   }) => {
     return (
       <View style={{ borderRadius: 20 }}>
-        <TouchableOpacity onPress={onPress} style={styles.card}>
+        <TouchableOpacity
+          onPress={onPress}
+          style={styles.card}
+          activeOpacity={0.7}
+        >
           <LinearGradient
             colors={["rgba(130, 67, 255, 1)", "rgba(221, 50, 52, 1)"]}
             start={{ x: 0, y: 0 }}

@@ -48,7 +48,7 @@ import * as ImagePicker from "expo-image-picker";
 
 export default function PersonalExpensEntry() {
   const [totalPrice, setTotalPrice] = useState("");
-  const [selection, setSelection] = useState(1);
+  const [selection, setSelection] = useState(0);
   const [loading, setLoadingStatus] = useState(false);
   const [resultCode, setResultCode] = useState(false);
   const [note, setNote] = useState("");
@@ -83,7 +83,7 @@ export default function PersonalExpensEntry() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.05,
+      quality: 0.01,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -98,7 +98,7 @@ export default function PersonalExpensEntry() {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.05,
+      quality: 0.01,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -207,21 +207,26 @@ export default function PersonalExpensEntry() {
         <TextInput
           style={{
             fontSize: 18,
-            textAlignVertical: "center",
-            lineHeight: 25,
+            justifyContent: "center",
+
+            lineHeight: 20,
             height: 65,
             width: Dimensions.get("window").width - 40,
             borderRadius: 10,
             borderColor: "gray",
             borderWidth: 1,
-            marginBottom: 20,
-            padding: 10,
+            padding: 15,
           }}
+          maxLength={200}
+          multiline={true}
           placeholder="Note"
           value={note}
           onChangeText={setNote}
           keyboardType="default"
         />
+        <Text style={{ textAlign: "right", marginBottom: 20 }}>
+          {note.length}/200
+        </Text>
 
         <SelectDropdown
           defaultValueByIndex={0}

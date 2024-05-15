@@ -9,6 +9,8 @@ import ExpenseEntry from "./Pages/ExpensDetails";
 import Groups from "./Pages/Groups";
 import CreateGroup from "./Pages/CreateGroup";
 import ResetPassword from "./Pages/ResetPassword";
+import { Platform, PlatformColor, Image, Dimensions } from "react-native";
+import { Rect } from "react-native-svg";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
@@ -50,8 +52,10 @@ const App: React.FC = () => {
           name="ExpenseEntry"
           component={ExpenseEntry}
           options={{
-            gestureEnabled: false,
-            headerShown: true,
+            headerShown: false,
+            headerTransparent: true,
+            headerTintColor: "white",
+            headerTitle: "",
           }}
         />
         <Stack.Screen

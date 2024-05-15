@@ -213,7 +213,7 @@ export default function Home() {
       <TouchableOpacity onPress={onPress} style={styles.card}>
         <View
           style={{
-            flex: 1,
+            flex: 2,
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
@@ -270,7 +270,7 @@ export default function Home() {
         </View>
         <View
           style={{
-            flex: 3,
+            flex: 5,
             flexDirection: "column",
             justifyContent: "flex-start",
             paddingHorizontal: 20,
@@ -295,7 +295,13 @@ export default function Home() {
               ? "Personal Care"
               : "Miscellaneous"}
           </Text>
-          <Text style={styles.cardDescription}>{description}</Text>
+          {description.length > 40 ? (
+            <Text style={styles.cardDescription}>
+              {description.slice(0, 40)}...
+            </Text>
+          ) : (
+            <Text style={styles.cardDescription}>{description}</Text>
+          )}
           <Text style={styles.cardDate}>{day + "/" + month + "/" + year}</Text>
         </View>
         <View
@@ -419,7 +425,7 @@ export default function Home() {
                   scrollEnabled={false}
                   style={{ width: "100%" }}
                   data={recentList}
-                  renderItem={({ item }) => (
+                  renderItem={({ item, index }) => (
                     <View>
                       <View style={{ height: 12 }}></View>
                       <CardView
@@ -512,8 +518,9 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   cardDescription: {
+    marginVertical: 4,
     fontSize: 14,
-    lineHeight: 24,
+    lineHeight: 15,
   },
   cardDate: {
     fontSize: 10,
