@@ -83,7 +83,7 @@ export default function PersonalExpensEntry() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.01,
+      quality: 0.05,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -98,7 +98,7 @@ export default function PersonalExpensEntry() {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.01,
+      quality: 0.05,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -217,7 +217,7 @@ export default function PersonalExpensEntry() {
             borderWidth: 1,
             padding: 15,
           }}
-          maxLength={200}
+          maxLength={300}
           multiline={true}
           placeholder="Note"
           value={note}
@@ -225,7 +225,7 @@ export default function PersonalExpensEntry() {
           keyboardType="default"
         />
         <Text style={{ textAlign: "right", marginBottom: 20 }}>
-          {note.length}/200
+          {note.length}/300
         </Text>
 
         <SelectDropdown

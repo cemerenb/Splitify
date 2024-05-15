@@ -22,6 +22,7 @@ import { MinSpacer } from "../Utils/Spacers";
 import { RootStackNavigatorParamsList } from "../App";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 // Define the MapData interface
 interface MapData {
@@ -120,140 +121,283 @@ const ExpenseEntry: React.FC<ExpenseEntryProps> = ({ route }) => {
   const toggleFullScreenImage = () => {
     setShowFullScreenImage(!showFullScreenImage);
   };
-  if (showFullScreenImage) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.upperContainer}>
-          <>
-            <ImageBackground
-              source={{ uri: cachedImageUrl }}
-              style={styles.image}
-            />
-            <View
-              style={{
-                width: "50%",
-                alignItems: "flex-start",
-                paddingLeft: 20,
-                marginTop: 70,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.goBack();
-                }}
-                activeOpacity={0.7}
+  if (mapData.imageUrl != null) {
+    if (showFullScreenImage) {
+      return (
+        <View style={styles.container}>
+          <View style={styles.upperContainer}>
+            <>
+              <ImageBackground
+                source={{ uri: cachedImageUrl }}
+                style={styles.image}
+              />
+              <View
                 style={{
-                  marginBottom: 60,
-                  marginRight: 20,
-                  alignItems: "flex-end",
-                }}
-              >
-                <View
-                  style={{
-                    height: 40,
-                    paddingHorizontal: 5,
-                    borderRadius: 9,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexDirection: "row",
-                    backgroundColor: "rgba(100,100,100,1)",
-                  }}
-                >
-                  <Ionicons
-                    name="chevron-back"
-                    style={{ fontSize: 30, color: "white" }}
-                  ></Ionicons>
-                  <Text
-                    style={{ paddingRight: 10, fontSize: 16, color: "white" }}
-                  >
-                    Back
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                width: "50%",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                paddingRight: 0,
-                alignItems: "flex-end",
-                marginBottom: -40,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  Alert.alert(
-                    "Delete Expense",
-                    "Are you sure you want to delete the expense?",
-                    [
-                      {
-                        text: "Cancel",
-                        onPress: () => {},
-                      },
-                      {
-                        text: "Delete",
-                        onPress: () => {
-                          deleteElement(mapData);
-                        },
-                        style: "destructive",
-                      },
-                    ],
-                    { cancelable: true }
-                  );
-                }}
-                activeOpacity={0.7}
-                style={{
+                  width: "50%",
+                  alignItems: "flex-start",
+                  paddingLeft: 20,
                   marginTop: 70,
-                  marginRight: 20,
-                  alignItems: "flex-end",
                 }}
               >
-                <View
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.goBack();
+                  }}
+                  activeOpacity={0.7}
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 9,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "rgb(253,60,74)",
+                    marginBottom: 60,
+                    marginRight: 20,
+                    alignItems: "flex-end",
                   }}
                 >
-                  <Ionicons
-                    name="trash-outline"
-                    style={{ fontSize: 26, color: "white" }}
-                  ></Ionicons>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={toggleFullScreenImage}
-                activeOpacity={0.7}
+                  <View
+                    style={{
+                      height: 40,
+                      paddingHorizontal: 5,
+                      borderRadius: 9,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexDirection: "row",
+                      backgroundColor: "rgba(100,100,100,1)",
+                    }}
+                  >
+                    <Ionicons
+                      name="chevron-back"
+                      style={{ fontSize: 30, color: "white" }}
+                    ></Ionicons>
+                    <Text
+                      style={{ paddingRight: 10, fontSize: 16, color: "white" }}
+                    >
+                      Back
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <View
                 style={{
-                  marginBottom: 60,
-                  marginRight: 20,
+                  width: "50%",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  paddingRight: 0,
                   alignItems: "flex-end",
+                  marginBottom: -40,
                 }}
               >
-                <View
+                <TouchableOpacity
+                  onPress={() => {
+                    Alert.alert(
+                      "Delete Expense",
+                      "Are you sure you want to delete the expense?",
+                      [
+                        {
+                          text: "Cancel",
+                          onPress: () => {},
+                        },
+                        {
+                          text: "Delete",
+                          onPress: () => {
+                            deleteElement(mapData);
+                          },
+                          style: "destructive",
+                        },
+                      ],
+                      { cancelable: true }
+                    );
+                  }}
+                  activeOpacity={0.7}
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 9,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "rgba(100,100,100,1)",
+                    marginTop: 70,
+                    marginRight: 20,
+                    alignItems: "flex-end",
                   }}
                 >
-                  <Ionicons
-                    name="scan-outline"
-                    style={{ fontSize: 30, color: "white" }}
-                  ></Ionicons>
-                </View>
-              </TouchableOpacity>
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 9,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "rgb(253,60,74)",
+                    }}
+                  >
+                    <Ionicons
+                      name="trash-outline"
+                      style={{ fontSize: 26, color: "white" }}
+                    ></Ionicons>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={toggleFullScreenImage}
+                  activeOpacity={0.7}
+                  style={{
+                    marginBottom: 60,
+                    marginRight: 20,
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 9,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "rgba(100,100,100,1)",
+                    }}
+                  >
+                    <Ionicons
+                      name="scan-outline"
+                      style={{ fontSize: 30, color: "white" }}
+                    ></Ionicons>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </>
+          </View>
+          <View style={styles.bottomContainer}>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <ScrollView style={{ width: "70%", paddingRight: 15 }}>
+                <Text style={styles.subTitle}>Details</Text>
+                <Text style={styles.text}>{mapData.note}</Text>
+                <Text style={styles.subTitle}>Date</Text>
+                <Text style={styles.text}>{reformatDate(mapData.date)}</Text>
+                <Text style={styles.subTitle}>Type</Text>
+                <Text style={styles.text}>
+                  {mapData.type == 1
+                    ? "Utilities"
+                    : mapData.type == 2
+                    ? "Food & Groceries"
+                    : mapData.type == 3
+                    ? "Healthcare"
+                    : mapData.type == 4
+                    ? "Entertainment"
+                    : mapData.type == 5
+                    ? "Shopping"
+                    : mapData.type == 6
+                    ? "Education"
+                    : mapData.type == 7
+                    ? "Transportation"
+                    : mapData.type == 8
+                    ? "Personal Care"
+                    : "Miscellaneous"}
+                </Text>
+                <MinSpacer></MinSpacer>
+              </ScrollView>
+              <View style={{ width: "35%", alignItems: "flex-end" }}>
+                <Text
+                  style={{
+                    fontSize: Dimensions.get("window").width / 14,
+                    color: "white",
+                  }}
+                >
+                  {mapData.total} ₺
+                </Text>
+              </View>
             </View>
-          </>
+          </View>
         </View>
-        <View style={styles.bottomContainer}>
+      );
+    } else {
+      return (
+        <ImageViewer
+          imageUrls={[{ url: cachedImageUrl }]}
+          enableSwipeDown={true}
+          onSwipeDown={toggleFullScreenImage}
+          style={{ width: Dimensions.get("window").width }}
+        />
+      );
+    }
+  } else {
+    return (
+      <View>
+        <LinearGradient
+          colors={["rgba(221, 50, 52, 1)", "rgba(130, 67, 255, 1)"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            height: 200,
+            paddingLeft: 20,
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexDirection: "row",
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}
+          >
+            <View
+              style={{
+                height: 40,
+                width: 80,
+                paddingHorizontal: 5,
+                borderRadius: 9,
+                marginBottom: -20,
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                backgroundColor: "rgba(100,100,100,1)",
+              }}
+            >
+              <Ionicons
+                name="chevron-back"
+                style={{ fontSize: 30, color: "white" }}
+              ></Ionicons>
+              <Text style={{ paddingRight: 10, fontSize: 16, color: "white" }}>
+                Back
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert(
+                "Delete Expense",
+                "Are you sure you want to delete the expense?",
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => {},
+                  },
+                  {
+                    text: "Delete",
+                    onPress: () => {
+                      deleteElement(mapData);
+                    },
+                    style: "destructive",
+                  },
+                ],
+                { cancelable: true }
+              );
+            }}
+            activeOpacity={0.7}
+            style={{
+              marginBottom: -20,
+              marginRight: 20,
+              alignItems: "flex-end",
+            }}
+          >
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 9,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgb(253,60,74)",
+              }}
+            >
+              <Ionicons
+                name="trash-outline"
+                style={{ fontSize: 26, color: "white" }}
+              ></Ionicons>
+            </View>
+          </TouchableOpacity>
+        </LinearGradient>
+        <View style={styles.fullContainer}>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
@@ -284,23 +428,19 @@ const ExpenseEntry: React.FC<ExpenseEntryProps> = ({ route }) => {
               </Text>
               <MinSpacer></MinSpacer>
             </ScrollView>
-            <View style={{ width: "30%", alignItems: "flex-end" }}>
-              <Text style={{ fontSize: 34, color: "white" }}>
+            <View style={{ width: "35%", alignItems: "flex-end" }}>
+              <Text
+                style={{
+                  fontSize: Dimensions.get("window").width / 14,
+                  color: "white",
+                }}
+              >
                 {mapData.total} ₺
               </Text>
             </View>
           </View>
         </View>
       </View>
-    );
-  } else {
-    return (
-      <ImageViewer
-        imageUrls={[{ url: cachedImageUrl }]}
-        enableSwipeDown={true}
-        onSwipeDown={toggleFullScreenImage}
-        style={{ width: Dimensions.get("window").width }}
-      />
     );
   }
 };
@@ -310,6 +450,18 @@ const styles = StyleSheet.create({
   upperContainer: {
     flexDirection: "row",
     height: (Dimensions.get("window").height / 6) * 3.5,
+  },
+  fullContainer: {
+    position: "relative",
+    flexDirection: "column",
+    width: "100%",
+    paddingHorizontal: 30,
+    paddingTop: 30,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: "#212529",
+    marginTop: -30,
+    height: Dimensions.get("window").height,
   },
   bottomContainer: {
     position: "relative",

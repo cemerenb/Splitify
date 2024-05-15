@@ -11,6 +11,7 @@ import CreateGroup from "./Pages/CreateGroup";
 import ResetPassword from "./Pages/ResetPassword";
 import { Platform, PlatformColor, Image, Dimensions } from "react-native";
 import { Rect } from "react-native-svg";
+import AllExpenses from "./Pages/AllExpenses";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
@@ -21,6 +22,7 @@ export type RootStackNavigatorParamsList = {
   ExpenseEntry: undefined;
   CreateGroup: undefined;
   ResetPassword: undefined;
+  AllExpenses: undefined;
 };
 
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
@@ -45,6 +47,15 @@ const App: React.FC = () => {
           options={{
             gestureEnabled: false,
             headerShown: true,
+            headerTitle: "",
+          }}
+        />
+        <Stack.Screen
+          name="AllExpenses"
+          component={AllExpenses}
+          options={{
+            gestureEnabled: false,
+            headerShown: false,
             headerTitle: "",
           }}
         />

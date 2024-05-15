@@ -306,7 +306,6 @@ export default function Home() {
         </View>
         <View
           style={{
-            flex: 2,
             alignItems: "flex-end",
             flexDirection: "column",
             justifyContent: "flex-start",
@@ -414,7 +413,9 @@ export default function Home() {
               <View style={styles.recentTransactionsHeader}>
                 <Text style={{ fontSize: 18, flex: 1 }}>Last Transactions</Text>
                 <Button
-                  onPress={() => {}}
+                  onPress={() => {
+                    navigation.navigate("AllExpenses");
+                  }}
                   style={{ backgroundColor: "rgb(222, 110, 235)" }}
                 >
                   <Text style={{ fontSize: 16, color: "white" }}>See All</Text>
