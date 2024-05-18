@@ -14,7 +14,7 @@ import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { Icon } from "react-native-paper";
@@ -35,6 +35,8 @@ const Groups = () => {
   const [loading, setLoading] = useState(true);
   const [groupData, setGroupData] = useState<Group[]>([]);
   const [names, setNames] = useState([]);
+  const isFocused = useIsFocused();
+
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
 
@@ -47,7 +49,7 @@ const Groups = () => {
 
     // Fetch data for each group
     const groups = await Promise.all(
-      groupIds.map(async (groupId) => {
+      groupIds.map(async (groupId: string) => {
         const groupDocRef = doc(FIRESTORE_DB, "groups", groupId); // Get group doc
         const groupData = await getDoc(groupDocRef); // Fetch group data
         const docRef = doc(FIRESTORE_DB, "users", groupData.data().ownerUid);
@@ -69,7 +71,13 @@ const Groups = () => {
   useEffect(() => {
     fetchGroupData(); // Fetch group data when the component mounts
   }, []); // Empty dependency array ensures this runs only once
-
+  useEffect(() => {
+    if (isFocused) {
+      setLoading(true);
+      fetchGroupData();
+      console.log("groups");
+    }
+  }, [isFocused]);
   const getImageSource = (imageSource) => {
     switch (imageSource) {
       case 0:
@@ -172,6 +180,7 @@ const Groups = () => {
   } else {
     return (
       <SafeAreaView style={{ flex: 1 }}>
+        <MaxSpacer></MaxSpacer>
         <View
           style={{
             flexDirection: "row",
@@ -179,7 +188,11 @@ const Groups = () => {
             paddingHorizontal: 20,
           }}
         >
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("JoinPage");
+            }}
+          >
             <View style={styles.groupContainer}>
               <Ionicons name={"people-outline"} size={40} color="white" />
               <Text
@@ -200,22 +213,44 @@ const Groups = () => {
             </View>
           </TouchableOpacity>
         </View>
-        <MaxSpacer></MaxSpacer>
-        <FlatList
-          style={{ paddingHorizontal: 20 }}
-          data={groupData} // List data
-          keyExtractor={(item) => item.groupId} // Use groupId as unique key
-          renderItem={({ item }) => (
-            <CardView
-              imageSource={item.type}
-              groupName={item.groupName}
-              ownerName={item.name}
-              onPress={() => {}}
-              memberCount={item.memberCount}
-              groupId={item.groupId}
+        {groupData.length == 0 ? (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <Text>Don't have any group</Text>
+          </View>
+        ) : (
+          <View>
+            <MaxSpacer></MaxSpacer>
+            <FlatList
+              style={{ paddingHorizontal: 20 }}
+              contentContainerStyle={{
+                paddingBottom: 200,
+              }}
+              data={groupData} // List data
+              keyExtractor={(item) => item.groupId} // Use groupId as unique key
+              renderItem={({ index, item }) => (
+                <View>
+                  <CardView
+                    imageSource={item.type}
+                    groupName={item.groupName}
+                    ownerName={item.name}
+                    onPress={() => {
+                      // @ts-ignore
+                      navigation.navigate("GroupPage", {
+                        groupId: item.groupId,
+                      });
+                    }}
+                    memberCount={item.memberCount}
+                    groupId={item.groupId}
+                  />
+                </View>
+              )}
             />
-          )}
-        />
+          </View>
+        )}
+
+        <View style={{}}></View>
       </SafeAreaView>
     );
   }
@@ -271,7 +306,7 @@ const styles = StyleSheet.create({
     height: 70,
     width: (Dimensions.get("window").width - 60) / 2,
     borderRadius: 10,
-    backgroundColor: "grey",
+    backgroundColor: "rgba(20,20,20,0.3)",
   },
 });
 

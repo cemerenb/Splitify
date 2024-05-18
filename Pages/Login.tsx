@@ -26,7 +26,7 @@ import Svg from "react-native-svg";
 export default function Login() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isVerificateModalVisible, setIsVerificateModalVisible] =
@@ -91,6 +91,7 @@ export default function Login() {
     } catch (error) {
       console.error("Error while checking user:", error);
     }
+    setLoading(false);
   };
 
   useLayoutEffect(() => {
@@ -100,137 +101,142 @@ export default function Login() {
     }
   }, []);
 
-  return (
-    <View style={styles.container}>
-      <MaxSpacer></MaxSpacer>
-      <Image
-        style={{
-          width: "70%",
-          height: "12%",
-          resizeMode: "stretch",
-        }}
-        source={require("../assets/logo-center.png")}
-      />
-      <MinSpacer></MinSpacer>
-      <View style={styles.loginarea}>
-        <View style={styles.inputStyle}>
-          <TextInput
-            style={styles.inputText}
-            keyboardType="email-address"
-            placeholder="Email"
-            onChangeText={setEmail}
-            inputMode="email"
-            autoComplete="email"
-            autoCapitalize="none"
-            value={email}
-            returnKeyType="next"
-            onSubmitEditing={() => {
-              this.secondTextInput.focus();
-            }}
-          />
-        </View>
-        <MinSpacer />
-        <View style={styles.inputStyle}>
-          <TextInput
-            ref={(input) => {
-              this.secondTextInput = input;
-            }}
-            returnKeyType="done"
-            style={styles.inputText}
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Password"
-          />
-          <MaterialCommunityIcons
-            name={!showPassword ? "eye-off" : "eye"}
-            size={24}
-            color="#aaa"
-            style={styles.icon}
-            onPress={toggleShowPassword}
-          />
-        </View>
-        <View style={styles.forgotPassword}>
-          <Text
-            onPress={() => {
-              navigation.navigate("ResetPassword");
-            }}
-          >
-            Forgot Password
-          </Text>
-        </View>
-      </View>
-      <MinSpacer></MinSpacer>
-      <View style={styles.button}>
-        <TouchableOpacity onPress={signIn} style={styles.button}>
-          {loading ? (
-            <View style={{ flex: 1, justifyContent: "center" }}>
-              <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
-            </View>
-          ) : (
-            <Text style={{ fontSize: 20, color: "white" }}>Login</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-      <Text></Text>
-      <Text style={styles.signUp}>
-        Don't have an account?{" "}
-        <Text onPress={onHandlePress} style={{ color: "rgb(180,24,113)" }}>
-          Sign Up
-        </Text>
-      </Text>
-      <StatusBar style="auto" />
-      <Modal isVisible={isModalVisible} backdropOpacity={0.2}>
-        <View style={{ height: 200, padding: 20 }}>
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 50,
-              borderRadius: 20,
-              alignItems: "center",
-              alignContent: "stretch",
-            }}
-          >
-            <Text style={{ fontSize: 20 }}>{errorMessage}</Text>
-            <MinSpacer />
-            <Button title="Close" onPress={() => setIsModalVisible(false)} />
+  if (!loading) {
+    return (
+      <View style={styles.container}>
+        <MaxSpacer></MaxSpacer>
+        <Image
+          style={{
+            width: "70%",
+            height: "12%",
+            resizeMode: "stretch",
+          }}
+          source={require("../assets/logo-center.png")}
+        />
+        <MinSpacer></MinSpacer>
+        <View style={styles.loginarea}>
+          <View style={styles.inputStyle}>
+            <TextInput
+              style={styles.inputText}
+              keyboardType="email-address"
+              placeholder="Email"
+              onChangeText={setEmail}
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              value={email}
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                this.secondTextInput.focus();
+              }}
+            />
           </View>
-        </View>
-      </Modal>
-      <Modal isVisible={isVerificateModalVisible} backdropOpacity={0.2}>
-        <View style={{ height: 200, padding: 20 }}>
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 50,
-              borderRadius: 20,
-              alignItems: "center",
-              alignContent: "stretch",
-            }}
-          >
-            <Text style={{ fontSize: 20 }}>
-              We have sent an email for you to confirm your account. Don't
-              forget to check your spam box.
-            </Text>
-            <MinSpacer />
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-evenly",
-                alignSelf: "stretch",
+          <MinSpacer />
+          <View style={styles.inputStyle}>
+            <TextInput
+              ref={(input) => {
+                this.secondTextInput = input;
+              }}
+              returnKeyType="done"
+              style={styles.inputText}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Password"
+            />
+            <MaterialCommunityIcons
+              name={!showPassword ? "eye-off" : "eye"}
+              size={24}
+              color="#aaa"
+              style={styles.icon}
+              onPress={toggleShowPassword}
+            />
+          </View>
+          <View style={styles.forgotPassword}>
+            <Text
+              onPress={() => {
+                navigation.navigate("ResetPassword");
               }}
             >
-              <Button title="Resend" onPress={() => setIsModalVisible(false)} />
-              <Button
-                title="Close"
-                onPress={() => setIsVerificateModalVisible(false)}
-              />
-            </View>
+              Forgot Password
+            </Text>
           </View>
         </View>
-      </Modal>
-    </View>
-  );
+        <MinSpacer></MinSpacer>
+        <View style={styles.button}>
+          <TouchableOpacity onPress={signIn} style={styles.button}>
+            {loading ? (
+              <View style={{ flex: 1, justifyContent: "center" }}>
+                <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
+              </View>
+            ) : (
+              <Text style={{ fontSize: 20, color: "white" }}>Login</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+        <Text></Text>
+        <Text style={styles.signUp}>
+          Don't have an account?{" "}
+          <Text onPress={onHandlePress} style={{ color: "rgb(180,24,113)" }}>
+            Sign Up
+          </Text>
+        </Text>
+        <StatusBar style="auto" />
+        <Modal isVisible={isModalVisible} backdropOpacity={0.2}>
+          <View style={{ height: 200, padding: 20 }}>
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 50,
+                borderRadius: 20,
+                alignItems: "center",
+                alignContent: "stretch",
+              }}
+            >
+              <Text style={{ fontSize: 20 }}>{errorMessage}</Text>
+              <MinSpacer />
+              <Button title="Close" onPress={() => setIsModalVisible(false)} />
+            </View>
+          </View>
+        </Modal>
+        <Modal isVisible={isVerificateModalVisible} backdropOpacity={0.2}>
+          <View style={{ height: 200, padding: 20 }}>
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 50,
+                borderRadius: 20,
+                alignItems: "center",
+                alignContent: "stretch",
+              }}
+            >
+              <Text style={{ fontSize: 20 }}>
+                We have sent an email for you to confirm your account. Don't
+                forget to check your spam box.
+              </Text>
+              <MinSpacer />
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                  alignSelf: "stretch",
+                }}
+              >
+                <Button
+                  title="Resend"
+                  onPress={() => setIsModalVisible(false)}
+                />
+                <Button
+                  title="Close"
+                  onPress={() => setIsVerificateModalVisible(false)}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({

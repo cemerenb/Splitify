@@ -20,9 +20,12 @@ import {
   SafeAreaView,
   StatusBar,
   ImageBackground,
+  Appearance,
+  useColorScheme,
 } from "react-native";
+
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, setDoc } from "firebase/firestore";
 import SelectDropdown from "react-native-select-dropdown";
 import * as SecureStore from "expo-secure-store";
 
@@ -33,7 +36,7 @@ import * as shape from "d3-shape";
 import { Button } from "react-native-paper";
 import { TabBar } from "../TabBar/TabBar";
 import { MaxSpacer, MidSpacer } from "../Utils/Spacers";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 
@@ -51,6 +54,8 @@ export default function Home() {
   const [loading, setLoadingStatus] = useState(true);
   const [recentList, setRecentList] = useState([]);
   const data2 = [80, 10, 95, 48, 24, 67, 51, 12, 33, 0, 24, 20, 50];
+  const colors = useTheme().colors;
+
   const items = {
     date: null,
     imageUrl: "",
@@ -63,6 +68,7 @@ export default function Home() {
     { title: "Last Month" },
     { title: "Last 6 Months" },
   ];
+
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
   const getTotalExpenses = async () => {
@@ -330,7 +336,10 @@ export default function Home() {
       return (
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={styles.scrollView}
+          style={{
+            flex: 1,
+            backgroundColor: "rgb(240,240,240)",
+          }}
         >
           <View
             style={{
@@ -470,6 +479,7 @@ export default function Home() {
                   width: Dimensions.get("window").width,
                 }}
               ></ImageBackground>
+
               <Text
                 style={{
                   fontSize: 25,

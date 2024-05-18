@@ -79,6 +79,7 @@ export default function CreateGroup() {
         ownerUid: uid,
         expenses: [{}],
         type: selection,
+        processedExpenses: [],
       };
       await setDoc(docRef, data);
 
@@ -116,6 +117,7 @@ export default function CreateGroup() {
               marginBottom: 20,
               padding: 10,
             }}
+            maxLength={25}
             placeholder="Group Name"
             value={groupName}
             onChangeText={setGroupName}

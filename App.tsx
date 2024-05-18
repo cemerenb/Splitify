@@ -1,6 +1,7 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import { TabBar } from "./TabBar/TabBar";
@@ -9,9 +10,11 @@ import ExpenseEntry from "./Pages/ExpensDetails";
 import Groups from "./Pages/Groups";
 import CreateGroup from "./Pages/CreateGroup";
 import ResetPassword from "./Pages/ResetPassword";
-import { Platform, PlatformColor, Image, Dimensions } from "react-native";
-import { Rect } from "react-native-svg";
 import AllExpenses from "./Pages/AllExpenses";
+import GroupPage from "./Pages/GroupPage";
+import Members from "./Pages/Members";
+import JoinGroup from "./Pages/JoinGroup";
+import JoinPage from "./Pages/JoinGroup";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
@@ -23,6 +26,9 @@ export type RootStackNavigatorParamsList = {
   CreateGroup: undefined;
   ResetPassword: undefined;
   AllExpenses: undefined;
+  GroupPage: undefined;
+  Members: undefined;
+  JoinPage: undefined;
 };
 
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
@@ -57,6 +63,40 @@ const App: React.FC = () => {
             gestureEnabled: false,
             headerShown: false,
             headerTitle: "",
+          }}
+        />
+        <Stack.Screen
+          name="GroupPage"
+          component={GroupPage}
+          options={{
+            gestureEnabled: false,
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="JoinPage"
+          component={JoinPage}
+          options={{
+            headerStyle: {
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+              backgroundColor: "#FF964F",
+              borderColor: "transparent",
+            },
+            gestureEnabled: false,
+            headerBackTitle: "Back",
+            headerBackTitleStyle: { fontWeight: "500" },
+            headerTintColor: "white",
+            headerTitle: "",
+          }}
+        />
+        <Stack.Screen
+          name="Members"
+          component={Members}
+          options={{
+            gestureEnabled: false,
+            headerShown: false,
           }}
         />
         <Stack.Screen
@@ -131,4 +171,6 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+const RootApp: React.FC = () => <App />;
+
+export default RootApp;
