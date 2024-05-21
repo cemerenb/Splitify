@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
@@ -10,18 +9,19 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import { useLayoutEffect, useState } from "react";
+import Modal from "react-native-modal";
+
+import { useContext, useLayoutEffect, useState } from "react";
 import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { signInWithEmailAndPassword } from "@firebase/auth";
-import Modal from "react-native-modal";
 import { FIREBASE_APP, FIREBASE_AUTH } from "../FirebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import * as SecureStore from "expo-secure-store";
 import React from "react";
-import Svg from "react-native-svg";
+import { ThemeContext } from "../Theme/ThemeContext";
 
 export default function Login() {
   const [password, setPassword] = useState("");
@@ -33,6 +33,7 @@ export default function Login() {
     useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [count, setCount] = useState(0);
+  const { theme } = useContext(ThemeContext);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -101,142 +102,148 @@ export default function Login() {
     }
   }, []);
 
-  if (!loading) {
-    return (
-      <View style={styles.container}>
-        <MaxSpacer></MaxSpacer>
-        <Image
-          style={{
-            width: "70%",
-            height: "12%",
-            resizeMode: "stretch",
-          }}
-          source={require("../assets/logo-center.png")}
-        />
-        <MinSpacer></MinSpacer>
-        <View style={styles.loginarea}>
-          <View style={styles.inputStyle}>
-            <TextInput
-              style={styles.inputText}
-              keyboardType="email-address"
-              placeholder="Email"
-              onChangeText={setEmail}
-              inputMode="email"
-              autoComplete="email"
-              autoCapitalize="none"
-              value={email}
-              returnKeyType="next"
-              onSubmitEditing={() => {
-                this.secondTextInput.focus();
-              }}
-            />
-          </View>
-          <MinSpacer />
-          <View style={styles.inputStyle}>
-            <TextInput
-              ref={(input) => {
-                this.secondTextInput = input;
-              }}
-              returnKeyType="done"
-              style={styles.inputText}
-              secureTextEntry={!showPassword}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Password"
-            />
-            <MaterialCommunityIcons
-              name={!showPassword ? "eye-off" : "eye"}
-              size={24}
-              color="#aaa"
-              style={styles.icon}
-              onPress={toggleShowPassword}
-            />
-          </View>
-          <View style={styles.forgotPassword}>
-            <Text
-              onPress={() => {
-                navigation.navigate("ResetPassword");
-              }}
-            >
-              Forgot Password
-            </Text>
-          </View>
+  return (
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <MaxSpacer></MaxSpacer>
+      <Image
+        style={{
+          width: Dimensions.get("window").width * 0.7,
+          height: Dimensions.get("window").width * 0.25,
+          resizeMode: "stretch",
+        }}
+        source={require("../assets/logo-center.png")}
+      />
+      <MinSpacer></MinSpacer>
+      <View style={styles.loginarea}>
+        <View style={[styles.inputStyle, { backgroundColor: theme.primary }]}>
+          <TextInput
+            style={[styles.inputText, { color: theme.text }]}
+            keyboardType="email-address"
+            placeholder="Email"
+            placeholderTextColor={theme.text}
+            onChangeText={setEmail}
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            value={email}
+            returnKeyType="next"
+            onSubmitEditing={() => {
+              this.secondTextInput.focus();
+            }}
+          />
         </View>
-        <MinSpacer></MinSpacer>
-        <View style={styles.button}>
-          <TouchableOpacity onPress={signIn} style={styles.button}>
-            {loading ? (
-              <View style={{ flex: 1, justifyContent: "center" }}>
-                <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
-              </View>
-            ) : (
-              <Text style={{ fontSize: 20, color: "white" }}>Login</Text>
-            )}
-          </TouchableOpacity>
+        <MinSpacer />
+        <View style={[styles.inputStyle, { backgroundColor: theme.primary }]}>
+          <TextInput
+            ref={(input) => {
+              this.secondTextInput = input;
+            }}
+            placeholderTextColor={theme.text}
+            returnKeyType="done"
+            style={[styles.inputText, { color: theme.text }]}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+          />
+          <MaterialCommunityIcons
+            name={!showPassword ? "eye-off" : "eye"}
+            size={24}
+            color="#aaa"
+            style={styles.icon}
+            onPress={toggleShowPassword}
+          />
         </View>
-        <Text></Text>
-        <Text style={styles.signUp}>
-          Don't have an account?{" "}
-          <Text onPress={onHandlePress} style={{ color: "rgb(180,24,113)" }}>
-            Sign Up
+        <View style={styles.forgotPassword}>
+          <Text
+            style={{ color: theme.text }}
+            onPress={() => {
+              navigation.navigate("ResetPassword");
+            }}
+          >
+            Forgot Password
           </Text>
-        </Text>
-        <StatusBar style="auto" />
-        <Modal isVisible={isModalVisible} backdropOpacity={0.2}>
-          <View style={{ height: 200, padding: 20 }}>
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 50,
-                borderRadius: 20,
-                alignItems: "center",
-                alignContent: "stretch",
-              }}
-            >
-              <Text style={{ fontSize: 20 }}>{errorMessage}</Text>
-              <MinSpacer />
-              <Button title="Close" onPress={() => setIsModalVisible(false)} />
-            </View>
-          </View>
-        </Modal>
-        <Modal isVisible={isVerificateModalVisible} backdropOpacity={0.2}>
-          <View style={{ height: 200, padding: 20 }}>
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 50,
-                borderRadius: 20,
-                alignItems: "center",
-                alignContent: "stretch",
-              }}
-            >
-              <Text style={{ fontSize: 20 }}>
-                We have sent an email for you to confirm your account. Don't
-                forget to check your spam box.
-              </Text>
-              <MinSpacer />
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-evenly",
-                  alignSelf: "stretch",
-                }}
-              >
-                <Button
-                  title="Resend"
-                  onPress={() => setIsModalVisible(false)}
-                />
-                <Button
-                  title="Close"
-                  onPress={() => setIsVerificateModalVisible(false)}
-                />
-              </View>
-            </View>
-          </View>
-        </Modal>
+        </View>
       </View>
-    );
-  }
+      <MinSpacer></MinSpacer>
+      <View style={[styles.button, { backgroundColor: theme.button }]}>
+        <TouchableOpacity
+          onPress={signIn}
+          style={[styles.button, { backgroundColor: theme.button }]}
+        >
+          {loading ? (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                backgroundColor: theme.button,
+              }}
+            >
+              <ActivityIndicator size="small" color={theme.buttonText} />
+            </View>
+          ) : (
+            <Text style={{ fontSize: 20, color: theme.buttonText }}>Login</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+      <Text></Text>
+      <Text style={[styles.signUp, { color: theme.text }]}>
+        Don't have an account?{" "}
+        <Text onPress={onHandlePress} style={{ color: theme.button }}>
+          Sign Up
+        </Text>
+      </Text>
+      <Modal isVisible={isModalVisible} backdropOpacity={0.2}>
+        <View style={{ height: 200, padding: 20 }}>
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 50,
+              borderRadius: 20,
+              alignItems: "center",
+              alignContent: "stretch",
+            }}
+          >
+            <Text style={{ fontSize: 20 }}>{errorMessage}</Text>
+            <MinSpacer />
+            <Button title="Close" onPress={() => setIsModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
+      <Modal isVisible={isVerificateModalVisible} backdropOpacity={0.2}>
+        <View style={{ height: 200, padding: 20 }}>
+          <View
+            style={{
+              backgroundColor: theme.primary,
+              padding: 50,
+              borderRadius: 20,
+              alignItems: "center",
+              alignContent: "stretch",
+            }}
+          >
+            <Text style={{ fontSize: 20, color: theme.text }}>
+              We have sent an email for you to confirm your account. Don't
+              forget to check your spam box.
+            </Text>
+            <MinSpacer />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+                alignSelf: "stretch",
+              }}
+            >
+              <Button title="Resend" onPress={() => setIsModalVisible(false)} />
+              <Button
+                title="Close"
+                onPress={() => setIsVerificateModalVisible(false)}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -253,13 +260,13 @@ const styles = StyleSheet.create({
   },
   inputText: {
     flex: 1,
-    color: "#333",
     height: 55,
     paddingVertical: 10,
     paddingRight: 10,
     fontSize: 18,
   },
   inputStyle: {
+    borderColor: "grey",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

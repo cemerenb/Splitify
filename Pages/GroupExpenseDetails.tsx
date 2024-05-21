@@ -37,19 +37,24 @@ interface MapData {
 
 // Define the navigation props types
 type RootStackParamList = {
-  ExpenseDetails: { mapData: MapData };
+  GroupExpenseDetails: { mapData: MapData; groupId: string };
 };
 
-type ExpenseDetailsRouteProp = RouteProp<RootStackParamList, "ExpenseDetails">;
+type GroupExpenseDetailsRouteProp = RouteProp<
+  RootStackParamList,
+  "GroupExpenseDetails"
+>;
 
-interface ExpenseDetailsProps {
-  route: ExpenseDetailsRouteProp;
+interface GroupExpenseDetailsProps {
+  route: GroupExpenseDetailsRouteProp;
 }
 
-// ExpenseDetails component
-const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
+// GroupExpenseDetails component
+const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
   const [loading, setLoadingStatus] = useState(true);
   const [index, setIndex] = useState(-1);
+  const [name, setName] = useState("");
+  const [groupId, setGroupId] = useState("");
   const [cachedImageUrl, setCachedImageUrl] = useState<string | undefined>(
     undefined
   );
@@ -58,6 +63,13 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
   const mapData = route.params;
 
+  const getName = async () => {
+    setName("");
+    setGroupId(mapData.groupId);
+    const nameDocRef = doc(FIRESTORE_DB, "users", mapData.createdBy);
+    const data = (await getDoc(nameDocRef)).data().name;
+    setName(data);
+  };
   const reformatDate = (date) => {
     const newDate =
       mapData.date.split("T")[0].split("-").reverse()[0] +
@@ -74,19 +86,15 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
   const deleteElement = async (elementToDelete) => {
     try {
       // Get a reference to the document containing the array
-      const docRef = doc(
-        FIRESTORE_DB,
-        "personal",
-        FIREBASE_AUTH.currentUser.uid
-      );
+      const docRef = doc(FIRESTORE_DB, "groups", mapData.groupId);
 
       // Get the current user data
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        const userData = docSnap.data();
+        const groupData = docSnap.data();
 
         // Filter out the elementToDelete from the expenses array
-        const updatedExpenses = userData.expenses.filter(
+        const updatedExpenses = groupData.expenses.filter(
           (expense) => expense.timeStamp !== elementToDelete.timeStamp
         );
 
@@ -94,7 +102,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
         await updateDoc(docRef, { expenses: updatedExpenses });
 
         console.log("Element deleted successfully");
-        navigation.replace("TabBar");
+        navigation.pop();
       } else {
         console.log("Document does not exist");
       }
@@ -106,6 +114,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
   };
 
   useEffect(() => {
+    getName();
     if (mapData.imageUrl) {
       CacheManager.get(mapData.imageUrl)
         .getPath()
@@ -264,7 +273,8 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
               <ScrollView style={{ width: "70%", paddingRight: 15 }}>
                 <Text style={styles.subTitle}>Details</Text>
                 <Text style={styles.text}>{mapData.note}</Text>
-
+                <Text style={styles.subTitle}>Created By</Text>
+                <Text style={styles.text}>{name}</Text>
                 <Text style={styles.subTitle}>Date</Text>
                 <Text style={styles.text}>{reformatDate(mapData.date)}</Text>
                 <Text style={styles.subTitle}>Type</Text>
@@ -407,7 +417,8 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
             <ScrollView style={{ width: "70%", paddingRight: 15 }}>
               <Text style={styles.subTitle}>Details</Text>
               <Text style={styles.text}>{mapData.note}</Text>
-
+              <Text style={styles.subTitle}>Created By</Text>
+              <Text style={styles.text}>{name}</Text>
               <Text style={styles.subTitle}>Date</Text>
               <Text style={styles.text}>{reformatDate(mapData.date)}</Text>
               <Text style={styles.subTitle}>Type</Text>
@@ -522,4 +533,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExpenseDetails;
+export default GroupExpenseDetails;

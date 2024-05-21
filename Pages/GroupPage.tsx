@@ -5,6 +5,7 @@ import {
 } from "@react-navigation/native";
 import React, {
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -20,9 +21,9 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  ScrollView,
+  Button,
 } from "react-native";
-import { Button } from "react-native-paper";
-
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
@@ -35,6 +36,7 @@ import { LineChart, Grid } from "react-native-svg-charts";
 import * as shape from "d3-shape";
 import { Shadow, Gradient } from "../ChartAdds";
 import { useIsFocused } from "@react-navigation/native";
+import { ThemeContext } from "../Theme/ThemeContext";
 
 type RootStackParamList = {
   GroupPage: { groupId: string };
@@ -60,6 +62,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
   const [loading, setLoadingStatus] = useState(true);
   const [selection, setSelection] = useState(1);
   const [stampDiff, setStampDiff] = useState(0);
+  const { theme } = useContext(ThemeContext);
 
   const [total, setTotal] = useState(0);
   const [lastSixMonthArray, setLastSixMonthArray] = useState([]);
@@ -86,7 +89,6 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
     } else {
       await fetchNames();
       setLoadingStatus(false);
-      console.log(expensesArray);
     }
   };
 
@@ -118,11 +120,15 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
     createdBy,
   }) => {
     imageSource = parseInt(imageSource);
+
     const day = date.split("T")[0].split("-")[2];
     const month = date.split("T")[0].split("-")[1];
     const year = date.split("T")[0].split("-")[0];
     return (
-      <TouchableOpacity onPress={onPress} style={styles.card}>
+      <TouchableOpacity
+        onPress={onPress}
+        style={[styles.card, { backgroundColor: theme.seeAll }]}
+      >
         <View
           style={{
             flex: 2,
@@ -133,50 +139,50 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
         >
           <View>
             {imageSource == 1 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/bill.png")}
-              />
+              <Ionicons
+                name="receipt-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 2 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/food.png")}
-              />
+              <Ionicons
+                name="fast-food-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 3 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/healthcare.png")}
-              />
+              <Ionicons
+                name="medical-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 4 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/entertainment.png")}
-              />
+              <Ionicons
+                name="balloon-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 5 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/shop.png")}
-              />
+              <Ionicons
+                name="bag-handle-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 6 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/book.png")}
-              />
+              <Ionicons
+                name="book-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 7 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/transportation.png")}
-              />
+              <Ionicons
+                name="train-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 8 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/personalcare.png")}
-              />
+              <Ionicons
+                name="man-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/miscellaneous.png")}
-              />
+              <Ionicons
+                name="cash-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             )}
           </View>
         </View>
@@ -188,7 +194,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             paddingHorizontal: 20,
           }}
         >
-          <Text style={styles.cardTitle}>
+          <Text style={[styles.cardTitle, { color: theme.text }]}>
             {imageSource == 1
               ? "Utilities"
               : imageSource == 2
@@ -208,17 +214,21 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
               : "Miscellaneous"}
           </Text>
           {description.length > 40 ? (
-            <Text style={styles.cardDescription}>
+            <Text style={[styles.cardDescription, { color: theme.text }]}>
               {description.slice(0, 40)}...
             </Text>
           ) : (
-            <Text style={styles.cardDescription}>{description}</Text>
+            <Text style={[styles.cardDescription, { color: theme.text }]}>
+              {description}
+            </Text>
           )}
-          <Text style={styles.cardName}>
+          <Text style={[styles.cardName, { color: theme.text }]}>
             {namesMap.find((user) => user.uid === createdBy)?.name || "Unknown"}
           </Text>
 
-          <Text style={styles.cardDate}>{day + "/" + month + "/" + year}</Text>
+          <Text style={[styles.cardDate, { color: theme.text }]}>
+            {day + "/" + month + "/" + year}
+          </Text>
         </View>
         <View
           style={{
@@ -228,7 +238,9 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             paddingHorizontal: 20,
           }}
         >
-          <Text style={styles.cardPrice}>{price}₺</Text>
+          <Text style={[styles.cardPrice, { color: theme.text }]}>
+            {price}₺
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -329,7 +341,10 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
     }
   };
   useEffect(() => {
+    console.log(expensesArray.length);
+
     calculateTotal();
+    generateRecentList();
     calculateSixMonthData(expensesArray);
     calculateLastMonthData(expensesArray);
     calculateLastSevenDaysData(expensesArray);
@@ -350,15 +365,22 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          backgroundColor: theme.background,
+        }}
+      >
+        <ActivityIndicator size="large" color={theme.gradientStart} />
       </View>
     );
   } else {
     return (
-      <SafeAreaView style={{ alignItems: "center" }}>
+      <SafeAreaView
+        style={{ alignItems: "center", backgroundColor: theme.background }}
+      >
         <MaxSpacer></MaxSpacer>
-
         <View
           style={{
             paddingHorizontal: 20,
@@ -368,23 +390,35 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
           }}
         >
           <TouchableOpacity
-            style={styles.homeIcon}
+            style={[styles.homeIcon, { backgroundColor: theme.card }]}
             onPress={() => {
               navigation.navigate("TabBar");
             }}
           >
-            <Ionicons name="home-outline" size={26}></Ionicons>
+            <Ionicons
+              name="home-outline"
+              color={theme.text}
+              size={26}
+            ></Ionicons>
           </TouchableOpacity>
-          <View style={styles.nameContainer}>
+          <View style={[styles.nameContainer, { backgroundColor: theme.card }]}>
             <View style={{ paddingLeft: 10 }}>
-              <Text style={{ fontSize: 30 - groupName.length / 2 }}>
+              <Text
+                style={{
+                  fontSize: 30 - groupName.length / 2,
+                  color: theme.text,
+                }}
+              >
                 {groupName}
               </Text>
-              <Text style={{ fontWeight: "300", fontSize: 12 }}>
+              <Text
+                style={{ fontWeight: "300", fontSize: 12, color: theme.text }}
+              >
                 {ownerName}'s group
               </Text>
             </View>
             <TouchableOpacity
+              activeOpacity={0.6}
               onPress={() => {
                 // @ts-ignore
                 navigation.navigate("Members", { groupId: groupId });
@@ -395,7 +429,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                 borderRadius: 18,
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: "rgb(222, 110, 235)",
+                backgroundColor: theme.gradientStart,
               }}
             >
               <Ionicons
@@ -406,107 +440,176 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             </TouchableOpacity>
           </View>
         </View>
+        <ScrollView style={{ flexDirection: "column", height: "90%" }}>
+          <View
+            style={{
+              width: Dimensions.get("window").width,
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <SelectDropdown
+              defaultValueByIndex={1}
+              data={selectionData}
+              onSelect={(selectedItem, index) => {
+                setSelection(index);
 
-        <SelectDropdown
-          defaultValueByIndex={1}
-          data={selectionData}
-          onSelect={(selectedItem, index) => {
-            setSelection(index);
-
-            calculateTotal();
-          }}
-          renderButton={(selectedItem, isOpened) => {
-            return (
-              <View style={styles.dropdownButtonStyle}>
-                <Text style={styles.dropdownButtonTxtStyle}>
-                  {selectedItem && selectedItem.title}
-                </Text>
-                <Icon
-                  name={isOpened ? "chevron-up" : "chevron-down"}
-                  style={styles.dropdownButtonArrowStyle}
-                />
-              </View>
-            );
-          }}
-          renderItem={(item, index, isSelected) => {
-            return (
-              <View
-                style={{
-                  ...styles.dropdownItemStyle,
-                  ...(isSelected && { backgroundColor: "#f2f2f2" }),
-                }}
-              >
-                <Text style={styles.dropdownItemTxtStyle}>{item.title}</Text>
-              </View>
-            );
-          }}
-          showsVerticalScrollIndicator={false}
-          dropdownStyle={styles.dropdownMenuStyle}
-        />
-
-        <View style={styles.totalExpensesContainer}>
-          <Text style={{ fontSize: 18 }}>Total Expenses</Text>
-          <Text style={{ fontSize: 55 }}>{total}₺</Text>
-        </View>
-
-        <LineChart
-          style={{
-            height: 150,
-            width: Dimensions.get("window").width + 20,
-          }}
-          gridMin={20}
-          gridMax={400}
-          data={
-            selection == 0
-              ? lastWeekArray
-              : selection == 1
-              ? lastMonthArray
-              : lastSixMonthArray
-          }
-          curve={shape.curveBasis}
-          svg={{
-            strokeWidth: 7,
-            stroke: "url(#gradient)",
-          }}
-          contentInset={{ top: 20, bottom: 20 }}
-        >
-          <Shadow />
-          <Gradient />
-        </LineChart>
-        <View>
-          <View style={styles.recentTransactionsHeader}>
-            <Text style={{ fontSize: 18, flex: 1 }}>Last Transactions</Text>
-            <Button
-              onPress={() => {
-                navigation.navigate("AllExpenses");
+                calculateTotal();
               }}
-              style={{ backgroundColor: "rgb(222, 110, 235)" }}
+              renderButton={(selectedItem, isOpened) => {
+                return (
+                  <View style={styles.dropdownButtonStyle}>
+                    <Text
+                      style={[
+                        styles.dropdownButtonTxtStyle,
+                        { color: theme.text },
+                      ]}
+                    >
+                      {selectedItem && selectedItem.title}
+                    </Text>
+                    <Icon
+                      name={isOpened ? "chevron-up" : "chevron-down"}
+                      style={[
+                        styles.dropdownButtonArrowStyle,
+                        { color: theme.text },
+                      ]}
+                    />
+                  </View>
+                );
+              }}
+              renderItem={(item, index, isSelected) => {
+                return (
+                  <View
+                    style={{
+                      ...styles.dropdownItemStyle,
+                      backgroundColor: theme.primary,
+                      ...(isSelected && { backgroundColor: theme.card }),
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.dropdownItemTxtStyle,
+                        { color: theme.text },
+                      ]}
+                    >
+                      {item.title}
+                    </Text>
+                  </View>
+                );
+              }}
+              showsVerticalScrollIndicator={false}
+              dropdownStyle={styles.dropdownMenuStyle}
+            />
+
+            <View style={styles.totalExpensesContainer}>
+              <Text style={{ fontSize: 18, color: theme.text }}>
+                Total Expenses
+              </Text>
+
+              <Text style={{ fontSize: 55, color: theme.text }}>{total}₺</Text>
+            </View>
+
+            <LineChart
+              style={{
+                height: 150,
+                width: Dimensions.get("window").width + 20,
+              }}
+              gridMin={20}
+              gridMax={400}
+              data={
+                selection == 0
+                  ? lastWeekArray
+                  : selection == 1
+                  ? lastMonthArray
+                  : lastSixMonthArray
+              }
+              curve={shape.curveBasis}
+              svg={{
+                strokeWidth: 7,
+                stroke: "url(#gradient)",
+              }}
+              contentInset={{ top: 20, bottom: 20 }}
             >
-              <Text style={{ fontSize: 16, color: "white" }}>See All</Text>
-            </Button>
-          </View>
-          <View style={styles.recentTransactionsBody}>
-            <FlatList
-              scrollEnabled={false}
-              style={{ width: "100%" }}
-              data={recentList}
-              renderItem={({ item, index }) => (
-                <View>
-                  <View style={{ height: 12 }}></View>
-                  <CardView
-                    imageSource={item.type}
-                    title={item.note}
-                    description={item.note}
-                    onPress={() => {}}
-                    price={item.total}
-                    date={item.date}
-                    createdBy={item.createdBy}
+              <Shadow />
+              <Gradient />
+            </LineChart>
+            {expensesArray.length > 0 ? (
+              <View>
+                <View style={styles.recentTransactionsHeader}>
+                  <Text style={{ fontSize: 18, flex: 1, color: theme.text }}>
+                    Last Transactions
+                  </Text>
+                  <Button
+                    onPress={() => {
+                      // @ts-ignore
+                      navigation.navigate("AllGroupExpenses", {
+                        groupId: groupId,
+                      });
+                    }}
+                    title="See All"
+                  ></Button>
+                </View>
+                <View style={styles.recentTransactionsBody}>
+                  <FlatList
+                    scrollEnabled={false}
+                    style={{ width: "100%" }}
+                    data={recentList}
+                    renderItem={({ item, index }) => (
+                      <View>
+                        <View style={{ height: 12 }}></View>
+                        <CardView
+                          imageSource={item.type}
+                          title={item.note}
+                          description={item.note}
+                          onPress={() => {
+                            navigation.navigate("GroupExpenseDetails", item);
+                          }}
+                          price={item.total}
+                          date={item.date}
+                          createdBy={item.createdBy}
+                        />
+                      </View>
+                    )}
                   />
                 </View>
-              )}
-            />
+              </View>
+            ) : (
+              <View></View>
+            )}
           </View>
-        </View>
+        </ScrollView>
+        <TouchableOpacity
+          onPress={() => {
+            // @ts-ignore
+            navigation.navigate("GroupExpensesEntry", {
+              groupId: groupId,
+            });
+          }}
+          style={{
+            borderWidth: 1,
+            borderColor: "rgba(0,0,0,0.2)",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            position: "absolute",
+            bottom: 80,
+            right: 20,
+            height: 60,
+            backgroundColor: theme.card,
+            borderRadius: 100,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 15,
+            }}
+          >
+            <Icon name="plus" size={30} color={theme.text} />
+            <Text style={{ color: theme.text }}>Add Expense</Text>
+          </View>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
@@ -543,14 +646,14 @@ const styles = StyleSheet.create({
   },
   cardDescription: {
     marginVertical: 4,
-    fontSize: 14,
+    fontSize: 15,
     lineHeight: 15,
   },
   cardDate: {
-    fontSize: 10,
+    fontSize: 12,
   },
   cardName: {
-    fontSize: 14,
+    fontSize: 13,
   },
   recentTransactionsHeader: {
     width: Dimensions.get("window").width,

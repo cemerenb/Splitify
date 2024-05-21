@@ -9,9 +9,9 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { RootStackNavigatorParamsList } from "../App";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { MaxSpacer } from "../Utils/Spacers";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { FIREBASE_AUTH } from "../FirebaseConfig";

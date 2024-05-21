@@ -19,14 +19,16 @@ import {
   Alert,
   ActivityIndicator,
   SafeAreaView,
+  TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
+import { PERMISSIONS, check } from "react-native-permissions";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
-
+import { DATABASE } from "../FirebaseConfig"; // Make sure to define this in your FirebaseConfig
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import {
@@ -37,15 +39,28 @@ import {
   addDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { Dimensions } from "react-native";
+import { TabBar } from "../TabBar/TabBar";
 import SelectDropdown from "react-native-select-dropdown";
 import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
-import { TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-export default function PersonalExpensEntry() {
+type RootStackParamList = {
+  GroupExpensesEntry: { groupId: string };
+};
+type GroupExpensesEntryRouteProp = RouteProp<
+  RootStackParamList,
+  "GroupExpensesEntry"
+>;
+
+interface GroupExpensesEntryProps {
+  route: GroupExpensesEntryRouteProp;
+}
+
+const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
+  const { groupId } = route.params;
+
   const [totalPrice, setTotalPrice] = useState("");
   const [selection, setSelection] = useState(0);
   const [loading, setLoadingStatus] = useState(false);
@@ -62,7 +77,7 @@ export default function PersonalExpensEntry() {
     const storage = getStorage();
     const storageRef = ref(
       storage,
-      `expenseImages/${FIREBASE_AUTH.currentUser.uid}-${Date.now()}.jpg`
+      `expenseImages/${groupId}-${Date.now()}.jpg`
     ); // Unique file name
 
     // Fetch the image data as a Blob
@@ -128,7 +143,7 @@ export default function PersonalExpensEntry() {
         setLoadingStatus(true);
 
         let uid = FIREBASE_AUTH.currentUser.uid;
-        const docRef = doc(FIRESTORE_DB, "personal", uid);
+        const docRef = doc(FIRESTORE_DB, "groups", groupId);
 
         let imageUrl = null;
 
@@ -139,6 +154,8 @@ export default function PersonalExpensEntry() {
         }
 
         const newExpense = {
+          groupId: groupId,
+          createdBy: uid,
           imageUrl: imageUrl,
           type: selection + 1,
           date: new Date().toISOString(),
@@ -151,7 +168,7 @@ export default function PersonalExpensEntry() {
           expenses: arrayUnion(newExpense),
         });
 
-        navigation.replace("TabBar");
+        navigation.pop();
       } catch (error) {
         console.error("Error creating document: ", error);
         Alert.alert("Failed to create document. Please try again.");
@@ -363,10 +380,10 @@ export default function PersonalExpensEntry() {
                 style={{
                   flex: 1,
                   justifyContent: "center",
-                  backgroundColor: theme.background,
+                  backgroundColor: "rgb(253,60,74)",
                 }}
               >
-                <ActivityIndicator size="large" color={theme.gradientStart} />
+                <ActivityIndicator size="small" color={theme.buttonText} />
               </View>
             ) : (
               <Text style={{ color: "white", fontSize: 20 }}>Add Expense</Text>
@@ -446,7 +463,7 @@ export default function PersonalExpensEntry() {
       </Modal>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   modalCard: {
@@ -604,3 +621,4 @@ const styles = StyleSheet.create({
     backgroundColor: "red",
   },
 });
+export default GroupExpensesEntry;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -18,13 +18,16 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
+import { ThemeContext } from "../Theme/ThemeContext";
 
 export default function JoinPage() {
   const [inviteCode, setInviteCode] = useState("");
   const [loading, setLoadingStatus] = useState(false);
+  const { theme } = useContext(ThemeContext);
+
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
   const checkInviteCode = async (code) => {
@@ -89,7 +92,7 @@ export default function JoinPage() {
         <Text style={{ fontSize: 50, color: "white" }}>Join a Group</Text>
       </View>
 
-      <View style={styles.bottomSheet}>
+      <View style={[styles.bottomSheet, { backgroundColor: theme.background }]}>
         <View>
           <TextInput
             style={{
@@ -100,6 +103,8 @@ export default function JoinPage() {
               height: 65,
               width: Dimensions.get("window").width - 40,
               borderRadius: 10,
+              backgroundColor: theme.primary,
+              color: theme.text,
               borderColor: "gray",
               borderWidth: 1,
               marginBottom: 20,
@@ -107,6 +112,7 @@ export default function JoinPage() {
             }}
             maxLength={25}
             placeholder="Invite Code"
+            placeholderTextColor={theme.text}
             value={inviteCode}
             onChangeText={setInviteCode}
             keyboardType="default"
@@ -132,8 +138,14 @@ export default function JoinPage() {
             }}
           >
             {loading ? (
-              <View style={{ flex: 1, justifyContent: "center" }}>
-                <ActivityIndicator size="small" color="white" />
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  backgroundColor: theme.background,
+                }}
+              >
+                <ActivityIndicator size="small" color={theme.gradientStart} />
               </View>
             ) : (
               <Text style={{ color: "white", fontSize: 20 }}>Join Group</Text>

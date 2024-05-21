@@ -15,12 +15,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Button,
-  Platform,
-  NativeModules,
 } from "react-native";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { MaxSpacer } from "../Utils/Spacers";
@@ -31,27 +29,37 @@ import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemeContext } from "../Theme/ThemeContext";
-const { StatusBarManager } = NativeModules;
 
-export default function SeeAll() {
+type RootStackParamList = {
+  AllGroupExpenses: { groupId: string };
+};
+type AllGroupExpensesRouteProp = RouteProp<
+  RootStackParamList,
+  "AllGroupExpenses"
+>;
+
+interface AllGroupExpensesProps {
+  route: AllGroupExpensesRouteProp;
+}
+
+const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
+  const { groupId } = route.params;
+
   const [selection, setSelection] = useState(0);
   const [count, setCount] = useState(0);
   const [total, setTotal] = useState(0);
   const [expensesArray, setArray] = useState([]);
   const [loading, setLoadingStatus] = useState(true);
   const [visible, setVisibility] = useState(false);
-  const [visible2, setVisibility2] = useState(false);
-
   const [dateFirst, setDateFirst] = useState(new Date());
   const [dateLast, setDateLast] = useState(new Date());
   const [expanded, setExpanded] = useState(false);
   const [filterActive, setFilterActive] = useState(false);
-  const [rangeSelection, setRangeSelection] = useState(0);
+  const [rangeSelection, setRangeSelection] = useState(false);
   const { theme } = useContext(ThemeContext);
 
   const toggleExpand = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
     setExpanded(!expanded);
   };
   const selectionData = [
@@ -205,14 +213,17 @@ export default function SeeAll() {
 
   const getTotalExpenses = async () => {
     setTotal(0);
-    let uid = FIREBASE_AUTH.currentUser.uid;
-    const docRef = doc(FIRESTORE_DB, "personal", uid);
-    const userData = await getDoc(docRef);
+    console.log(groupId);
 
-    setArray(userData.data()?.expenses ?? []);
+    const docRef = doc(FIRESTORE_DB, "groups", groupId);
+    const groupData = await getDoc(docRef);
+
+    setArray(groupData.data()?.expenses ?? []);
     setDateFirst(
       new Date(
-        userData.data()?.expenses[userData.data().expenses.length - 1].timeStamp
+        groupData.data()?.expenses[
+          groupData.data().expenses.length - 1
+        ].timeStamp
       )
     );
     setDateLast(new Date());
@@ -228,9 +239,8 @@ export default function SeeAll() {
   }, []);
 
   const options = [
-    { label: "Date", value: 0 },
-    { label: "Range", value: 1 },
-    { label: "None", value: 2 },
+    { label: "Date", value: false },
+    { label: "Range", value: true },
   ];
   if (loading) {
     return (
@@ -246,11 +256,10 @@ export default function SeeAll() {
     );
   } else {
     return (
-      <View
+      <SafeAreaView
         style={{
-          flex: 1,
-          paddingTop: Platform.OS === "android" ? StatusBarManager.HEIGHT : 50,
           backgroundColor: theme.background,
+          minHeight: Dimensions.get("window").height,
         }}
       >
         <View style={{ paddingBottom: 0 }}>
@@ -297,197 +306,72 @@ export default function SeeAll() {
             </TouchableOpacity>
           </View>
         </View>
-        {expanded ? (
-          <View
-            style={{
-              paddingTop: 30,
-              backgroundColor: theme.filter,
-              borderBottomLeftRadius: 20,
-              borderBottomRightRadius: 20,
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <View
-              style={{
-                borderWidth: 1,
-                borderRadius: 20,
-                width: "75%",
-
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <SwitchSelector
-                options={options}
-                initial={0}
-                buttonColor={theme.button}
-                onPress={(value) => {
-                  setRangeSelection(value);
-                }}
-              />
-            </View>
-
+        <View
+          style={{
+            backgroundColor: theme.text,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+          }}
+        >
+          <View style={[styles.datePickersContainer, animationStyle]}>
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "center",
+                justifyContent: "space-between",
                 width: "100%",
                 paddingTop: 20,
               }}
             >
-              {rangeSelection == 2 ? (
-                <View></View>
-              ) : rangeSelection != 2 && Platform.OS == "android" ? (
-                <View
-                  style={{
-                    width: "125%",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-evenly",
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <RNDateTimePicker
+                  textColor={theme.text}
+                  mode="date"
+                  value={dateFirst}
+                  onChange={(event, selectedDate) => {
+                    // Ensure that selectedDate is not older than dateLast
+                    if (selectedDate.getTime() > dateLast.getTime()) {
+                      setDateLast(selectedDate);
+                    }
+                    setDateFirst(selectedDate || dateFirst);
                   }}
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      setVisibility(true);
-                      console.log(visible);
-                    }}
-                  >
-                    <Text>{dateFirst.toDateString()}</Text>
-                  </TouchableOpacity>
-                  {visible && (
-                    <RNDateTimePicker
-                      textColor={theme.text}
-                      mode="date"
-                      value={dateFirst}
-                      onChange={(event, selectedDate) => {
-                        // Ensure that selectedDate is not older than dateLast
-                        if (rangeSelection == 0) {
-                          setDateFirst(selectedDate || dateFirst);
-                          setVisibility(false);
-                          console.log("-------------------");
-                          console.log("1");
-
-                          console.log(visible);
-                        }
-                        if (
-                          selectedDate.getTime() > dateLast.getTime() &&
-                          rangeSelection == 1
-                        ) {
-                          setDateLast(selectedDate);
-                          setDateFirst(selectedDate);
-                        }
-                        setDateFirst(selectedDate || dateFirst);
-                        setVisibility(false);
-                        console.log("-------------------");
-                        console.log("1");
-
-                        console.log(visible);
-                      }}
-                    />
-                  )}
-
-                  {rangeSelection == 1 && (
-                    <Text style={{ paddingLeft: 10, color: theme.text }}>
-                      -
-                    </Text>
-                  )}
-                  {rangeSelection == 1 && (
-                    <View>
-                      <TouchableOpacity
-                        onPress={() => {
-                          setVisibility2(true);
-                          console.log(visible2);
-                        }}
-                        style={{ backgroundColor: "#B8B8B9", padding: 10 }}
-                      >
-                        <Text>
-                          {dateLast.toDateString().split(" ")[2]}
-                          {dateLast.toDateString().split(" ")[1]}
-                          {dateLast.toDateString().split(" ")[3]}
-                        </Text>
-                      </TouchableOpacity>
-                      {visible2 && (
-                        <RNDateTimePicker
-                          mode="date"
-                          value={dateLast}
-                          onTouchEnd={() => {
-                            setVisibility2(false);
-                            console.log(visible2);
-                          }}
-                          onResponderTerminate={() => {
-                            setVisibility2(false);
-                            console.log(visible2);
-                          }}
-                          onPointerCancel={() => {
-                            setVisibility2(false);
-                            console.log(visible2);
-                          }}
-                          onTouchCancel={() => {
-                            setVisibility2(false);
-                            console.log(visible2);
-                          }}
-                          onChange={(event, selectedDate) => {
-                            // Ensure that selectedDate is not older than dateFirst
-                            if (selectedDate.getTime() < dateFirst.getTime()) {
-                              setDateFirst(selectedDate);
-                              setDateLast(selectedDate);
-                            }
-                            setDateLast(selectedDate || dateLast);
-                            setVisibility2(false);
-                            console.log("2");
-
-                            console.log("-------------------");
-
-                            console.log(visible2);
-                          }}
-                        />
-                      )}
-                    </View>
-                  )}
-                </View>
-              ) : (
-                <View
-                  style={{
-                    width: "90%",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-evenly",
-                  }}
-                >
+                />
+                {rangeSelection && (
+                  <Text style={{ paddingLeft: 10, color: theme.reverse }}>
+                    -
+                  </Text>
+                )}
+                {rangeSelection && (
                   <RNDateTimePicker
-                    textColor={theme.text}
                     mode="date"
-                    value={dateFirst}
+                    value={dateLast}
                     onChange={(event, selectedDate) => {
-                      // Ensure that selectedDate is not older than dateLast
-                      if (selectedDate.getTime() > dateLast.getTime()) {
-                        setDateLast(selectedDate);
+                      // Ensure that selectedDate is not older than dateFirst
+                      if (selectedDate.getTime() < dateFirst.getTime()) {
+                        setDateFirst(selectedDate);
                       }
-                      setDateFirst(selectedDate || dateFirst);
+                      setDateLast(selectedDate || dateLast);
                     }}
                   />
-                  {rangeSelection == 1 && (
-                    <Text style={{ paddingLeft: 10, color: theme.text }}>
-                      -
-                    </Text>
-                  )}
-                  {rangeSelection == 1 && (
-                    <RNDateTimePicker
-                      mode="date"
-                      value={dateLast}
-                      onChange={(event, selectedDate) => {
-                        // Ensure that selectedDate is not older than dateFirst
-                        if (selectedDate.getTime() < dateFirst.getTime()) {
-                          setDateFirst(selectedDate);
-                        }
-                        setDateLast(selectedDate || dateLast);
-                      }}
-                    />
-                  )}
-                </View>
-              )}
+                )}
+              </View>
+              <View
+                style={{
+                  width: "29%",
+                  paddingRight: 20,
+                  paddingLeft: 10,
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <SwitchSelector
+                  options={options}
+                  initial={0}
+                  buttonColor={theme.card}
+                  onPress={(value) => {
+                    setRangeSelection(value);
+                  }}
+                />
+              </View>
             </View>
             <SelectDropdown
               defaultValueByIndex={0}
@@ -500,13 +384,13 @@ export default function SeeAll() {
                   <View
                     style={[
                       styles.dropdownButtonStyle,
-                      { borderColor: theme.text },
+                      { borderColor: theme.reverse },
                     ]}
                   >
                     <Text
                       style={[
                         styles.dropdownButtonTxtStyle,
-                        { color: theme.text },
+                        { color: theme.reverse },
                       ]}
                     >
                       {selectedItem && selectedItem.title}
@@ -515,7 +399,7 @@ export default function SeeAll() {
                       name={isOpened ? "chevron-up" : "chevron-down"}
                       style={[
                         styles.dropdownButtonArrowStyle,
-                        { color: theme.text },
+                        { color: theme.reverse },
                       ]}
                     />
                   </View>
@@ -547,89 +431,57 @@ export default function SeeAll() {
             <View
               style={{
                 flexDirection: "row",
-                width: "100%",
                 justifyContent: "flex-end",
                 marginBottom: 10,
                 paddingRight: 20,
               }}
             >
               <Button
-                color={theme.text}
                 onPress={() => {
-                  setFilterActive(false);
-                  setSelection(0);
+                  setFilterActive(true);
                   toggleExpand();
                 }}
                 title="Clear"
               ></Button>
               <Button
-                color={theme.text}
                 onPress={() => {
-                  setFilterActive(true);
-                  console.log(dateFirst);
-                  console.log(dateLast);
-                  console.log(rangeSelection);
-                  console.log(selection);
-
+                  setFilterActive(false);
                   toggleExpand();
                 }}
                 title="Filter"
               ></Button>
             </View>
           </View>
-        ) : (
-          <View></View>
-        )}
+        </View>
         <ScrollView>
           <FlatList
             scrollEnabled={false}
             style={{ width: "100%", paddingHorizontal: 20 }}
             data={expensesArray.filter((item) => {
-              const itemDate = new Date(item.date);
-              const firstDate = new Date(dateFirst);
-              const lastDate = new Date(dateLast);
-
-              if (filterActive && rangeSelection === 0) {
-                // Single Date Filtering
-                if (selection === 0) {
+              // Check if filterActive is true and apply date filtering logic
+              if (filterActive) {
+                if (rangeSelection) {
+                  // If range selection is true, filter by date range
+                  const itemDate = new Date(item.date);
+                  return (
+                    itemDate.getTime() >= dateFirst.getTime() &&
+                    itemDate.getTime() <= dateLast.getTime()
+                  );
+                } else {
+                  // If range selection is false, filter by selected date
+                  const itemDate = new Date(item.date);
+                  const firstDate = new Date(dateFirst);
                   return (
                     itemDate.getDate() === firstDate.getDate() &&
                     itemDate.getMonth() === firstDate.getMonth() &&
                     itemDate.getFullYear() === firstDate.getFullYear()
                   );
                 }
-                if (selection !== 0) {
-                  return (
-                    itemDate.getDate() === firstDate.getDate() &&
-                    itemDate.getMonth() === firstDate.getMonth() &&
-                    itemDate.getFullYear() === firstDate.getFullYear() &&
-                    item.type === selection
-                  );
-                }
-              } else if (filterActive && rangeSelection === 1) {
-                // Date Range Filtering
-                if (selection === 0) {
-                  return itemDate >= firstDate && itemDate <= lastDate;
-                } else {
-                  return (
-                    itemDate >= firstDate &&
-                    itemDate <= lastDate &&
-                    item.type === selection
-                  );
-                }
-              } else if (filterActive && rangeSelection === 2) {
-                // Category Filtering
-                if (selection === 0) {
-                  return true;
-                } else {
-                  return item.type === selection;
-                }
               } else {
-                // No Filter Applied
-                return true;
+                // If filterActive is false, apply filtering based on category selection
+                return selection === 0 || item.type === selection;
               }
             })}
-            keyExtractor={(item) => item.timeStamp}
             renderItem={({ item, index }) => (
               <View>
                 <View style={{ height: 12 }} />
@@ -651,10 +503,10 @@ export default function SeeAll() {
           <MaxSpacer />
           <MaxSpacer />
         </ScrollView>
-      </View>
+      </SafeAreaView>
     );
   }
-}
+};
 
 const styles = StyleSheet.create({
   dropdownButtonTxtStyle: {
@@ -696,7 +548,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "grey",
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
     paddingHorizontal: 12,
     marginTop: 15,
@@ -750,3 +602,4 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 30,
   },
 });
+export default AllGroupExpenses;

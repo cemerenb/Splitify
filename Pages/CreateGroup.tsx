@@ -7,7 +7,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -24,12 +24,14 @@ import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
+import { ThemeContext } from "../Theme/ThemeContext";
 
 export default function CreateGroup() {
   const [groupName, setGroupName] = useState("");
   const [selection, setSelection] = useState(0);
   const [loading, setLoadingStatus] = useState(false);
   const [groups, setGroups] = useState([]);
+  const { theme } = useContext(ThemeContext);
 
   const selectionData = [
     { title: "Home" },
@@ -101,10 +103,12 @@ export default function CreateGroup() {
         <Text style={{ fontSize: 50, color: "white" }}>Create Group</Text>
       </View>
 
-      <View style={styles.bottomSheet}>
+      <View style={[styles.bottomSheet, { backgroundColor: theme.background }]}>
         <View>
           <TextInput
             style={{
+              color: theme.text,
+              backgroundColor: theme.primary,
               marginVertical: 40,
               fontSize: 18,
               textAlignVertical: "center",
@@ -119,6 +123,7 @@ export default function CreateGroup() {
             }}
             maxLength={25}
             placeholder="Group Name"
+            placeholderTextColor={theme.text}
             value={groupName}
             onChangeText={setGroupName}
             keyboardType="default"
@@ -132,13 +137,26 @@ export default function CreateGroup() {
             }}
             renderButton={(selectedItem, isOpened) => {
               return (
-                <View style={styles.dropdownButtonStyle}>
-                  <Text style={styles.dropdownButtonTxtStyle}>
+                <View
+                  style={[
+                    styles.dropdownButtonStyle,
+                    { backgroundColor: theme.primary },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.dropdownButtonTxtStyle,
+                      { color: theme.text },
+                    ]}
+                  >
                     {selectedItem && selectedItem.title}
                   </Text>
                   <Icon
                     name={isOpened ? "chevron-up" : "chevron-down"}
-                    style={styles.dropdownButtonArrowStyle}
+                    style={[
+                      styles.dropdownButtonArrowStyle,
+                      { color: theme.text },
+                    ]}
                   />
                 </View>
               );
@@ -148,10 +166,15 @@ export default function CreateGroup() {
                 <View
                   style={{
                     ...styles.dropdownItemStyle,
-                    ...(isSelected && { backgroundColor: "#f2f2f2" }),
+                    backgroundColor: theme.primary,
+                    ...(isSelected && { backgroundColor: theme.card }),
                   }}
                 >
-                  <Text style={styles.dropdownItemTxtStyle}>{item.title}</Text>
+                  <Text
+                    style={[styles.dropdownItemTxtStyle, { color: theme.text }]}
+                  >
+                    {item.title}
+                  </Text>
                 </View>
               );
             }}
@@ -192,8 +215,14 @@ export default function CreateGroup() {
             }}
           >
             {loading ? (
-              <View style={{ flex: 1, justifyContent: "center" }}>
-                <ActivityIndicator size="small" color="white" />
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  backgroundColor: theme.background,
+                }}
+              >
+                <ActivityIndicator size="small" color={theme.gradientStart} />
               </View>
             ) : (
               <Text style={{ color: "white", fontSize: 20 }}>Create Group</Text>

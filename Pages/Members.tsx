@@ -1,5 +1,5 @@
 import { RouteProp, useNavigation } from "@react-navigation/native";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -13,8 +13,11 @@ import {
   Modal,
   Button,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { LinearGradient } from "expo-linear-gradient";
+
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import {
   arrayUnion,
@@ -28,6 +31,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaxSpacer, MinSpacer } from "../Utils/Spacers";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
+import { ThemeContext } from "../Theme/ThemeContext";
 
 type RootStackParamList = {
   Members: { groupId: string };
@@ -51,6 +55,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   const [admin, setAdminStatus] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState("");
+  const { theme } = useContext(ThemeContext);
 
   const generateRandomString = async (length = 10) => {
     // Possible characters for the random string
@@ -92,6 +97,24 @@ const Members: React.FC<MembersProps> = ({ route }) => {
     setLoadingStatus(false);
   };
 
+  const transferOwnership = async (uid) => {
+    try {
+      setModalVisible(true);
+      const docRef = doc(FIRESTORE_DB, "groups", groupId);
+      await updateDoc(docRef, {
+        admins: arrayUnion(uid),
+        ownerUid: uid,
+      });
+      setAdmins((await getDoc(docRef)).data().admins);
+      setOwnerUid((await getDoc(docRef)).data().ownerUid);
+      // @ts-ignore
+
+      navigation.replace("Members", { groupId: groupId });
+      setModalVisible(false);
+    } catch (error) {
+      Alert.alert("An error occured while transfering ownership");
+    }
+  };
   const makeAdmin = async (uid) => {
     setModalVisible(true);
     const docRef = doc(FIRESTORE_DB, "groups", groupId);
@@ -248,7 +271,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
         style={{
           height: 0.3,
           width: "100%",
-          backgroundColor: "grey",
+          backgroundColor: theme.text,
         }}
       />
     );
@@ -256,189 +279,473 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   const { groupId } = route.params;
   if (memberNames.length < members.length) {
     return (
-      <View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          backgroundColor: theme.background,
+        }}
+      >
+        <ActivityIndicator size="large" color={theme.gradientStart} />
       </View>
     );
   } else if (memberNames.length === members.length && members.length > 0) {
     return (
-      <SafeAreaView>
-        <Modal
-          visible={modalVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
+      <SafeAreaView
+        style={{
+          backgroundColor: theme.background,
+          flex: 1,
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          alignItems: "flex-start",
+        }}
+      >
+        <ScrollView>
+          <Modal
+            visible={modalVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalBackground}>
               <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
-                  width: Dimensions.get("window").width * 0.7,
-                }}
+                style={[
+                  styles.modalContainer,
+                  { backgroundColor: theme.secondary },
+                ]}
               >
-                <TouchableOpacity
-                  onPress={() => setModalVisible(false)}
-                  style={styles.closeButton}
-                >
-                  <Ionicons name="close" size={30} color="black" />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={{ fontSize: 22 }}>
-                {memberNames[members.indexOf(selectedUser)]}
-              </Text>
-              <Text style={{ fontSize: 12 }}>{selectedUser}</Text>
-
-              <View
-                style={{
-                  marginTop: 30,
-                  borderRadius: 20,
-                  backgroundColor: "rgba(20,20,20,0.05)",
-                  width: Dimensions.get("window").width * 0.8 - 40,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    if (selectedUser == ownerUid) {
-                      Alert.alert(
-                        "",
-                        "You cannot kick group owner",
-                        [
-                          {
-                            text: "Okay",
-                            onPress: () => {
-                              setModalVisible(false);
-                            },
-                            style: "cancel",
-                          },
-                        ],
-                        { cancelable: true }
-                      );
-                    } else {
-                      kickUser(selectedUser);
-                    }
-                  }}
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingHorizontal: 20,
-                    paddingVertical: 20,
-                  }}
-                >
-                  <Text style={{ fontSize: 18 }}>Kick User</Text>
-                </TouchableOpacity>
                 <View
                   style={{
-                    height: 0.5,
-                    backgroundColor: "rgba(50,50,50,0.3)",
-                    width: "100%",
-                  }}
-                ></View>
-                <TouchableOpacity
-                  onPress={() => {
-                    if (selectedUser == ownerUid) {
-                      Alert.alert(
-                        "",
-                        "You cannot change the group owner's permissions",
-                        [
-                          {
-                            text: "Okay",
-                            onPress: () => {
-                              setModalVisible(false);
-                            },
-                            style: "cancel",
-                          },
-                        ],
-                        { cancelable: true }
-                      );
-                    } else {
-                      admins.includes(selectedUser)
-                        ? revokeAdmin(selectedUser)
-                        : makeAdmin(selectedUser);
-                    }
-                  }}
-                  style={{
                     flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingHorizontal: 20,
-                    paddingVertical: 20,
+                    justifyContent: "flex-end",
+                    width: Dimensions.get("window").width * 0.7,
                   }}
                 >
-                  <Text style={{ fontSize: 18 }}>
-                    {admins.includes(selectedUser)
-                      ? "Revoke Admin"
-                      : "Make Admin"}
-                  </Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setModalVisible(false)}
+                    style={styles.closeButton}
+                  >
+                    <Ionicons name="close" size={30} color={theme.text} />
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={{ fontSize: 22, color: theme.text }}>
+                  {memberNames[members.indexOf(selectedUser)]}
+                </Text>
+                <Text style={{ fontSize: 12, color: theme.text }}>
+                  {selectedUser}
+                </Text>
+
+                <View
+                  style={{
+                    marginTop: 30,
+                    borderRadius: 20,
+                    backgroundColor: theme.third,
+                    width: Dimensions.get("window").width * 0.8 - 40,
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (selectedUser == ownerUid) {
+                        Alert.alert(
+                          "",
+                          "You cannot kick group owner",
+                          [
+                            {
+                              text: "Okay",
+                              onPress: () => {
+                                setModalVisible(false);
+                              },
+                              style: "cancel",
+                            },
+                          ],
+                          { cancelable: true }
+                        );
+                      } else {
+                        kickUser(selectedUser);
+                      }
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 20,
+                      paddingVertical: 20,
+                    }}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                      Kick User
+                    </Text>
+                  </TouchableOpacity>
+                  <View
+                    style={{
+                      height: 0.5,
+                      backgroundColor: "rgba(50,50,50,0.3)",
+                      width: "100%",
+                    }}
+                  ></View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (selectedUser == ownerUid) {
+                        Alert.alert(
+                          "",
+                          "You cannot change the group owner's permissions",
+                          [
+                            {
+                              text: "Okay",
+                              onPress: () => {
+                                setModalVisible(false);
+                              },
+                              style: "cancel",
+                            },
+                          ],
+                          { cancelable: true }
+                        );
+                      } else {
+                        admins.includes(selectedUser)
+                          ? revokeAdmin(selectedUser)
+                          : makeAdmin(selectedUser);
+                      }
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 20,
+                      paddingVertical: 20,
+                    }}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                      {admins.includes(selectedUser)
+                        ? "Revoke Admin"
+                        : "Make Admin"}
+                    </Text>
+                  </TouchableOpacity>
+                  {FIREBASE_AUTH.currentUser.uid == ownerUid ? (
+                    <View>
+                      <View
+                        style={{
+                          height: 0.5,
+                          backgroundColor: "rgba(50,50,50,0.3)",
+                          width: "100%",
+                        }}
+                      ></View>
+                      <TouchableOpacity
+                        onPress={async () => {
+                          Alert.alert(
+                            "",
+                            "Are you sure you want to transfer ownership?",
+                            [
+                              {
+                                text: "Cancel",
+                                onPress: () => {},
+                              },
+                              {
+                                text: "Transfer",
+                                onPress: async () => {
+                                  await transferOwnership(selectedUser);
+                                },
+                                style: "default",
+                              },
+                            ],
+                            { cancelable: true }
+                          );
+                        }}
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          paddingHorizontal: 20,
+                          paddingVertical: 20,
+                        }}
+                      >
+                        <Text style={{ color: theme.text, fontSize: 18 }}>
+                          Transfer Ownership
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View></View>
+                  )}
+                </View>
               </View>
             </View>
-          </View>
-        </Modal>
-        <View style={{ paddingBottom: 20 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                navigation.goBack();
-              }}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingHorizontal: 10,
-                paddingTop: 10,
-              }}
-            >
-              <Ionicons name="chevron-back-outline" size={30}></Ionicons>
-              <Text style={{ fontSize: 18 }}>Back</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        {admin ? (
-          <View
-            style={{
-              width: Dimensions.get("window").width - 40,
-              marginLeft: 20,
-              borderRadius: 20,
-              backgroundColor: "rgba(20,20,20,0.05)",
-            }}
-          >
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex-start",
-                alignItems: "center",
-                paddingHorizontal: 20,
-                paddingVertical: 15,
-              }}
-              onPress={() => {
-                onShare();
-              }}
-            >
-              <Ionicons name="scan-outline" size={30}></Ionicons>
-              <Text style={{ fontSize: 20, paddingLeft: 10 }}>
-                Scan QR code
-              </Text>
-            </TouchableOpacity>
+          </Modal>
+          <View style={{ paddingBottom: 20 }}>
             <View
               style={{
-                height: 0.3,
-                width: "100%",
-                backgroundColor: "grey",
                 flexDirection: "row",
-                justifyContent: "center",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
-            ></View>
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 10,
+                  paddingTop: 10,
+                }}
+              >
+                <Ionicons
+                  color={theme.text}
+                  name="chevron-back-outline"
+                  size={30}
+                ></Ionicons>
+                <Text style={{ color: theme.text, fontSize: 18 }}>Back</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          {admin ? (
+            <View
+              style={{
+                width: Dimensions.get("window").width - 40,
+                marginLeft: 20,
+                borderRadius: 20,
+                backgroundColor: theme.primary,
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  paddingHorizontal: 20,
+                  paddingVertical: 15,
+                }}
+                onPress={() => {
+                  onShare();
+                }}
+              >
+                <Ionicons
+                  color={theme.text}
+                  name="scan-outline"
+                  size={30}
+                ></Ionicons>
+                <Text
+                  style={{ color: theme.text, fontSize: 20, paddingLeft: 10 }}
+                >
+                  Scan QR code
+                </Text>
+              </TouchableOpacity>
+              <View
+                style={{
+                  height: 0.3,
+                  width: "100%",
+                  backgroundColor: theme.text,
+                  flexDirection: "row",
+                  justifyContent: "center",
+                }}
+              ></View>
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  paddingHorizontal: 20,
+                  paddingVertical: 15,
+                }}
+                onPress={() => {
+                  onShare();
+                }}
+              >
+                <Ionicons
+                  color={theme.text}
+                  name="link-outline"
+                  size={30}
+                ></Ionicons>
+                <Text
+                  style={{ color: theme.text, fontSize: 20, paddingLeft: 10 }}
+                >
+                  Share invite code
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={{ backgroundColor: theme.background }}></View>
+          )}
+          <MaxSpacer></MaxSpacer>
+          {admins.includes(FIREBASE_AUTH.currentUser.uid) ? (
+            <FlatList
+              ItemSeparatorComponent={FlatListItemSeparator}
+              scrollEnabled={false}
+              style={{
+                width: Dimensions.get("window").width - 40,
+                marginLeft: 20,
+                borderRadius: 20,
+                backgroundColor: theme.primary,
+              }}
+              data={members} // List data
+              keyExtractor={(item) => item} // Use groupId as unique key
+              renderItem={({ index, item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (item != FIREBASE_AUTH.currentUser.uid) {
+                      setModalVisible(true);
+                      setSelectedUser(item);
+                    }
+                  }}
+                  disabled={
+                    item == FIREBASE_AUTH.currentUser.uid ? true : false
+                  }
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 20,
+                      paddingVertical: 20,
+                    }}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 20 }}>
+                      {memberNames[index]}
+                    </Text>
+                    {members[index] == ownerUid ? (
+                      <View
+                        style={{
+                          width: 60,
+                          flexDirection: "row",
+                          justifyContent: "flex-end",
+                          alignItems: "flex-end",
+                        }}
+                      >
+                        <LinearGradient
+                          colors={[
+                            "rgba(130, 67, 255, 1)",
+                            "rgba(221, 50, 52, 1)",
+                          ]}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                          style={{
+                            height: 30,
+                            width: 70,
+                            borderRadius: 30,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ color: "white", fontWeight: "600" }}>
+                            Owner
+                          </Text>
+                        </LinearGradient>
+                      </View>
+                    ) : admins.includes(members[index]) &&
+                      ownerUid != members[index] ? (
+                      <View
+                        style={{
+                          width: 70,
+                          flexDirection: "row",
+                          justifyContent: "flex-end",
+                          alignItems: "flex-end",
+                          paddingHorizontal: 10,
+                        }}
+                      >
+                        <Text style={{ color: theme.text, fontSize: 16 }}>
+                          Admin
+                        </Text>
+                      </View>
+                    ) : (
+                      <View></View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          ) : (
+            <FlatList
+              ItemSeparatorComponent={FlatListItemSeparator}
+              scrollEnabled={false}
+              style={{
+                width: Dimensions.get("window").width - 40,
+                marginLeft: 20,
+                borderRadius: 20,
+                backgroundColor: theme.background,
+              }}
+              data={members} // List data
+              keyExtractor={(item) => item} // Use groupId as unique key
+              renderItem={({ index, item }) => (
+                <View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 20,
+                      paddingVertical: 20,
+                    }}
+                  >
+                    <Text style={{ fontSize: 20 }}>{memberNames[index]}</Text>
+                    {members[index] == ownerUid ? (
+                      <View
+                        style={{
+                          width: 60,
+                          flexDirection: "row",
+                          justifyContent: "flex-end",
+                          alignItems: "flex-end",
+                        }}
+                      >
+                        <LinearGradient
+                          colors={[
+                            "rgba(130, 67, 255, 1)",
+                            "rgba(221, 50, 52, 1)",
+                          ]}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                          style={{
+                            height: 30,
+                            width: 70,
+                            borderRadius: 30,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ color: "white", fontWeight: "600" }}>
+                            Owner
+                          </Text>
+                        </LinearGradient>
+                      </View>
+                    ) : admins.includes(members[index]) &&
+                      ownerUid != members[index] ? (
+                      <View
+                        style={{
+                          width: 70,
+                          flexDirection: "row",
+                          justifyContent: "flex-end",
+                          alignItems: "flex-end",
+                          paddingHorizontal: 10,
+                        }}
+                      >
+                        <Text style={{ fontSize: 16 }}>Admin</Text>
+                      </View>
+                    ) : (
+                      <View></View>
+                    )}
+                  </View>
+                </View>
+              )}
+            />
+          )}
+
+          <MaxSpacer></MaxSpacer>
+          <View
+            style={{
+              width: Dimensions.get("window").width - 40,
+              marginLeft: 20,
+              flexDirection: "column",
+              justifyContent: "flex-start",
+            }}
+          >
             <TouchableOpacity
               style={{
+                borderRadius: 20,
+
+                backgroundColor: "rgb(253,60,74)",
                 flexDirection: "row",
                 justifyContent: "flex-start",
                 alignItems: "center",
@@ -446,178 +753,67 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 paddingVertical: 15,
               }}
               onPress={() => {
-                onShare();
+                if (members.length == 1) {
+                  Alert.alert(
+                    "Delete Group",
+                    "Are you sure you want to delete the group?",
+                    [
+                      {
+                        text: "Cancel",
+                        onPress: () => {},
+                      },
+                      {
+                        text: "Delete",
+                        onPress: () => {
+                          deleteGroup();
+                        },
+                        style: "destructive",
+                      },
+                    ],
+                    { cancelable: true }
+                  );
+                } else {
+                  Alert.alert(
+                    "Leave Group",
+                    "Are you sure you want to leave the group?",
+                    [
+                      {
+                        text: "Cancel",
+                        onPress: () => {},
+                      },
+                      {
+                        text: "Leave",
+                        onPress: () => {
+                          leaveGroup();
+                        },
+                        style: "destructive",
+                      },
+                    ],
+                    { cancelable: true }
+                  );
+                }
               }}
             >
-              <Ionicons name="link-outline" size={30}></Ionicons>
-              <Text style={{ fontSize: 20, paddingLeft: 10 }}>
-                Share invite code
+              {members.length == 1 ? (
+                <Ionicons
+                  color={"white"}
+                  name="close-outline"
+                  size={30}
+                ></Ionicons>
+              ) : (
+                <Ionicons
+                  color={"white"}
+                  name="log-out-outline"
+                  size={30}
+                ></Ionicons>
+              )}
+
+              <Text style={{ color: "white", fontSize: 20, paddingLeft: 10 }}>
+                {members.length == 1 ? "Delete Group" : "Leave Group"}
               </Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          <View></View>
-        )}
-        <MaxSpacer></MaxSpacer>
-        {admins.includes(FIREBASE_AUTH.currentUser.uid) ? (
-          <FlatList
-            ItemSeparatorComponent={FlatListItemSeparator}
-            scrollEnabled={false}
-            style={{
-              width: Dimensions.get("window").width - 40,
-              marginLeft: 20,
-              borderRadius: 20,
-              backgroundColor: "rgba(20,20,20,0.05)",
-            }}
-            data={members} // List data
-            keyExtractor={(item) => item} // Use groupId as unique key
-            renderItem={({ index, item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  if (item != FIREBASE_AUTH.currentUser.uid) {
-                    setModalVisible(true);
-                    setSelectedUser(item);
-                  }
-                }}
-                disabled={item == FIREBASE_AUTH.currentUser.uid ? true : false}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingHorizontal: 20,
-                    paddingVertical: 20,
-                  }}
-                >
-                  <Text style={{ fontSize: 20 }}>{memberNames[index]}</Text>
-                  <Text style={{ fontSize: 16 }}>
-                    {members[index] == ownerUid
-                      ? "Owner"
-                      : admins.includes(members[index])
-                      ? "Admin"
-                      : ""}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        ) : (
-          <FlatList
-            ItemSeparatorComponent={FlatListItemSeparator}
-            scrollEnabled={false}
-            style={{
-              width: Dimensions.get("window").width - 40,
-              marginLeft: 20,
-              borderRadius: 20,
-              backgroundColor: "rgba(20,20,20,0.05)",
-            }}
-            data={members} // List data
-            keyExtractor={(item) => item} // Use groupId as unique key
-            renderItem={({ index, item }) => (
-              <View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingHorizontal: 20,
-                    paddingVertical: 20,
-                  }}
-                >
-                  <Text style={{ fontSize: 20 }}>{memberNames[index]}</Text>
-                  <Text style={{ fontSize: 16 }}>
-                    {members[index] == ownerUid
-                      ? "Owner"
-                      : admins.includes(members[index])
-                      ? "Admin"
-                      : ""}
-                  </Text>
-                </View>
-              </View>
-            )}
-          />
-        )}
-
-        <MaxSpacer></MaxSpacer>
-        <View
-          style={{
-            width: Dimensions.get("window").width - 40,
-            marginLeft: 20,
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              borderRadius: 20,
-
-              backgroundColor: "rgb(253,60,74)",
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              paddingHorizontal: 20,
-              paddingVertical: 15,
-            }}
-            onPress={() => {
-              if (members.length == 1) {
-                Alert.alert(
-                  "Delete Group",
-                  "Are you sure you want to delete the group?",
-                  [
-                    {
-                      text: "Cancel",
-                      onPress: () => {},
-                    },
-                    {
-                      text: "Delete",
-                      onPress: () => {
-                        deleteGroup();
-                      },
-                      style: "destructive",
-                    },
-                  ],
-                  { cancelable: true }
-                );
-              } else {
-                Alert.alert(
-                  "Leave Group",
-                  "Are you sure you want to leave the group?",
-                  [
-                    {
-                      text: "Cancel",
-                      onPress: () => {},
-                    },
-                    {
-                      text: "Leave",
-                      onPress: () => {
-                        leaveGroup();
-                      },
-                      style: "destructive",
-                    },
-                  ],
-                  { cancelable: true }
-                );
-              }
-            }}
-          >
-            {members.length == 1 ? (
-              <Ionicons
-                color={"white"}
-                name="close-outline"
-                size={30}
-              ></Ionicons>
-            ) : (
-              <Ionicons
-                color={"white"}
-                name="log-out-outline"
-                size={30}
-              ></Ionicons>
-            )}
-
-            <Text style={{ color: "white", fontSize: 20, paddingLeft: 10 }}>
-              {members.length == 1 ? "Delete Group" : "Leave Group"}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }

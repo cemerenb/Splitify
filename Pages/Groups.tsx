@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Image,
   View,
@@ -9,17 +9,17 @@ import {
   Dimensions,
   StyleSheet,
   ImageBackground,
+  SafeAreaView,
 } from "react-native";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
-import { Icon } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaxSpacer } from "../Utils/Spacers";
+import { ThemeContext } from "../Theme/ThemeContext";
 
 // Define the type for group data
 type Group = {
@@ -36,6 +36,7 @@ const Groups = () => {
   const [groupData, setGroupData] = useState<Group[]>([]);
   const [names, setNames] = useState([]);
   const isFocused = useIsFocused();
+  const { theme } = useContext(ThemeContext);
 
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
@@ -111,7 +112,7 @@ const Groups = () => {
           activeOpacity={0.7}
         >
           <LinearGradient
-            colors={["rgba(130, 67, 255, 1)", "rgba(221, 50, 52, 1)"]}
+            colors={["rgba(130, 96, 245, 1)", "rgba(221, 50, 52, 1)"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{
@@ -173,13 +174,19 @@ const Groups = () => {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          backgroundColor: theme.background,
+        }}
+      >
+        <ActivityIndicator size="large" color={theme.gradientStart} />
       </View>
     );
   } else {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
         <MaxSpacer></MaxSpacer>
         <View
           style={{
@@ -193,7 +200,12 @@ const Groups = () => {
               navigation.navigate("JoinPage");
             }}
           >
-            <View style={styles.groupContainer}>
+            <View
+              style={[
+                styles.groupContainer,
+                { backgroundColor: theme.gradientStart },
+              ]}
+            >
               <Ionicons name={"people-outline"} size={40} color="white" />
               <Text
                 style={{ fontSize: 18, paddingHorizontal: 4, color: "white" }}
@@ -203,7 +215,12 @@ const Groups = () => {
             </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("CreateGroup")}>
-            <View style={styles.groupContainer}>
+            <View
+              style={[
+                styles.groupContainer,
+                { backgroundColor: theme.gradientStart },
+              ]}
+            >
               <Ionicons name={"add"} size={40} color="white" />
               <Text
                 style={{ fontSize: 18, paddingHorizontal: 4, color: "white" }}

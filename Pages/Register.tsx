@@ -1,5 +1,4 @@
-import React, { useRef, useState } from "react";
-import { StatusBar } from "expo-status-bar";
+import React, { useContext, useRef, useState } from "react";
 import {
   Button,
   StyleSheet,
@@ -8,6 +7,10 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Platform,
+  Dimensions,
+  KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -17,12 +20,13 @@ import {
 } from "firebase/auth";
 import { sendEmailVerification } from "firebase/auth";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
-import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { doc, setDoc } from "firebase/firestore";
 import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
+import { ThemeContext } from "../Theme/ThemeContext";
+import Modal from "react-native-modal";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -36,6 +40,7 @@ export default function Register() {
   const [isCompletedVisible, setIsCompletedVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const passwordFieldRef = useRef<TextInput>(null); // Ref for the password field
+  const { theme } = useContext(ThemeContext);
 
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
@@ -126,144 +131,160 @@ export default function Register() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Sign Up to Splitify</Text>
-      <View style={styles.loginArea}>
-        <View style={styles.inputStyle}>
-          <TextInput
-            style={styles.inputText}
-            placeholder="Full Name"
-            onChangeText={setFullName}
-            value={fullName}
-            autoComplete="additional-name"
-            autoCapitalize="words"
-            keyboardType="default"
-            returnKeyType="next"
-            onSubmitEditing={() => {
-              this.secondTextInput.focus();
-            }}
-          />
-        </View>
-        <MidSpacer></MidSpacer>
-        <View style={styles.inputStyle}>
-          <TextInput
-            ref={(input) => {
-              this.secondTextInput = input;
-            }}
-            returnKeyType="next"
-            onSubmitEditing={() => {
-              this.thirdTextInput.focus();
-            }}
-            style={styles.inputText}
-            placeholder="Email"
-            onChangeText={setEmail}
-            value={email}
-            autoComplete="email"
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-        </View>
-        <MidSpacer></MidSpacer>
-        <View style={styles.inputStyle}>
-          <TextInput
-            ref={(input) => {
-              this.thirdTextInput = input;
-            }}
-            returnKeyType="next"
-            onSubmitEditing={() => {
-              this.fourthTextInput.focus();
-            }}
-            style={styles.inputText}
-            placeholder="Password"
-            onChangeText={setPassword}
-            value={password}
-            autoComplete="password"
-            secureTextEntry={!showPassword}
-          />
-          <MaterialCommunityIcons
-            name={!showPassword ? "eye-off" : "eye"}
-            size={24}
-            color="#aaa"
-            style={styles.icon}
-            onPress={toggleShowPassword}
-          />
-        </View>
-        <MinSpacer />
-        <View style={styles.inputStyle}>
-          <TextInput
-            ref={(input) => {
-              this.fourthTextInput = input;
-            }}
-            returnKeyType="done"
-            style={styles.inputText}
-            placeholder="Confirm Password"
-            onChangeText={setConfirmPassword}
-            value={confirmPassword}
-            autoComplete="password"
-            secureTextEntry={!showConfirmPassword}
-          />
-          <MaterialCommunityIcons
-            name={!showConfirmPassword ? "eye-off" : "eye"}
-            size={24}
-            color="#aaa"
-            style={styles.icon}
-            onPress={toggleShowConfirmPassword}
-          />
-        </View>
-      </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={signUp} style={styles.button}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text></Text>
-      <Text style={styles.signUp}>
-        Already have an account?
-        <Text onPress={() => navigation.goBack()} style={styles.link}>
-          {" "}
-          Login
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1, height: Dimensions.get("window").height * 1.5 }}
+    >
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <Text style={[styles.header, { color: theme.text }]}>
+          Sign Up to Splitify
         </Text>
-      </Text>
-      <StatusBar style="auto" />
+        <View style={styles.loginArea}>
+          <View style={[styles.inputStyle, { backgroundColor: theme.primary }]}>
+            <TextInput
+              placeholderTextColor={theme.text}
+              style={[styles.inputText, { color: theme.text }]}
+              placeholder="Full Name"
+              onChangeText={setFullName}
+              value={fullName}
+              autoComplete="name"
+              autoCapitalize="words"
+              keyboardType="default"
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                this.secondTextInput.focus();
+              }}
+            />
+          </View>
+          <MidSpacer></MidSpacer>
+          <View style={[styles.inputStyle, { backgroundColor: theme.primary }]}>
+            <TextInput
+              ref={(input) => {
+                this.secondTextInput = input;
+              }}
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                this.thirdTextInput.focus();
+              }}
+              placeholderTextColor={theme.text}
+              style={[styles.inputText, { color: theme.text }]}
+              placeholder="Email"
+              onChangeText={setEmail}
+              value={email}
+              autoComplete="email"
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+          </View>
+          <MidSpacer></MidSpacer>
+          <View style={[styles.inputStyle, { backgroundColor: theme.primary }]}>
+            <TextInput
+              ref={(input) => {
+                this.thirdTextInput = input;
+              }}
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                this.fourthTextInput.focus();
+              }}
+              placeholderTextColor={theme.text}
+              style={[styles.inputText, { color: theme.text }]}
+              placeholder="Password"
+              onChangeText={setPassword}
+              value={password}
+              autoComplete="password"
+              secureTextEntry={!showPassword}
+            />
+            <MaterialCommunityIcons
+              name={!showPassword ? "eye-off" : "eye"}
+              size={24}
+              color="#aaa"
+              style={styles.icon}
+              onPress={toggleShowPassword}
+            />
+          </View>
+          <MinSpacer />
+          <View style={[styles.inputStyle, { backgroundColor: theme.primary }]}>
+            <TextInput
+              ref={(input) => {
+                this.fourthTextInput = input;
+              }}
+              placeholderTextColor={theme.text}
+              returnKeyType="done"
+              style={[styles.inputText, { color: theme.text }]}
+              placeholder="Confirm Password"
+              onChangeText={setConfirmPassword}
+              value={confirmPassword}
+              autoComplete="password"
+              secureTextEntry={!showConfirmPassword}
+            />
+            <MaterialCommunityIcons
+              name={!showConfirmPassword ? "eye-off" : "eye"}
+              size={24}
+              color="#aaa"
+              style={styles.icon}
+              onPress={toggleShowConfirmPassword}
+            />
+          </View>
+        </View>
+        <View
+          style={[styles.buttonContainer, { backgroundColor: theme.button }]}
+        >
+          <TouchableOpacity onPress={signUp} style={styles.button}>
+            <Text style={{ fontSize: 22, color: theme.buttonText }}>
+              Sign Up
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Modal */}
-      <Modal isVisible={isModalVisible} backdropOpacity={0.2}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>{errorMessage}</Text>
-          <MinSpacer />
-          <Button title="Close" onPress={() => setIsModalVisible(false)} />
-        </View>
-      </Modal>
-      <Modal isVisible={isCompletedVisible} backdropOpacity={0.2}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>
-            We have sent an email for you to confirm your account. Don't forget
-            to check your spam box.
+        <Text style={{ fontSize: 16, color: theme.text, paddingRight: 5 }}>
+          Already have an account?
+          <Text
+            onPress={() => navigation.goBack()}
+            style={{ color: theme.button, marginLeft: 5 }}
+          >
+            Login
           </Text>
-          <MinSpacer />
-          <Button title="Login" onPress={() => navigation.goBack()} />
-        </View>
-      </Modal>
-    </View>
+        </Text>
+
+        <Modal isVisible={isModalVisible} backdropOpacity={0.2}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{errorMessage}</Text>
+            <MinSpacer />
+            <Button title="Close" onPress={() => setIsModalVisible(false)} />
+          </View>
+        </Modal>
+        <Modal isVisible={isCompletedVisible} backdropOpacity={0.2}>
+          <View
+            style={[styles.modalContent, { backgroundColor: theme.primary }]}
+          >
+            <Text style={[styles.modalText, { color: theme.text }]}>
+              We have sent an email for you to confirm your account. Don't
+              forget to check your spam box.
+            </Text>
+            <MinSpacer />
+            <Button title="Login" onPress={() => navigation.goBack()} />
+          </View>
+        </Modal>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "space-evenly",
   },
   header: {
-    fontSize: 70,
+    fontSize: 60,
     fontWeight: "300",
   },
   loginArea: {
     width: "80%",
   },
   inputStyle: {
+    borderColor: "grey",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -293,21 +314,11 @@ const styles = StyleSheet.create({
   button: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgb(180,24,113)",
     width: "100%",
     height: "100%",
     borderRadius: 10,
   },
-  buttonText: {
-    fontSize: 22,
-    color: "white",
-  },
-  signUp: {
-    fontSize: 16,
-  },
-  link: {
-    color: "purple",
-  },
+
   modalContent: {
     height: 200,
     padding: 20,

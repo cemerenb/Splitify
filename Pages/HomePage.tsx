@@ -4,6 +4,7 @@ import React, {
   useRef,
   useState,
   useEffect,
+  useContext,
 } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -22,23 +23,21 @@ import {
   ImageBackground,
   Appearance,
   useColorScheme,
+  Button,
 } from "react-native";
 
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { getDoc, doc, setDoc } from "firebase/firestore";
 import SelectDropdown from "react-native-select-dropdown";
-import * as SecureStore from "expo-secure-store";
-
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { LineChart, Grid } from "react-native-svg-charts";
 import { Shadow, Gradient } from "../ChartAdds";
 import * as shape from "d3-shape";
-import { Button } from "react-native-paper";
-import { TabBar } from "../TabBar/TabBar";
 import { MaxSpacer, MidSpacer } from "../Utils/Spacers";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
+import { ThemeContext } from "../Theme/ThemeContext";
 
 export default function Home() {
   const [count, setCount] = useState(0);
@@ -54,7 +53,7 @@ export default function Home() {
   const [loading, setLoadingStatus] = useState(true);
   const [recentList, setRecentList] = useState([]);
   const data2 = [80, 10, 95, 48, 24, 67, 51, 12, 33, 0, 24, 20, 50];
-  const colors = useTheme().colors;
+  const { theme } = useContext(ThemeContext);
 
   const items = {
     date: null,
@@ -216,7 +215,10 @@ export default function Home() {
     const month = date.split("T")[0].split("-")[1];
     const year = date.split("T")[0].split("-")[0];
     return (
-      <TouchableOpacity onPress={onPress} style={styles.card}>
+      <TouchableOpacity
+        onPress={onPress}
+        style={[styles.card, { backgroundColor: theme.card }]}
+      >
         <View
           style={{
             flex: 2,
@@ -227,50 +229,50 @@ export default function Home() {
         >
           <View>
             {imageSource == 1 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/bill.png")}
-              />
+              <Ionicons
+                name="receipt-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 2 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/food.png")}
-              />
+              <Ionicons
+                name="fast-food-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 3 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/healthcare.png")}
-              />
+              <Ionicons
+                name="medical-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 4 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/entertainment.png")}
-              />
+              <Ionicons
+                name="balloon-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 5 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/shop.png")}
-              />
+              <Ionicons
+                name="bag-handle-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 6 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/book.png")}
-              />
+              <Ionicons
+                name="book-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 7 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/transportation.png")}
-              />
+              <Ionicons
+                name="train-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : imageSource == 8 ? (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/personalcare.png")}
-              />
+              <Ionicons
+                name="man-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             ) : (
-              <Image
-                style={styles.recentTransactionsImage}
-                source={require("../assets/miscellaneous.png")}
-              />
+              <Ionicons
+                name="cash-outline"
+                style={{ color: theme.text, fontSize: 40 }}
+              ></Ionicons>
             )}
           </View>
         </View>
@@ -282,7 +284,7 @@ export default function Home() {
             paddingHorizontal: 20,
           }}
         >
-          <Text style={styles.cardTitle}>
+          <Text style={[styles.cardTitle, { color: theme.text }]}>
             {imageSource == 1
               ? "Utilities"
               : imageSource == 2
@@ -302,13 +304,17 @@ export default function Home() {
               : "Miscellaneous"}
           </Text>
           {description.length > 40 ? (
-            <Text style={styles.cardDescription}>
+            <Text style={[styles.cardDescription, { color: theme.text }]}>
               {description.slice(0, 40)}...
             </Text>
           ) : (
-            <Text style={styles.cardDescription}>{description}</Text>
+            <Text style={[styles.cardDescription, { color: theme.text }]}>
+              {description}
+            </Text>
           )}
-          <Text style={styles.cardDate}>{day + "/" + month + "/" + year}</Text>
+          <Text style={[styles.cardDate, { color: theme.text }]}>
+            {day + "/" + month + "/" + year}
+          </Text>
         </View>
         <View
           style={{
@@ -318,7 +324,9 @@ export default function Home() {
             paddingHorizontal: 20,
           }}
         >
-          <Text style={styles.cardPrice}>{price}₺</Text>
+          <Text style={[styles.cardPrice, { color: theme.text }]}>
+            {price}₺
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -327,8 +335,14 @@ export default function Home() {
   const [maxWidth, setMaxWidth] = useState(Dimensions.get("window").width);
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator size="large" color="rgb(222, 110, 235)" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          backgroundColor: theme.background,
+        }}
+      >
+        <ActivityIndicator size="large" color={theme.gradientStart} />
       </View>
     );
   } else {
@@ -338,7 +352,7 @@ export default function Home() {
           showsVerticalScrollIndicator={false}
           style={{
             flex: 1,
-            backgroundColor: "rgb(240,240,240)",
+            backgroundColor: theme.background,
           }}
         >
           <View
@@ -360,12 +374,20 @@ export default function Home() {
               renderButton={(selectedItem, isOpened) => {
                 return (
                   <View style={styles.dropdownButtonStyle}>
-                    <Text style={styles.dropdownButtonTxtStyle}>
+                    <Text
+                      style={[
+                        styles.dropdownButtonTxtStyle,
+                        { color: theme.text },
+                      ]}
+                    >
                       {selectedItem && selectedItem.title}
                     </Text>
                     <Icon
                       name={isOpened ? "chevron-up" : "chevron-down"}
-                      style={styles.dropdownButtonArrowStyle}
+                      style={[
+                        styles.dropdownButtonArrowStyle,
+                        { color: theme.text },
+                      ]}
                     />
                   </View>
                 );
@@ -375,10 +397,16 @@ export default function Home() {
                   <View
                     style={{
                       ...styles.dropdownItemStyle,
-                      ...(isSelected && { backgroundColor: "#f2f2f2" }),
+                      backgroundColor: theme.primary,
+                      ...(isSelected && { backgroundColor: theme.card }),
                     }}
                   >
-                    <Text style={styles.dropdownItemTxtStyle}>
+                    <Text
+                      style={[
+                        styles.dropdownItemTxtStyle,
+                        { color: theme.text },
+                      ]}
+                    >
                       {item.title}
                     </Text>
                   </View>
@@ -389,8 +417,10 @@ export default function Home() {
             />
 
             <View style={styles.totalExpensesContainer}>
-              <Text style={{ fontSize: 18 }}>Total Expenses</Text>
-              <Text style={{ fontSize: 55 }}>{total}₺</Text>
+              <Text style={{ fontSize: 18, color: theme.text }}>
+                Total Expenses
+              </Text>
+              <Text style={{ fontSize: 55, color: theme.text }}>{total}₺</Text>
             </View>
 
             <LineChart
@@ -420,15 +450,22 @@ export default function Home() {
 
             <View>
               <View style={styles.recentTransactionsHeader}>
-                <Text style={{ fontSize: 18, flex: 1 }}>Last Transactions</Text>
-                <Button
+                <Text style={{ fontSize: 18, flex: 1, color: theme.text }}>
+                  Last Transactions
+                </Text>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: theme.button,
+                    paddingHorizontal: 10,
+                    paddingVertical: 7,
+                    borderRadius: 40,
+                  }}
                   onPress={() => {
                     navigation.navigate("AllExpenses");
                   }}
-                  style={{ backgroundColor: "rgb(222, 110, 235)" }}
                 >
-                  <Text style={{ fontSize: 16, color: "white" }}>See All</Text>
-                </Button>
+                  <Text style={{ color: theme.buttonText }}>See All</Text>
+                </TouchableOpacity>
               </View>
               <View style={styles.recentTransactionsBody}>
                 <FlatList
@@ -443,7 +480,7 @@ export default function Home() {
                         title={item.note}
                         description={item.note}
                         onPress={() => {
-                          navigation.navigate("ExpenseEntry", item);
+                          navigation.navigate("ExpenseDetails", item);
                         }}
                         price={item.total}
                         date={item.date}
@@ -463,8 +500,14 @@ export default function Home() {
           <SafeAreaView>
             <MidSpacer></MidSpacer>
             <View style={{ flexDirection: "row", paddingHorizontal: 20 }}>
-              <Text style={{ fontSize: 25, fontWeight: "500" }}>Welcome</Text>
-              <Text style={{ fontSize: 25, fontWeight: "300" }}>
+              <Text
+                style={{ fontSize: 25, fontWeight: "500", color: theme.text }}
+              >
+                Welcome
+              </Text>
+              <Text
+                style={{ fontSize: 25, fontWeight: "300", color: theme.text }}
+              >
                 {" "}
                 {FIREBASE_AUTH.currentUser.displayName}
               </Text>
@@ -482,6 +525,7 @@ export default function Home() {
 
               <Text
                 style={{
+                  color: theme.text,
                   fontSize: 25,
                   height: 200,
                   flex: 1,
@@ -501,7 +545,6 @@ export default function Home() {
 }
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
     shadowColor: "000",

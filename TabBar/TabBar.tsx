@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Alert,
   Animated,
@@ -21,6 +21,7 @@ import PersonalExpensesEntry from "../Pages/PersonalExpensesEntry";
 import Groups from "../Pages/Groups";
 import Stats from "../Pages/Stats";
 import { LinearGradient } from "expo-linear-gradient";
+import { ThemeContext } from "../Theme/ThemeContext";
 
 const BottomBar = createBottomTabNavigator();
 
@@ -30,8 +31,6 @@ type Props = {
 
 const renderTabBar = ({ routeName, selectedTab, navigate }) => {
   const renderIcon = (routeName, selectedTab) => {
-    let icon = "";
-
     return (
       <Ionicons
         name={
@@ -44,7 +43,7 @@ const renderTabBar = ({ routeName, selectedTab, navigate }) => {
             : "bar-chart"
         }
         size={25}
-        color={routeName === selectedTab ? "rgb(222, 110, 235)" : "gray"}
+        color={routeName === selectedTab ? "#9C60D7" : "gray"}
       />
     );
   };
@@ -61,10 +60,13 @@ export const TabBar: React.FC<Props> = ({}) => (
   <CurvedBottomBarExpo.Navigator
     type="DOWN"
     style={styles.bottomBar}
-    shadowStyle={styles.shawdow}
+    shadowStyle={[
+      styles.shawdow,
+      { shadowColor: useContext(ThemeContext).theme.shadow },
+    ]}
     height={75}
     circleWidth={60}
-    bgColor="white"
+    bgColor={useContext(ThemeContext).theme.primary}
     initialRouteName="homepage"
     screenOptions={{ headerShown: false }}
     borderTopLeftRight
@@ -72,8 +74,8 @@ export const TabBar: React.FC<Props> = ({}) => (
       <Animated.View style={styles.btnCircleUp}>
         <LinearGradient
           colors={["rgba(130, 67, 255, 1)", "rgba(221, 50, 52, 1)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+          start={{ x: 1, y: 0 }}
+          end={{ x: 0, y: 1 }}
           style={{
             width: 60,
             height: 60,
