@@ -32,6 +32,7 @@ import { MaxSpacer, MinSpacer } from "../Utils/Spacers";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { ThemeContext } from "../Theme/ThemeContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RootStackParamList = {
   Members: { groupId: string };
@@ -51,6 +52,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   const [ownerName, setOwnerName] = useState("");
   const [loading, setLoadingStatus] = useState(true);
   const [selection, setSelection] = useState(1);
+
   const [total, setTotal] = useState(0);
   const [admin, setAdminStatus] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -224,6 +226,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
 
     navigation.pop(2);
   };
+
   const onShare = async () => {
     try {
       const code = await generateRandomString();
@@ -261,6 +264,10 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   useLayoutEffect(() => {
     if (count == 0) {
       getGroupDetails();
+      AsyncStorage.getItem("themeMode").then((value) => {
+        setSelection(value == "dark" ? 2 : value == "light" ? 1 : 0);
+        console.log(value == "dark" ? 2 : value == "light" ? 1 : 0);
+      });
 
       setCount(1);
     }
@@ -295,6 +302,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
         style={{
           backgroundColor: theme.background,
           flex: 1,
+          paddingTop: 50,
           flexDirection: "column",
           justifyContent: "flex-start",
           alignItems: "flex-start",

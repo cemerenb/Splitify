@@ -12,7 +12,7 @@
     "splash": {
       "image": "./splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "red"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -24,7 +24,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "red"
       },
       "package": "cemerenb.splitify.com"
     },

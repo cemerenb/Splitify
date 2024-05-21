@@ -378,7 +378,11 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
   } else {
     return (
       <SafeAreaView
-        style={{ alignItems: "center", backgroundColor: theme.background }}
+        style={{
+          alignItems: "center",
+          backgroundColor: theme.background,
+          paddingTop: 40,
+        }}
       >
         <MaxSpacer></MaxSpacer>
         <View
@@ -539,15 +543,23 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                   <Text style={{ fontSize: 18, flex: 1, color: theme.text }}>
                     Last Transactions
                   </Text>
-                  <Button
+
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: theme.button,
+                      paddingHorizontal: 10,
+                      paddingVertical: 7,
+                      borderRadius: 40,
+                    }}
                     onPress={() => {
                       // @ts-ignore
                       navigation.navigate("AllGroupExpenses", {
                         groupId: groupId,
                       });
                     }}
-                    title="See All"
-                  ></Button>
+                  >
+                    <Text style={{ color: theme.buttonText }}>See All</Text>
+                  </TouchableOpacity>
                 </View>
                 <View style={styles.recentTransactionsBody}>
                   <FlatList

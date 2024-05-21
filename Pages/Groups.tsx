@@ -10,6 +10,7 @@ import {
   StyleSheet,
   ImageBackground,
   SafeAreaView,
+  Platform,
 } from "react-native";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
@@ -186,7 +187,13 @@ const Groups = () => {
     );
   } else {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: theme.background,
+          paddingTop: 50,
+        }}
+      >
         <MaxSpacer></MaxSpacer>
         <View
           style={{

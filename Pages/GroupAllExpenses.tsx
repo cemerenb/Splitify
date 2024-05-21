@@ -1,6 +1,5 @@
 import React, { useContext, useLayoutEffect, useState } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   Image,
@@ -15,6 +14,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Button,
+  Platform,
 } from "react-native";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
@@ -44,18 +44,18 @@ interface AllGroupExpensesProps {
 
 const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
   const { groupId } = route.params;
-
+  const [visible, setVisibility] = useState(false);
+  const [visible2, setVisibility2] = useState(false);
   const [selection, setSelection] = useState(0);
   const [count, setCount] = useState(0);
   const [total, setTotal] = useState(0);
   const [expensesArray, setArray] = useState([]);
   const [loading, setLoadingStatus] = useState(true);
-  const [visible, setVisibility] = useState(false);
   const [dateFirst, setDateFirst] = useState(new Date());
   const [dateLast, setDateLast] = useState(new Date());
   const [expanded, setExpanded] = useState(false);
   const [filterActive, setFilterActive] = useState(false);
-  const [rangeSelection, setRangeSelection] = useState(false);
+  const [rangeSelection, setRangeSelection] = useState(0);
   const { theme } = useContext(ThemeContext);
 
   const toggleExpand = () => {
@@ -239,8 +239,9 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
   }, []);
 
   const options = [
-    { label: "Date", value: false },
-    { label: "Range", value: true },
+    { label: "Date", value: 0 },
+    { label: "Range", value: 1 },
+    { label: "None", value: 2 },
   ];
   if (loading) {
     return (
@@ -248,6 +249,7 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
         style={{
           flex: 1,
           justifyContent: "center",
+          alignContent: "center",
           backgroundColor: theme.background,
         }}
       >
@@ -256,10 +258,12 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
     );
   } else {
     return (
-      <SafeAreaView
+      <View
         style={{
+          alignContent: "center",
           backgroundColor: theme.background,
-          minHeight: Dimensions.get("window").height,
+          paddingTop: Platform.OS === "android" ? 50 : 50,
+          flex: 1,
         }}
       >
         <View style={{ paddingBottom: 0 }}>
@@ -306,72 +310,197 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View
-          style={{
-            backgroundColor: theme.text,
-            borderBottomLeftRadius: 20,
-            borderBottomRightRadius: 20,
-          }}
-        >
-          <View style={[styles.datePickersContainer, animationStyle]}>
+        {expanded ? (
+          <View
+            style={{
+              paddingTop: 30,
+              backgroundColor: theme.filter,
+              borderBottomLeftRadius: 20,
+              borderBottomRightRadius: 20,
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <View
+              style={{
+                borderWidth: 1,
+                borderRadius: 20,
+                width: "75%",
+
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <SwitchSelector
+                options={options}
+                initial={0}
+                buttonColor={theme.button}
+                onPress={(value) => {
+                  setRangeSelection(value);
+                }}
+              />
+            </View>
+
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between",
+                justifyContent: "center",
                 width: "100%",
                 paddingTop: 20,
               }}
             >
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <RNDateTimePicker
-                  textColor={theme.text}
-                  mode="date"
-                  value={dateFirst}
-                  onChange={(event, selectedDate) => {
-                    // Ensure that selectedDate is not older than dateLast
-                    if (selectedDate.getTime() > dateLast.getTime()) {
-                      setDateLast(selectedDate);
-                    }
-                    setDateFirst(selectedDate || dateFirst);
+              {rangeSelection == 2 ? (
+                <View></View>
+              ) : rangeSelection != 2 && Platform.OS == "android" ? (
+                <View
+                  style={{
+                    width: "125%",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
                   }}
-                />
-                {rangeSelection && (
-                  <Text style={{ paddingLeft: 10, color: theme.reverse }}>
-                    -
-                  </Text>
-                )}
-                {rangeSelection && (
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      setVisibility(true);
+                      console.log(visible);
+                    }}
+                  >
+                    <Text>{dateFirst.toDateString()}</Text>
+                  </TouchableOpacity>
+                  {visible && (
+                    <RNDateTimePicker
+                      textColor={theme.text}
+                      mode="date"
+                      value={dateFirst}
+                      onChange={(event, selectedDate) => {
+                        // Ensure that selectedDate is not older than dateLast
+                        if (rangeSelection == 0) {
+                          setDateFirst(selectedDate || dateFirst);
+                          setVisibility(false);
+                          console.log("-------------------");
+                          console.log("1");
+
+                          console.log(visible);
+                        }
+                        if (
+                          selectedDate.getTime() > dateLast.getTime() &&
+                          rangeSelection == 1
+                        ) {
+                          setDateLast(selectedDate);
+                          setDateFirst(selectedDate);
+                        }
+                        setDateFirst(selectedDate || dateFirst);
+                        setVisibility(false);
+                        console.log("-------------------");
+                        console.log("1");
+
+                        console.log(visible);
+                      }}
+                    />
+                  )}
+
+                  {rangeSelection == 1 && (
+                    <Text style={{ paddingLeft: 10, color: theme.text }}>
+                      -
+                    </Text>
+                  )}
+                  {rangeSelection == 1 && (
+                    <View>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setVisibility2(true);
+                          console.log(visible2);
+                        }}
+                        style={{ backgroundColor: "#B8B8B9", padding: 10 }}
+                      >
+                        <Text>
+                          {dateLast.toDateString().split(" ")[2]}
+                          {dateLast.toDateString().split(" ")[1]}
+                          {dateLast.toDateString().split(" ")[3]}
+                        </Text>
+                      </TouchableOpacity>
+                      {visible2 && (
+                        <RNDateTimePicker
+                          mode="date"
+                          value={dateLast}
+                          onTouchEnd={() => {
+                            setVisibility2(false);
+                            console.log(visible2);
+                          }}
+                          onResponderTerminate={() => {
+                            setVisibility2(false);
+                            console.log(visible2);
+                          }}
+                          onPointerCancel={() => {
+                            setVisibility2(false);
+                            console.log(visible2);
+                          }}
+                          onTouchCancel={() => {
+                            setVisibility2(false);
+                            console.log(visible2);
+                          }}
+                          onChange={(event, selectedDate) => {
+                            // Ensure that selectedDate is not older than dateFirst
+                            if (selectedDate.getTime() < dateFirst.getTime()) {
+                              setDateFirst(selectedDate);
+                              setDateLast(selectedDate);
+                            }
+                            setDateLast(selectedDate || dateLast);
+                            setVisibility2(false);
+                            console.log("2");
+
+                            console.log("-------------------");
+
+                            console.log(visible2);
+                          }}
+                        />
+                      )}
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <View
+                  style={{
+                    width: "90%",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                  }}
+                >
                   <RNDateTimePicker
+                    textColor={theme.text}
                     mode="date"
-                    value={dateLast}
+                    value={dateFirst}
                     onChange={(event, selectedDate) => {
-                      // Ensure that selectedDate is not older than dateFirst
-                      if (selectedDate.getTime() < dateFirst.getTime()) {
-                        setDateFirst(selectedDate);
+                      // Ensure that selectedDate is not older than dateLast
+                      if (selectedDate.getTime() > dateLast.getTime()) {
+                        setDateLast(selectedDate);
                       }
-                      setDateLast(selectedDate || dateLast);
+                      setDateFirst(selectedDate || dateFirst);
                     }}
                   />
-                )}
-              </View>
-              <View
-                style={{
-                  width: "29%",
-                  paddingRight: 20,
-                  paddingLeft: 10,
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <SwitchSelector
-                  options={options}
-                  initial={0}
-                  buttonColor={theme.card}
-                  onPress={(value) => {
-                    setRangeSelection(value);
-                  }}
-                />
-              </View>
+                  {rangeSelection == 1 && (
+                    <Text style={{ paddingLeft: 10, color: theme.text }}>
+                      -
+                    </Text>
+                  )}
+                  {rangeSelection == 1 && (
+                    <RNDateTimePicker
+                      mode="date"
+                      value={dateLast}
+                      onChange={(event, selectedDate) => {
+                        // Ensure that selectedDate is not older than dateFirst
+                        if (selectedDate.getTime() < dateFirst.getTime()) {
+                          setDateFirst(selectedDate);
+                        }
+                        setDateLast(selectedDate || dateLast);
+                      }}
+                    />
+                  )}
+                </View>
+              )}
             </View>
             <SelectDropdown
               defaultValueByIndex={0}
@@ -384,13 +513,13 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                   <View
                     style={[
                       styles.dropdownButtonStyle,
-                      { borderColor: theme.reverse },
+                      { borderColor: theme.text },
                     ]}
                   >
                     <Text
                       style={[
                         styles.dropdownButtonTxtStyle,
-                        { color: theme.reverse },
+                        { color: theme.text },
                       ]}
                     >
                       {selectedItem && selectedItem.title}
@@ -399,7 +528,7 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                       name={isOpened ? "chevron-up" : "chevron-down"}
                       style={[
                         styles.dropdownButtonArrowStyle,
-                        { color: theme.reverse },
+                        { color: theme.text },
                       ]}
                     />
                   </View>
@@ -431,28 +560,39 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
             <View
               style={{
                 flexDirection: "row",
+                width: "100%",
                 justifyContent: "flex-end",
                 marginBottom: 10,
                 paddingRight: 20,
               }}
             >
               <Button
+                color={theme.text}
                 onPress={() => {
-                  setFilterActive(true);
+                  setFilterActive(false);
+                  setSelection(0);
                   toggleExpand();
                 }}
                 title="Clear"
               ></Button>
               <Button
+                color={theme.text}
                 onPress={() => {
-                  setFilterActive(false);
+                  setFilterActive(true);
+                  console.log(dateFirst);
+                  console.log(dateLast);
+                  console.log(rangeSelection);
+                  console.log(selection);
+
                   toggleExpand();
                 }}
                 title="Filter"
               ></Button>
             </View>
           </View>
-        </View>
+        ) : (
+          <View></View>
+        )}
         <ScrollView>
           <FlatList
             scrollEnabled={false}
@@ -503,7 +643,7 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
           <MaxSpacer />
           <MaxSpacer />
         </ScrollView>
-      </SafeAreaView>
+      </View>
     );
   }
 };

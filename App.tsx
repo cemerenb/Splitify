@@ -1,7 +1,13 @@
-import React, { useContext } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React, { useContext, useState } from "react";
+import { View, StyleSheet } from "react-native";
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+  Theme as NavigationTheme,
+} from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { ThemeContext, ThemeProvider } from "./Theme/ThemeContext"; // Import ThemeProvider
+import { ThemeContext, ThemeProvider } from "./Theme/ThemeContext";
 
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
@@ -20,6 +26,7 @@ import GroupExpenseDetails from "./Pages/GroupExpenseDetails";
 import GroupExpensEntry from "./Pages/GroupExpensesEntry";
 import GroupExpensesEntry from "./Pages/GroupExpensesEntry";
 import AllGroupExpenses from "./Pages/GroupAllExpenses";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
@@ -42,11 +49,24 @@ export type RootStackNavigatorParamsList = {
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
 
 const App: React.FC = () => {
+  const [themeData, setThemeData] = useState(0);
   const { theme } = useContext(ThemeContext);
+
+  const MyTheme: NavigationTheme = {
+    dark: true,
+    colors: {
+      primary: "rgb(255, 45, 85)",
+      background: "transparent",
+      card: "rgb(18, 18, 18)",
+      text: theme.text,
+      border: "rgb(39, 39, 41)",
+      notification: "rgb(255, 69, 58)",
+    },
+  };
 
   return (
     <ThemeProvider>
-      <NavigationContainer>
+      <NavigationContainer theme={MyTheme}>
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen
             name="Login"
@@ -223,6 +243,12 @@ const App: React.FC = () => {
     </ThemeProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 const RootApp: React.FC = () => <App />;
 

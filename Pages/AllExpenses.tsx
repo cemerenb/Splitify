@@ -1,6 +1,5 @@
 import React, { useContext, useLayoutEffect, useState } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   Image,
