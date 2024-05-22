@@ -360,7 +360,7 @@ export default function Home() {
               flex: 1,
               justifyContent: "flex-start",
               alignItems: "center",
-              paddingTop: 100,
+              paddingTop: 70,
             }}
           >
             <SelectDropdown

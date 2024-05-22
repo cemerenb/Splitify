@@ -82,7 +82,9 @@ function Profile() {
     },
   ];
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: theme.background, paddingTop: 50 }}
+    >
       <Modal
         visible={modalVisible}
         transparent={true}

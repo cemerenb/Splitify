@@ -71,6 +71,19 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { theme } = useContext(ThemeContext);
 
+  const generateRandomString = (length = 30) => {
+    // Possible characters for the random string
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+
+    // Generate a random string of the specified length
+    const randomString = Array.from({ length }, () =>
+      characters.charAt(Math.floor(Math.random() * charactersLength))
+    ).join("");
+
+    return randomString;
+  };
   const uploadImageToFirebase = async (imageUri) => {
     console.log("girdi");
 
@@ -98,7 +111,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.05,
+      quality: 0.1,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -113,7 +126,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.05,
+      quality: 0.1,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -162,6 +175,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
           timeStamp: Date.now(),
           total: parseInt(totalPrice),
           note: note,
+          expenseId: generateRandomString(),
         };
 
         await updateDoc(docRef, {

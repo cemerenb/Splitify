@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React, { useContext, useLayoutEffect, useState } from "react";
 import {
   View,
@@ -31,7 +33,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { ThemeContext } from "../Theme/ThemeContext";
 
 type RootStackParamList = {
-  AllGroupExpenses: { groupId: string };
+  AllGroupExpenses: { groupId: string; memberNames: Array };
 };
 type AllGroupExpensesRouteProp = RouteProp<
   RootStackParamList,
@@ -43,7 +45,8 @@ interface AllGroupExpensesProps {
 }
 
 const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
-  const { groupId } = route.params;
+  const groupId = route.params.groupId;
+  const memberNames = route.params.memberNames;
   const [visible, setVisibility] = useState(false);
   const [visible2, setVisibility2] = useState(false);
   const [selection, setSelection] = useState(0);
@@ -56,6 +59,8 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
   const [expanded, setExpanded] = useState(false);
   const [filterActive, setFilterActive] = useState(false);
   const [rangeSelection, setRangeSelection] = useState(0);
+  const [processedExpenses, setProcessedExpenses] = useState([]);
+
   const { theme } = useContext(ThemeContext);
 
   const toggleExpand = () => {
@@ -88,8 +93,11 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
     onPress,
     price,
     date,
+    expenseId,
+    createdBy,
   }) => {
     imageSource = parseInt(imageSource);
+
     const day = date.split("T")[0].split("-")[2];
     const month = date.split("T")[0].split("-")[1];
     const year = date.split("T")[0].split("-")[0];
@@ -154,6 +162,29 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
               ></Ionicons>
             )}
           </View>
+          {processedExpenses.includes(expenseId) ? (
+            <View
+              style={{
+                position: "absolute",
+                right: 0,
+                top: -10,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "green",
+                padding: 4,
+                borderRadius: 40,
+              }}
+            >
+              <Ionicons
+                size={15}
+                color={theme.reverse}
+                name="checkmark-outline"
+              ></Ionicons>
+            </View>
+          ) : (
+            <View></View>
+          )}
         </View>
         <View
           style={{
@@ -191,6 +222,9 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
               {description}
             </Text>
           )}
+          <Text style={[styles.cardName, { color: theme.text }]}>
+            {memberNames[createdBy] || "Unknown"}
+          </Text>
           <Text style={[styles.cardDate, { color: theme.text }]}>
             {day + "/" + month + "/" + year}
           </Text>
@@ -217,7 +251,7 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
 
     const docRef = doc(FIRESTORE_DB, "groups", groupId);
     const groupData = await getDoc(docRef);
-
+    setProcessedExpenses(groupData.data().processedExpenses);
     setArray(groupData.data()?.expenses ?? []);
     setDateFirst(
       new Date(
@@ -597,31 +631,33 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
           <FlatList
             scrollEnabled={false}
             style={{ width: "100%", paddingHorizontal: 20 }}
-            data={expensesArray.filter((item) => {
-              // Check if filterActive is true and apply date filtering logic
-              if (filterActive) {
-                if (rangeSelection) {
-                  // If range selection is true, filter by date range
-                  const itemDate = new Date(item.date);
-                  return (
-                    itemDate.getTime() >= dateFirst.getTime() &&
-                    itemDate.getTime() <= dateLast.getTime()
-                  );
+            data={expensesArray
+              .filter((item) => {
+                // Check if filterActive is true and apply date filtering logic
+                if (filterActive) {
+                  if (rangeSelection) {
+                    // If range selection is true, filter by date range
+                    const itemDate = new Date(item.date);
+                    return (
+                      itemDate.getTime() >= dateFirst.getTime() &&
+                      itemDate.getTime() <= dateLast.getTime()
+                    );
+                  } else {
+                    // If range selection is false, filter by selected date
+                    const itemDate = new Date(item.date);
+                    const firstDate = new Date(dateFirst);
+                    return (
+                      itemDate.getDate() === firstDate.getDate() &&
+                      itemDate.getMonth() === firstDate.getMonth() &&
+                      itemDate.getFullYear() === firstDate.getFullYear()
+                    );
+                  }
                 } else {
-                  // If range selection is false, filter by selected date
-                  const itemDate = new Date(item.date);
-                  const firstDate = new Date(dateFirst);
-                  return (
-                    itemDate.getDate() === firstDate.getDate() &&
-                    itemDate.getMonth() === firstDate.getMonth() &&
-                    itemDate.getFullYear() === firstDate.getFullYear()
-                  );
+                  // If filterActive is false, apply filtering based on category selection
+                  return selection === 0 || item.type === selection;
                 }
-              } else {
-                // If filterActive is false, apply filtering based on category selection
-                return selection === 0 || item.type === selection;
-              }
-            })}
+              })
+              .reverse()}
             renderItem={({ item, index }) => (
               <View>
                 <View style={{ height: 12 }} />
@@ -630,10 +666,15 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                   title={item.note}
                   description={item.note}
                   onPress={() => {
-                    navigation.navigate("ExpenseDetails", item);
+                    navigation.navigate("GroupExpenseDetails", {
+                      mapData: item,
+                      memberNames: memberNames,
+                    });
                   }}
                   price={item.total}
                   date={item.date}
+                  expenseId={item.expenseId}
+                  createdBy={item.createdBy}
                 />
               </View>
             )}

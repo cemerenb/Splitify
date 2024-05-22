@@ -276,9 +276,11 @@ const Members: React.FC<MembersProps> = ({ route }) => {
     return (
       <View
         style={{
-          height: 0.3,
-          width: "100%",
-          backgroundColor: theme.text,
+          height: 0.4,
+          width: Dimensions.get("window").width - 60,
+          paddingLeft: 20,
+          marginLeft: 10,
+          backgroundColor: theme.shadow,
         }}
       />
     );
@@ -299,14 +301,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   } else if (memberNames.length === members.length && members.length > 0) {
     return (
       <SafeAreaView
-        style={{
-          backgroundColor: theme.background,
-          flex: 1,
-          paddingTop: 50,
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-        }}
+        style={{ backgroundColor: theme.background, paddingTop: 50, flex: 1 }}
       >
         <ScrollView>
           <Modal
@@ -319,7 +314,10 @@ const Members: React.FC<MembersProps> = ({ route }) => {
               <View
                 style={[
                   styles.modalContainer,
-                  { backgroundColor: theme.secondary },
+                  {
+                    backgroundColor: theme.secondary,
+                    width: Dimensions.get("window").width * 0.85,
+                  },
                 ]}
               >
                 <View
@@ -576,6 +574,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
             <View style={{ backgroundColor: theme.background }}></View>
           )}
           <MaxSpacer></MaxSpacer>
+
           {admins.includes(FIREBASE_AUTH.currentUser.uid) ? (
             <FlatList
               ItemSeparatorComponent={FlatListItemSeparator}
@@ -602,11 +601,12 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 >
                   <View
                     style={{
+                      height: 55,
                       flexDirection: "row",
                       justifyContent: "space-between",
                       alignItems: "center",
                       paddingHorizontal: 20,
-                      paddingVertical: 20,
+                      paddingVertical: 10,
                     }}
                   >
                     <Text style={{ color: theme.text, fontSize: 20 }}>
@@ -672,7 +672,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 width: Dimensions.get("window").width - 40,
                 marginLeft: 20,
                 borderRadius: 20,
-                backgroundColor: theme.background,
+                backgroundColor: theme.primary,
               }}
               data={members} // List data
               keyExtractor={(item) => item} // Use groupId as unique key

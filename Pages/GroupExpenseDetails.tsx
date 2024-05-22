@@ -33,11 +33,15 @@ interface MapData {
   timeStamp: string;
   note: string;
   totalData: number;
+  createdBy: string;
+  expenseId: string;
+  participants: Array;
+  type: number;
 }
 
 // Define the navigation props types
 type RootStackParamList = {
-  GroupExpenseDetails: { mapData: MapData; groupId: string };
+  GroupExpenseDetails: { mapData: MapData; memberNames: Array };
 };
 
 type GroupExpenseDetailsRouteProp = RouteProp<
@@ -53,23 +57,18 @@ interface GroupExpenseDetailsProps {
 const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
   const [loading, setLoadingStatus] = useState(true);
   const [index, setIndex] = useState(-1);
-  const [name, setName] = useState("");
   const [groupId, setGroupId] = useState("");
+  const { image, setImage } = useState("");
+  const [imageExist, setImageExist] = useState(false);
   const [cachedImageUrl, setCachedImageUrl] = useState<string | undefined>(
     undefined
   );
   const [showFullScreenImage, setShowFullScreenImage] = useState(true); // State to manage full-screen image visibility
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
-  const mapData = route.params;
+  const mapData = route.params.mapData;
+  const nameMap = route.params.memberNames;
 
-  const getName = async () => {
-    setName("");
-    setGroupId(mapData.groupId);
-    const nameDocRef = doc(FIRESTORE_DB, "users", mapData.createdBy);
-    const data = (await getDoc(nameDocRef)).data().name;
-    setName(data);
-  };
   const reformatDate = (date) => {
     const newDate =
       mapData.date.split("T")[0].split("-").reverse()[0] +
@@ -114,8 +113,8 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
   };
 
   useEffect(() => {
-    getName();
     if (mapData.imageUrl) {
+      setImageExist(true);
       CacheManager.get(mapData.imageUrl)
         .getPath()
         .then((cachedPath) => {
@@ -126,6 +125,8 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
             console.log("Image downloaded:", mapData.imageUrl);
           }
         });
+    } else {
+      setImageExist(false);
     }
   }, [mapData.imageUrl]);
 
@@ -274,7 +275,9 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                 <Text style={styles.subTitle}>Details</Text>
                 <Text style={styles.text}>{mapData.note}</Text>
                 <Text style={styles.subTitle}>Created By</Text>
-                <Text style={styles.text}>{name}</Text>
+                <Text style={styles.text}>
+                  {nameMap[mapData.createdBy] ?? "Unknown"}
+                </Text>
                 <Text style={styles.subTitle}>Date</Text>
                 <Text style={styles.text}>{reformatDate(mapData.date)}</Text>
                 <Text style={styles.subTitle}>Type</Text>
@@ -418,7 +421,10 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
               <Text style={styles.subTitle}>Details</Text>
               <Text style={styles.text}>{mapData.note}</Text>
               <Text style={styles.subTitle}>Created By</Text>
-              <Text style={styles.text}>{name}</Text>
+              <Text style={styles.text}>
+                {" "}
+                {nameMap[mapData.createdBy] ?? "Unknown"}
+              </Text>
               <Text style={styles.subTitle}>Date</Text>
               <Text style={styles.text}>{reformatDate(mapData.date)}</Text>
               <Text style={styles.subTitle}>Type</Text>

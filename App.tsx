@@ -27,6 +27,9 @@ import GroupExpensEntry from "./Pages/GroupExpensesEntry";
 import GroupExpensesEntry from "./Pages/GroupExpensesEntry";
 import AllGroupExpenses from "./Pages/GroupAllExpenses";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import GroupSummary from "./Pages/GroupSummary";
+import OldTransections from "./Pages/SummaryHistory";
+import TransferDetails from "./Pages/TransferDetails";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
@@ -44,6 +47,9 @@ export type RootStackNavigatorParamsList = {
   GroupExpenseDetails: undefined;
   GroupExpensesEntry: undefined;
   AllGroupExpenses: undefined;
+  GroupSummary: undefined;
+  OldTransections: undefined;
+  TransferDetails: undefined;
 };
 
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
@@ -94,6 +100,30 @@ const App: React.FC = () => {
               gestureEnabled: false,
               headerShown: false,
               headerTitle: "",
+            }}
+          />
+          <Stack.Screen
+            name="GroupSummary"
+            component={GroupSummary}
+            options={{
+              gestureEnabled: false,
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="TransferDetails"
+            component={TransferDetails}
+            options={{
+              gestureEnabled: false,
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="OldTransections"
+            component={OldTransections}
+            options={{
+              gestureEnabled: false,
+              headerShown: false,
             }}
           />
           <Stack.Screen

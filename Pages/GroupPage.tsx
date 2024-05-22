@@ -26,7 +26,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaxSpacer, MinSpacer } from "../Utils/Spacers";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -69,6 +69,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
   const [lastMonthArray, setLastMonthArray] = useState([]);
   const [lastWeekArray, setLastWeekArray] = useState([]);
   const [namesMap, setNamesMap] = useState([]);
+  const [processedExpenses, setProcessedExpenses] = useState([]);
   const isFocused = useIsFocused();
   const getGroupDetails = async () => {
     setTotal(0);
@@ -84,25 +85,69 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
     setTimeStamp(groupData.data().timeStamp ?? 0);
     setOwnerUid(groupData.data().ownerUid ?? "");
     setOwnerName((await getDoc(nameDocRef)).data().name);
+    setNamesMap(groupData.data().memberNames ?? {});
+    setProcessedExpenses(groupData.data().processedExpenses);
     if (!groupData.data().members.includes(FIREBASE_AUTH.currentUser.uid)) {
       navigation.pop();
     } else {
-      await fetchNames();
+      fetchAndSaveNames(groupData.data().memberNames, groupData.data().members)
+        .then((nameMap) => {
+          setNamesMap(nameMap);
+        })
+        .catch((error) => {
+          console.error("Error fetching and saving names:", error);
+        });
       setLoadingStatus(false);
     }
   };
 
-  const fetchNames = async () => {
-    const newNamesMap = []; // Temporary array to hold the new names map
+  const fetchAndSaveNames = async (nameMapLocal, membersLocal) => {
+    try {
+      // Check if all UIDs exist in the existing nameMap
+      let allNamesExist = true;
+      for (const uid of members) {
+        if (!nameMapLocal[uid]) {
+          allNamesExist = false;
+          break;
+        }
+      }
+      console.log(allNamesExist);
 
-    for (let index = 0; index < members.length; index++) {
-      const uid = members[index];
-      const nameDocRef = doc(FIRESTORE_DB, "users", uid);
-      const name = (await getDoc(nameDocRef)).data().name;
-      newNamesMap.push({ uid, name }); // Push the object with uid and name to the temporary array
+      // If any name is missing, fetch all names from Firestore
+      if (!allNamesExist) {
+        const docRefs = membersLocal.map((uid) =>
+          doc(FIRESTORE_DB, "users", uid)
+        );
+        const docSnaps = await Promise.all(docRefs.map(getDoc));
+
+        docSnaps.forEach((docSnap, index) => {
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            // Check if name data exists
+            if (userData && userData.name) {
+              // Update nameMap with fetched name
+              nameMapLocal[membersLocal[index]] = userData.name;
+            } else {
+              console.error(
+                `Name data not found for user with UID ${membersLocal[index]}`
+              );
+            }
+          } else {
+            console.error(
+              `User with UID ${membersLocal[index]} not found in Firestore.`
+            );
+          }
+        });
+      }
+    } catch (error) {
+      // Handle fetch error
+      console.error("Error fetching user data:", error);
     }
-
-    setNamesMap(newNamesMap); // Update the state with the new names map
+    const groupRef = doc(FIRESTORE_DB, "groups", groupId);
+    await updateDoc(groupRef, { memberNames: nameMapLocal });
+    // Return the updated nameMap
+    setNamesMap(nameMapLocal);
+    return nameMapLocal;
   };
 
   const selectionData = [
@@ -118,6 +163,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
     price,
     date,
     createdBy,
+    expenseId,
   }) => {
     imageSource = parseInt(imageSource);
 
@@ -185,6 +231,29 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
               ></Ionicons>
             )}
           </View>
+          {processedExpenses.includes(expenseId) ? (
+            <View
+              style={{
+                position: "absolute",
+                right: 0,
+                top: -10,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#188c3f",
+                padding: 4,
+                borderRadius: 40,
+              }}
+            >
+              <Ionicons
+                size={15}
+                color={theme.reverse}
+                name="checkmark-outline"
+              ></Ionicons>
+            </View>
+          ) : (
+            <View></View>
+          )}
         </View>
         <View
           style={{
@@ -223,7 +292,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             </Text>
           )}
           <Text style={[styles.cardName, { color: theme.text }]}>
-            {namesMap.find((user) => user.uid === createdBy)?.name || "Unknown"}
+            {namesMap[createdBy] || "Unknown"}
           </Text>
 
           <Text style={[styles.cardDate, { color: theme.text }]}>
@@ -444,7 +513,9 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             </TouchableOpacity>
           </View>
         </View>
-        <ScrollView style={{ flexDirection: "column", height: "90%" }}>
+        <ScrollView
+          style={{ flexDirection: "column", height: "90%", paddingTop: 30 }}
+        >
           <View
             style={{
               width: Dimensions.get("window").width,
@@ -506,7 +577,9 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             />
 
             <View style={styles.totalExpensesContainer}>
-              <Text style={{ fontSize: 18, color: theme.text }}>
+              <Text
+                style={{ fontSize: 18, color: theme.text, paddingVertical: 40 }}
+              >
                 Total Expenses
               </Text>
 
@@ -516,6 +589,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             <LineChart
               style={{
                 height: 150,
+
                 width: Dimensions.get("window").width + 20,
               }}
               gridMin={20}
@@ -538,12 +612,29 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
               <Gradient />
             </LineChart>
             {expensesArray.length > 0 ? (
-              <View>
+              <View style={{ paddingTop: 30 }}>
                 <View style={styles.recentTransactionsHeader}>
                   <Text style={{ fontSize: 18, flex: 1, color: theme.text }}>
                     Last Transactions
                   </Text>
-
+                  <TouchableOpacity
+                    style={{
+                      marginRight: 8,
+                      backgroundColor: theme.button,
+                      paddingHorizontal: 10,
+                      paddingVertical: 7,
+                      borderRadius: 40,
+                    }}
+                    onPress={() => {
+                      // @ts-ignore
+                      navigation.navigate("GroupSummary", {
+                        groupId: groupId,
+                        memberNames: namesMap,
+                      });
+                    }}
+                  >
+                    <Text style={{ color: theme.buttonText }}>Summary</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={{
                       backgroundColor: theme.button,
@@ -555,6 +646,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                       // @ts-ignore
                       navigation.navigate("AllGroupExpenses", {
                         groupId: groupId,
+                        memberNames: namesMap,
                       });
                     }}
                   >
@@ -574,11 +666,16 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                           title={item.note}
                           description={item.note}
                           onPress={() => {
-                            navigation.navigate("GroupExpenseDetails", item);
+                            //@ts-ignore
+                            navigation.navigate("GroupExpenseDetails", {
+                              mapData: item,
+                              memberNames: namesMap,
+                            });
                           }}
                           price={item.total}
                           date={item.date}
                           createdBy={item.createdBy}
+                          expenseId={item.expenseId}
                         />
                       </View>
                     )}
@@ -598,16 +695,14 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             });
           }}
           style={{
-            borderWidth: 1,
-            borderColor: "rgba(0,0,0,0.2)",
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
             position: "absolute",
             bottom: 80,
             right: 20,
-            height: 60,
-            backgroundColor: theme.card,
+            height: 50,
+            backgroundColor: theme.button,
             borderRadius: 100,
           }}
         >
@@ -618,8 +713,8 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
               paddingHorizontal: 15,
             }}
           >
-            <Icon name="plus" size={30} color={theme.text} />
-            <Text style={{ color: theme.text }}>Add Expense</Text>
+            <Icon name="plus" size={30} color={theme.buttonText} />
+            <Text style={{ color: theme.buttonText }}>Add Expense</Text>
           </View>
         </TouchableOpacity>
       </SafeAreaView>
@@ -689,7 +784,6 @@ const styles = StyleSheet.create({
     width: 40,
   },
   nameContainer: {
-    marginBottom: 30,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -702,7 +796,6 @@ const styles = StyleSheet.create({
   },
   homeIcon: {
     height: 80,
-    marginBottom: 30,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
@@ -756,7 +849,6 @@ const styles = StyleSheet.create({
     color: "#151E26",
   },
   totalExpensesContainer: {
-    paddingTop: 40,
     alignItems: "center",
     justifyContent: "space-between",
   },
