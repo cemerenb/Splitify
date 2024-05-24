@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -8,62 +8,245 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Alert,
   SafeAreaView,
+  Modal,
+  Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { RootStackNavigatorParamsList } from "../App";
 import { MaxSpacer } from "../Utils/Spacers";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import validator from "validator";
+import { ThemeContext } from "../Theme/ThemeContext";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
+  const { theme } = useContext(ThemeContext);
+  const [modalVisible2, setModalVisible2] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
   const handleResetPassword = async () => {
     await sendPasswordResetEmail(FIREBASE_AUTH, email)
       .then(() => {
-        Alert.alert(
-          "Email Sent",
-          "We sent you an email. Please don't forget to check spam folder",
-          [{ text: "Okay", onPress: () => navigation.replace("Login") }],
-          { cancelable: false }
-        );
+        setModalVisible2(true);
       })
       .catch((error: any) => {
-        Alert.alert("An error occured. Please try ");
+        setErrorMessage(error.message);
+        setModalVisible(true);
         console.log(error.message);
       });
   };
   return (
     <SafeAreaView
-      style={{ backgroundColor: "white", flex: 1, paddingHorizontal: 20 }}
+      style={{
+        backgroundColor: theme.background,
+        flex: 1,
+        paddingHorizontal: 20,
+      }}
     >
-      <View style={{ justifyContent: "space-evenly", flex: 1 }}>
-        <View style={{ flex: 4 }}>
-          <View style={{ flex: 1, alignItems: "center", marginBottom: 40 }}>
-            <Image
-              style={{ width: 140, height: 140 }}
-              source={require("../assets/forget-b.png")}
-            />
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible2}
+        onRequestClose={() => {
+          setModalVisible2(!modalVisible2);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "rgba(10,10,10,0.6)",
+            flex: 1,
+            height: Dimensions.get("window").height,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme.primary,
+              width: "80%",
+              paddingTop: 50,
+              borderRadius: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ color: theme.text, fontSize: 18, paddingBottom: 40 }}
+            >
+              Email Sent
+            </Text>
+            <Text
+              style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+            >
+              We sent you an email. Please don't forget to check spam folder
+            </Text>
+            <View style={{ width: "100%", flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible2(false);
+                }}
+                style={{
+                  width: "50%",
+                  height: 50,
+                  backgroundColor: theme.shadow,
+                  borderBottomLeftRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: theme.text, fontSize: 18 }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.replace("Login");
+                }}
+                style={{
+                  borderBottomRightRadius: 20,
+                  width: "50%",
+                  height: 50,
+                  backgroundColor: "rgb(253,60,74)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {processing ? (
+                  <ActivityIndicator
+                    size={"small"}
+                    color={"white"}
+                  ></ActivityIndicator>
+                ) : (
+                  <Text style={{ color: theme.text, fontSize: 18 }}>
+                    Delete
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
-
+        </View>
+      </Modal>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "rgba(10,10,10,0.6)",
+            flex: 1,
+            height: Dimensions.get("window").height,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme.primary,
+              width: "80%",
+              paddingTop: 50,
+              borderRadius: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+            >
+              {errorMessage}
+            </Text>
+            <View style={{ width: "100%", flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(false);
+                }}
+                style={{
+                  width: "100%",
+                  height: 50,
+                  backgroundColor: theme.shadow,
+                  borderBottomLeftRadius: 20,
+                  borderBottomRightRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <View style={{ paddingTop: 0 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingTop: 10,
+            }}
+          >
+            <Ionicons
+              name="chevron-back-outline"
+              size={30}
+              color={theme.text}
+            ></Ionicons>
+            <Text style={{ fontSize: 18, color: theme.text }}>Back</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View
+        style={{
+          justifyContent: "space-evenly",
+          flex: 1,
+          paddingHorizontal: 20,
+        }}
+      >
+        <View style={{ flex: 4, paddingTop: 100 }}>
           <View style={{ flex: 1, width: "100%" }}>
-            <Text style={{ color: "black", fontSize: 50, fontWeight: "300" }}>
+            <Text
+              style={{ color: theme.text, fontSize: 50, fontWeight: "300" }}
+            >
               Reset Password
             </Text>
-            <Text style={{ fontWeight: "200", width: "70%" }}>
+            <Text
+              style={{ color: theme.text, fontWeight: "200", width: "70%" }}
+            >
               We will send you an email if an account exist with this email
             </Text>
           </View>
           <MaxSpacer></MaxSpacer>
           <View style={{ flex: 1 }}>
-            <View style={styles.inputStyle}>
+            <View
+              style={[styles.inputStyle, { backgroundColor: theme.primary }]}
+            >
               <TextInput
-                style={styles.inputText}
+                style={{
+                  flex: 1,
+                  color: theme.text,
+                  backgroundColor: theme.primary,
+                  height: 55,
+                  paddingVertical: 10,
+                  paddingRight: 10,
+                  fontSize: 18,
+                }}
                 keyboardType="email-address"
                 placeholder="Email"
+                placeholderTextColor={theme.text}
                 onChangeText={setEmail}
                 inputMode="email"
                 autoComplete="email"
@@ -78,14 +261,16 @@ export default function ResetPassword() {
           </View>
         </View>
         <View style={{ flex: 3, justifyContent: "center" }}>
-          <View style={styles.button}>
+          <View style={[styles.button, { backgroundColor: theme.button }]}>
             <TouchableOpacity
               onPress={() => {
                 if (email.length < 1) {
-                  Alert.alert("Email can't be empty");
+                  setErrorMessage("Email can't be empty");
+                  setModalVisible(true);
                 }
                 if (email.length > 0 && !validator.isEmail(email)) {
-                  Alert.alert("Email is bad formatted");
+                  setErrorMessage("Email is bad formatted");
+                  setModalVisible(true);
                 }
                 if (email.length > 0 && validator.isEmail(email)) {
                   handleResetPassword();
@@ -117,13 +302,5 @@ const styles = StyleSheet.create({
     height: 65,
     borderRadius: 8,
     paddingHorizontal: 14,
-  },
-  inputText: {
-    flex: 1,
-    color: "#333",
-    height: 55,
-    paddingVertical: 10,
-    paddingRight: 10,
-    fontSize: 18,
   },
 });

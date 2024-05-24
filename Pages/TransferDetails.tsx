@@ -17,7 +17,6 @@ import {
   ActivityIndicator,
   Dimensions,
   ScrollView,
-  Alert,
 } from "react-native";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { RouteProp, useNavigation } from "@react-navigation/native";

@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import React, {
   useLayoutEffect,
   Component,
@@ -16,11 +18,12 @@ import {
   Keyboard,
   Modal,
   Platform,
-  Alert,
   ActivityIndicator,
   SafeAreaView,
   TouchableOpacity,
   Dimensions,
+  FlatList,
+  Switch,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { PERMISSIONS, check } from "react-native-permissions";
@@ -30,6 +33,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { DATABASE } from "../FirebaseConfig"; // Make sure to define this in your FirebaseConfig
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import SwitchSelector from "react-native-switch-selector";
 
 import {
   getDoc,
@@ -45,9 +49,10 @@ import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
 import * as ImagePicker from "expo-image-picker";
 import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type RootStackParamList = {
-  GroupExpensesEntry: { groupId: string };
+  GroupExpensesEntry: { groupId: string; membersMap: Array; members: Array };
 };
 type GroupExpensesEntryRouteProp = RouteProp<
   RootStackParamList,
@@ -59,8 +64,9 @@ interface GroupExpensesEntryProps {
 }
 
 const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
-  const { groupId } = route.params;
-
+  const groupId = route.params.groupId;
+  const memberNames = route.params.membersMap;
+  const members = route.params.members;
   const [totalPrice, setTotalPrice] = useState("");
   const [selection, setSelection] = useState(0);
   const [loading, setLoadingStatus] = useState(false);
@@ -69,7 +75,25 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
   const [categoriesVisibility, changeCategoriesVisibility] = useState(false);
   const [imageUri, setImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible2, setModalVisible2] = useState(false);
+  const [modalText, setModalText] = useState("");
+  const [membersModalVisible, setMembersModalVisible] = useState(false);
+  const [everyoneSelected, setEveryOneSelected] = useState(true);
   const { theme } = useContext(ThemeContext);
+  const [selectedUserIds, setSelectedUserIds] = useState([
+    FIREBASE_AUTH.currentUser.uid,
+  ]);
+
+  const handleCheckboxChange = (uid) => {
+    setSelectedUserIds((prevSelectedUserIds) => {
+      if (prevSelectedUserIds.includes(uid)) {
+        return prevSelectedUserIds.filter((id) => id !== uid);
+      } else {
+        return [...prevSelectedUserIds, uid];
+      }
+    });
+    console.log(selectedUserIds);
+  };
 
   const generateRandomString = (length = 30) => {
     // Possible characters for the random string
@@ -176,6 +200,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
           total: parseInt(totalPrice),
           note: note,
           expenseId: generateRandomString(),
+          participants: everyoneSelected ? members : selectedUserIds,
         };
 
         await updateDoc(docRef, {
@@ -185,15 +210,57 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
         navigation.pop();
       } catch (error) {
         console.error("Error creating document: ", error);
-        Alert.alert("Failed to create document. Please try again.");
+        setModalText("Failed to create document. Please try again.");
+        setModalVisible2(true);
       } finally {
         setLoadingStatus(false);
       }
     } else {
-      Alert.alert("You must enter the spending amount");
+      setModalText("You must enter the spending amount");
+      setModalVisible2(true);
     }
   };
+  const options = [
+    { label: "Everyone", value: true },
+    { label: "Select", value: false },
+  ];
+  const renderUserItem = ({ item }) => {
+    const uid = item[0];
+    const name = item[1];
+    const isChecked = selectedUserIds.includes(uid);
 
+    // Exclude current user's UID from the selection list
+    if (uid === FIREBASE_AUTH.currentUser.uid) {
+      return null; // Skip rendering the current user's UID
+    }
+
+    return (
+      <View style={styles.userItem}>
+        <CustomCheckbox
+          isChecked={isChecked}
+          onPress={() => handleCheckboxChange(uid)}
+        />
+        <Text style={{ color: theme.text }}>{name}</Text>
+      </View>
+    );
+  };
+
+  const CustomCheckbox = ({ isChecked, onPress }) => {
+    return (
+      <TouchableOpacity onPress={onPress} style={styles.checkbox}>
+        {isChecked && (
+          <MaterialIcons name="check-box" size={35} color={theme.button} />
+        )}
+        {!isChecked && (
+          <MaterialIcons
+            name="check-box-outline-blank"
+            size={35}
+            color={theme.text}
+          />
+        )}
+      </TouchableOpacity>
+    );
+  };
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
 
@@ -204,6 +271,113 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
         backgroundColor: "rgb(253,60,74)",
       }}
     >
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible2}
+        onRequestClose={() => {
+          setModalVisible2(!modalVisible2);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "rgba(10,10,10,0.6)",
+            flex: 1,
+            height: Dimensions.get("window").height,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme.primary,
+              width: "80%",
+              paddingTop: 50,
+              borderRadius: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+            >
+              {modalText}
+            </Text>
+            <View style={{ width: "100%", flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible2(false);
+                }}
+                style={{
+                  width: "100%",
+                  height: 50,
+                  backgroundColor: theme.shadow,
+                  borderBottomLeftRadius: 20,
+                  borderBottomRightRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        style={{ height: 200 }}
+        visible={membersModalVisible}
+      >
+        <View style={styles.modalBackground}>
+          <View
+            style={{
+              width: "80%",
+              backgroundColor: theme.primary,
+              borderRadius: 30,
+              paddingHorizontal: 20,
+              paddingVertical: 30,
+            }}
+          >
+            <SwitchSelector
+              style={{ borderWidth: 1, borderRadius: 20 }}
+              options={options}
+              initial={everyoneSelected ? 0 : 1}
+              buttonColor={theme.button}
+              onPress={(value) => {
+                setEveryOneSelected(value);
+              }}
+            ></SwitchSelector>
+            {!everyoneSelected ? (
+              <FlatList
+                style={{ paddingVertical: 20 }}
+                data={Object.entries(memberNames)}
+                renderItem={renderUserItem}
+                keyExtractor={(item) => item[0]}
+              />
+            ) : (
+              <View style={{ height: 40 }}></View>
+            )}
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <TouchableOpacity
+                style={{
+                  width: "90%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: 40,
+                  backgroundColor: theme.button,
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  setMembersModalVisible(false);
+                }}
+              >
+                <Text style={{ fontSize: 16, color: theme.text }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.priceArea}>
         <Text style={{ color: "rgb(252,252,252)", fontSize: 18 }}>
           {" "}
@@ -235,6 +409,15 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
 
       <View style={[styles.bottomSheet, { backgroundColor: theme.background }]}>
         <MidSpacer></MidSpacer>
+        <Text
+          style={{
+            color: theme.text,
+            fontSize: 13,
+            paddingBottom: 5,
+          }}
+        >
+          Note
+        </Text>
         <TextInput
           style={{
             fontSize: 18,
@@ -252,17 +435,24 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
           maxLength={300}
           multiline={true}
           placeholderTextColor={theme.text}
-          placeholder="Note"
           value={note}
           onChangeText={setNote}
           keyboardType="default"
         />
         <Text
-          style={{ textAlign: "right", marginBottom: 20, color: theme.text }}
+          style={{ textAlign: "right", marginBottom: 0, color: theme.text }}
         >
           {note.length}/300
         </Text>
-
+        <Text
+          style={{
+            color: theme.text,
+            fontSize: 13,
+            paddingBottom: 5,
+          }}
+        >
+          Category
+        </Text>
         <SelectDropdown
           defaultValueByIndex={0}
           data={selectionData}
@@ -312,6 +502,40 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
           showsVerticalScrollIndicator={false}
           dropdownStyle={styles.dropdownMenuStyle}
         />
+        <Text
+          style={{
+            color: theme.text,
+            fontSize: 13,
+            paddingTop: 10,
+            paddingBottom: 5,
+          }}
+        >
+          Participants
+        </Text>
+        <TouchableOpacity
+          onPress={() => {
+            setMembersModalVisible(true);
+          }}
+          style={{
+            width: "100%",
+            height: 65,
+            borderRadius: 10,
+            borderWidth: 0.4,
+            backgroundColor: theme.primary,
+            justifyContent: "center",
+            paddingLeft: 10,
+          }}
+        >
+          {everyoneSelected ? (
+            <Text style={{ color: theme.text, fontSize: 18 }}>Everyone</Text>
+          ) : selectedUserIds.length == 1 ? (
+            <Text style={{ color: theme.text, fontSize: 18 }}>You</Text>
+          ) : (
+            <Text style={{ color: theme.text, fontSize: 18 }}>
+              You and {selectedUserIds.length - 1} members
+            </Text>
+          )}
+        </TouchableOpacity>
 
         {imageUri && (
           <View style={styles.imageContainer}>
@@ -417,13 +641,19 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
               }}
             >
               <TouchableOpacity
-                style={[styles.modalCard, { backgroundColor: theme.card }]}
+                style={[
+                  styles.modalCard,
+                  { backgroundColor: theme.background },
+                ]}
                 onPress={() => {
                   pickImage();
                 }}
               >
                 <View
-                  style={[styles.modalCard, { backgroundColor: theme.card }]}
+                  style={[
+                    styles.modalCard,
+                    { backgroundColor: theme.background },
+                  ]}
                 >
                   <Ionicons
                     name="images-outline"
@@ -435,9 +665,17 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                   </Text>
                 </View>
               </TouchableOpacity>
-              <View style={[styles.modalCard, { backgroundColor: theme.card }]}>
+              <View
+                style={[
+                  styles.modalCard,
+                  { backgroundColor: theme.background },
+                ]}
+              >
                 <TouchableOpacity
-                  style={[styles.modalCard, { backgroundColor: theme.card }]}
+                  style={[
+                    styles.modalCard,
+                    { backgroundColor: theme.background },
+                  ]}
                   onPress={() => {
                     pickCameraImage();
                   }}
@@ -480,6 +718,25 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  checkbox: {
+    marginRight: 10,
+  },
+  userItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: "center",
+  },
   modalCard: {
     height: 90,
     width: Dimensions.get("window").width / 2.6,
@@ -504,7 +761,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: "dashed",
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 70,
   },
   addImageText: {
     fontSize: 18,
@@ -602,7 +859,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     paddingHorizontal: 12,
-    marginBottom: 10,
   },
   priceArea: {
     paddingHorizontal: 20,

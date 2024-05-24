@@ -16,7 +16,6 @@ import {
   Keyboard,
   Modal,
   Platform,
-  Alert,
   ActivityIndicator,
   SafeAreaView,
 } from "react-native";
@@ -55,6 +54,8 @@ export default function PersonalExpensEntry() {
   const [imageUri, setImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const { theme } = useContext(ThemeContext);
+  const [modalVisible2, setModalVisible2] = useState(false);
+  const [modalText, setModalText] = useState("");
 
   const uploadImageToFirebase = async (imageUri) => {
     console.log("girdi");
@@ -154,12 +155,14 @@ export default function PersonalExpensEntry() {
         navigation.replace("TabBar");
       } catch (error) {
         console.error("Error creating document: ", error);
-        Alert.alert("Failed to create document. Please try again.");
+        setModalText("Failed to create document. Please try again.");
+        setModalVisible2(true);
       } finally {
         setLoadingStatus(false);
       }
     } else {
-      Alert.alert("You must enter the spending amount");
+      setModalText("You must enter the spending amount");
+      setModalVisible2(true);
     }
   };
 
@@ -173,6 +176,58 @@ export default function PersonalExpensEntry() {
         backgroundColor: "rgb(253,60,74)",
       }}
     >
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible2}
+        onRequestClose={() => {
+          setModalVisible2(!modalVisible2);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "rgba(10,10,10,0.6)",
+            flex: 1,
+            height: Dimensions.get("window").height,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme.primary,
+              width: "80%",
+              paddingTop: 50,
+              borderRadius: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+            >
+              {modalText}
+            </Text>
+            <View style={{ width: "100%", flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible2(false);
+                }}
+                style={{
+                  width: "100%",
+                  height: 50,
+                  backgroundColor: theme.shadow,
+                  borderBottomLeftRadius: 20,
+                  borderBottomRightRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.priceArea}>
         <Text style={{ color: "rgb(252,252,252)", fontSize: 18 }}>
           {" "}

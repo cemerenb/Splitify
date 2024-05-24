@@ -348,12 +348,22 @@ export default function SeeAll() {
                   }}
                 >
                   <TouchableOpacity
+                    style={{
+                      backgroundColor: "#B8B8B9",
+                      paddingHorizontal: 20,
+                      paddingVertical: 10,
+                      borderRadius: 20,
+                    }}
                     onPress={() => {
                       setVisibility(true);
                       console.log(visible);
                     }}
                   >
-                    <Text>{dateFirst.toDateString()}</Text>
+                    <Text style={{ color: theme.text, fontSize: 16 }}>
+                      {dateFirst.toDateString().split(" ")[2]}{" "}
+                      {dateFirst.toDateString().split(" ")[1]}{" "}
+                      {dateFirst.toDateString().split(" ")[3]}
+                    </Text>
                   </TouchableOpacity>
                   {visible && (
                     <RNDateTimePicker
@@ -399,11 +409,16 @@ export default function SeeAll() {
                           setVisibility2(true);
                           console.log(visible2);
                         }}
-                        style={{ backgroundColor: "#B8B8B9", padding: 10 }}
+                        style={{
+                          backgroundColor: "#B8B8B9",
+                          paddingHorizontal: 20,
+                          paddingVertical: 10,
+                          borderRadius: 20,
+                        }}
                       >
-                        <Text>
-                          {dateLast.toDateString().split(" ")[2]}
-                          {dateLast.toDateString().split(" ")[1]}
+                        <Text style={{ color: theme.text, fontSize: 16 }}>
+                          {dateLast.toDateString().split(" ")[2]}{" "}
+                          {dateLast.toDateString().split(" ")[1]}{" "}
                           {dateLast.toDateString().split(" ")[3]}
                         </Text>
                       </TouchableOpacity>
@@ -525,14 +540,14 @@ export default function SeeAll() {
                   <View
                     style={{
                       ...styles.dropdownItemStyle,
-                      backgroundColor: theme.text,
-                      ...(isSelected && { backgroundColor: theme.card }),
+                      backgroundColor: theme.background,
+                      ...(isSelected && { backgroundColor: theme.button }),
                     }}
                   >
                     <Text
                       style={[
                         styles.dropdownItemTxtStyle,
-                        { color: theme.reverse },
+                        { color: theme.text },
                       ]}
                     >
                       {item.title}

@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import {
-  Alert,
   Dimensions,
   Keyboard,
   TextInput,
@@ -9,6 +8,7 @@ import {
   View,
   Text,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import {
@@ -27,7 +27,8 @@ export default function JoinPage() {
   const [inviteCode, setInviteCode] = useState("");
   const [loading, setLoadingStatus] = useState(false);
   const { theme } = useContext(ThemeContext);
-
+  const [modalVisible2, setModalVisible2] = useState(false);
+  const [modalText, setModalText] = useState("");
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
   const checkInviteCode = async (code) => {
@@ -37,57 +38,121 @@ export default function JoinPage() {
       const codeData = await getDoc(docRef);
       console.log(codeData.data().timeStamp);
       console.log(new Date().getTime());
+      const groupDocRef = doc(FIRESTORE_DB, "groups", codeData.data().groupId);
+      const found = (await getDoc(groupDocRef)).exists();
+      console.log(found);
 
       console.log("code data fetched");
-
-      if (codeData.data().used == true) {
-        Alert.alert("This invitation code has been used before");
-        setLoadingStatus(false);
-      } else {
-        if (codeData.data().timeStamp < new Date().getTime()) {
-          Alert.alert("Invitation code has expired");
+      if (found) {
+        if (codeData.data().used == true) {
+          setModalText("This invitation code has been used before");
+          setModalVisible2(true);
           setLoadingStatus(false);
         } else {
-          try {
-            const personalDocRef = doc(
-              FIRESTORE_DB,
-              "personal",
-              FIREBASE_AUTH.currentUser.uid
-            );
-            await updateDoc(personalDocRef, {
-              groups: arrayUnion(codeData.data().groupId),
-            });
-            console.log("group added to user data");
-            const groupDocRef = doc(
-              FIRESTORE_DB,
-              "groups",
-              codeData.data().groupId
-            );
-            await updateDoc(groupDocRef, {
-              members: arrayUnion(FIREBASE_AUTH.currentUser.uid),
-            });
-            console.log("user added to members data");
-            const data = {
-              used: true,
-            };
-            await updateDoc(docRef, data);
-            console.log("code made used");
-            await deleteDoc(docRef);
+          if (codeData.data().timeStamp < new Date().getTime()) {
+            setModalText("Invitation code has expired");
+            setModalVisible2(true);
             setLoadingStatus(false);
-            navigation.goBack();
-          } catch {
-            Alert.alert("An error occured while joining group");
-            setLoadingStatus(false);
+          } else {
+            try {
+              const personalDocRef = doc(
+                FIRESTORE_DB,
+                "personal",
+                FIREBASE_AUTH.currentUser.uid
+              );
+              await updateDoc(personalDocRef, {
+                groups: arrayUnion(codeData.data().groupId),
+              });
+              console.log("group added to user data");
+              const groupDocRef = doc(
+                FIRESTORE_DB,
+                "groups",
+                codeData.data().groupId
+              );
+              await updateDoc(groupDocRef, {
+                members: arrayUnion(FIREBASE_AUTH.currentUser.uid),
+              });
+              console.log("user added to members data");
+              const data = {
+                used: true,
+              };
+              await updateDoc(docRef, data);
+              console.log("code made used");
+              await deleteDoc(docRef);
+              setLoadingStatus(false);
+              navigation.goBack();
+            } catch {
+              setModalText("An error occured while joining group");
+              setModalVisible2(true);
+              setLoadingStatus(false);
+            }
           }
         }
+      } else {
+        setModalText("This group no longer exists");
+        setModalVisible2(true);
+        setLoadingStatus(false);
       }
     } catch {
-      Alert.alert("Invitation code is incorrect or invalid");
+      setModalText("Invitation code is incorrect or invalid");
+      setModalVisible2(true);
       setLoadingStatus(false);
     }
   };
   return (
     <View style={{ flex: 1 }}>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible2}
+        onRequestClose={() => {
+          setModalVisible2(!modalVisible2);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "rgba(10,10,10,0.6)",
+            flex: 1,
+            height: Dimensions.get("window").height,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme.primary,
+              width: "80%",
+              paddingTop: 50,
+              borderRadius: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+            >
+              {modalText}
+            </Text>
+            <View style={{ width: "100%", flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible2(false);
+                }}
+                style={{
+                  width: "100%",
+                  height: 50,
+                  backgroundColor: theme.shadow,
+                  borderBottomLeftRadius: 20,
+                  borderBottomRightRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.textArea}>
         <Text style={{ fontSize: 50, color: "white" }}>Join a Group</Text>
       </View>
@@ -142,10 +207,10 @@ export default function JoinPage() {
                 style={{
                   flex: 1,
                   justifyContent: "center",
-                  backgroundColor: theme.background,
+                  backgroundColor: "transparent",
                 }}
               >
-                <ActivityIndicator size="small" color={theme.gradientStart} />
+                <ActivityIndicator size="small" color={theme.buttonText} />
               </View>
             ) : (
               <Text style={{ color: "white", fontSize: 20 }}>Join Group</Text>

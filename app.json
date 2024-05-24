@@ -1,5 +1,16 @@
+
 {
   "expo": {
+    "plugins":[
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
+    ],
     "name": "splitify",
     "slug": "splitify",
     "version": "1.0.0",
@@ -12,7 +23,7 @@
     "splash": {
       "image": "./splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "red"
+      "backgroundColor": "#252833"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -23,9 +34,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./adaptive-icon.png",
-        "backgroundColor": "red"
+        "foregroundImage": "./icon.png",
+        "backgroundColor": "#252833"
       },
+      "splash":{"image": "./splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#252833"},
       "package": "cemerenb.splitify.com"
     },
     "web": {

@@ -33,6 +33,8 @@ function Profile() {
     if (count === 0) {
       AsyncStorage.getItem("themeMode").then((value) => {
         setSelection(value == "dark" ? 2 : value == "light" ? 1 : 0);
+        console.log("--------------------------");
+
         console.log(value == "dark" ? 2 : value == "light" ? 1 : 0);
       });
       setCount(1);
@@ -85,6 +87,34 @@ function Profile() {
     <SafeAreaView
       style={{ flex: 1, backgroundColor: theme.background, paddingTop: 50 }}
     >
+      <View style={{ paddingBottom: 0 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 10,
+              paddingTop: 10,
+            }}
+          >
+            <Ionicons
+              color={theme.text}
+              name="chevron-back-outline"
+              size={30}
+            ></Ionicons>
+            <Text style={{ color: theme.text, fontSize: 18 }}>Back</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -93,7 +123,7 @@ function Profile() {
       >
         <View style={styles.modalBackground}>
           <View
-            style={[styles.modalContainer, { backgroundColor: theme.card }]}
+            style={[styles.modalContainer, { backgroundColor: theme.shadow }]}
           >
             <View
               style={{
@@ -184,7 +214,7 @@ function Profile() {
               <SwitchSelector
                 options={options}
                 initial={selection}
-                buttonColor={theme.themeSelector}
+                buttonColor={theme.button}
                 backgroundColor={theme.shadow}
                 onPress={(value) => {
                   setSelection(value);
@@ -299,7 +329,7 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    paddingTop: 30,
+    paddingTop: 20,
     paddingHorizontal: 20,
     flex: 1,
   },

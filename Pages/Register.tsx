@@ -6,11 +6,12 @@ import {
   View,
   TouchableOpacity,
   TextInput,
-  Alert,
   Platform,
   Dimensions,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
+  Modal,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -26,7 +27,6 @@ import { RootStackNavigatorParamsList } from "../App";
 import { doc, setDoc } from "firebase/firestore";
 import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
 import { ThemeContext } from "../Theme/ThemeContext";
-import Modal from "react-native-modal";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -37,7 +37,7 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isCompletedVisible, setIsCompletedVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const passwordFieldRef = useRef<TextInput>(null); // Ref for the password field
   const { theme } = useContext(ThemeContext);
@@ -76,10 +76,11 @@ export default function Register() {
           sendEmailVerification(FIREBASE_AUTH.currentUser!);
           // Create document in Firestore
           createDocument(FIREBASE_AUTH.currentUser!.uid);
+          setModalVisible(true);
         }
-
-        setIsCompletedVisible(true);
       } catch (error: any) {
+        console.log(error);
+
         // Set error message based on error code
         switch (error.code) {
           case "auth/email-already-in-use":
@@ -105,6 +106,7 @@ export default function Register() {
     } else {
       setErrorMessage("Passwords do not match");
       setIsModalVisible(true);
+      setLoading(false);
     }
   };
 
@@ -133,7 +135,11 @@ export default function Register() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, height: Dimensions.get("window").height * 1.5 }}
+      style={{
+        flex: 1,
+        height: Dimensions.get("window").height * 1.5,
+        backgroundColor: theme.background,
+      }}
     >
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <Text style={[styles.header, { color: theme.text }]}>
@@ -230,39 +236,141 @@ export default function Register() {
           style={[styles.buttonContainer, { backgroundColor: theme.button }]}
         >
           <TouchableOpacity onPress={signUp} style={styles.button}>
-            <Text style={{ fontSize: 22, color: theme.buttonText }}>
-              Sign Up
-            </Text>
+            {loading ? (
+              <View>
+                <ActivityIndicator
+                  size={"small"}
+                  color={theme.buttonText}
+                ></ActivityIndicator>
+              </View>
+            ) : (
+              <Text style={{ fontSize: 22, color: theme.buttonText }}>
+                Sign Up
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
-
-        <Text style={{ fontSize: 16, color: theme.text, paddingRight: 5 }}>
-          Already have an account?
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={{ fontSize: 16, color: theme.text, paddingRight: 5 }}>
+            Already have an account?
+          </Text>
           <Text
             onPress={() => navigation.goBack()}
-            style={{ color: theme.button, marginLeft: 5 }}
+            style={{ color: theme.button, margin: 5, fontSize: 16 }}
           >
             Login
           </Text>
-        </Text>
-
-        <Modal isVisible={isModalVisible} backdropOpacity={0.2}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>{errorMessage}</Text>
-            <MinSpacer />
-            <Button title="Close" onPress={() => setIsModalVisible(false)} />
+        </View>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => {
+            setIsModalVisible(!isModalVisible);
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "rgba(10,10,10,0.6)",
+              flex: 1,
+              height: Dimensions.get("window").height,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: theme.primary,
+                width: "80%",
+                paddingTop: 50,
+                borderRadius: 20,
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+              >
+                {errorMessage}
+              </Text>
+              <View style={{ width: "100%", flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsModalVisible(false);
+                  }}
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    backgroundColor: theme.shadow,
+                    borderBottomLeftRadius: 20,
+                    borderBottomRightRadius: 20,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </Modal>
-        <Modal isVisible={isCompletedVisible} backdropOpacity={0.2}>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+        >
           <View
-            style={[styles.modalContent, { backgroundColor: theme.primary }]}
+            style={{
+              backgroundColor: "rgba(10,10,10,0.6)",
+              flex: 1,
+              height: Dimensions.get("window").height,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <Text style={[styles.modalText, { color: theme.text }]}>
-              We have sent an email for you to confirm your account. Don't
-              forget to check your spam box.
-            </Text>
-            <MinSpacer />
-            <Button title="Login" onPress={() => navigation.goBack()} />
+            <View
+              style={{
+                backgroundColor: theme.primary,
+                width: "80%",
+                paddingTop: 50,
+                borderRadius: 20,
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  color: theme.text,
+                  fontSize: 16,
+                  paddingBottom: 40,
+                  paddingHorizontal: 10,
+                }}
+              >
+                We have sent an email for you to confirm your account. Don't
+                forget to check your spam box.
+              </Text>
+              <View style={{ width: "100%", flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.goBack();
+                    setModalVisible(false);
+                  }}
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    backgroundColor: theme.shadow,
+                    borderBottomLeftRadius: 20,
+                    borderBottomRightRadius: 20,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </Modal>
       </View>
@@ -320,7 +428,6 @@ const styles = StyleSheet.create({
   },
 
   modalContent: {
-    height: 200,
     padding: 20,
     backgroundColor: "white",
     borderRadius: 20,

@@ -16,7 +16,6 @@ import {
   ActivityIndicator,
   Dimensions,
   ScrollView,
-  Alert,
 } from "react-native";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { RouteProp, useNavigation } from "@react-navigation/native";
@@ -44,6 +43,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
   const [endDate, setEndDate] = useState("");
   const { theme } = useContext(ThemeContext);
   const [loading, setLoading] = useState(false);
+  const [modalVisible2, setModalVisible2] = useState(false);
 
   const getExpenses = async () => {
     const docRef = doc(FIRESTORE_DB, "groups", groupId);
@@ -93,6 +93,9 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
 
     filtered.forEach((expense) => {
       const { total, createdBy, participants } = expense;
+      console.log("parti");
+
+      console.log(participants);
 
       // Her bir katılımcının borç payını hesaplayın
       const share = total / participants.length;
@@ -179,7 +182,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
         match[3] ? "/" : ""
       }${match[3]}`;
     }
-    console.log(dateString.lenght());
+    console.log(dateString.lenght);
 
     return dateString;
   };
@@ -226,6 +229,58 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
         paddingTop: 60,
       }}
     >
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible2}
+        onRequestClose={() => {
+          setModalVisible2(!modalVisible2);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "rgba(10,10,10,0.6)",
+            flex: 1,
+            height: Dimensions.get("window").height,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme.primary,
+              width: "80%",
+              paddingTop: 50,
+              borderRadius: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+            >
+              An error occured while saving transections
+            </Text>
+            <View style={{ width: "100%", flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible2(false);
+                }}
+                style={{
+                  width: "100%",
+                  height: 50,
+                  backgroundColor: theme.shadow,
+                  borderBottomLeftRadius: 20,
+                  borderBottomRightRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <View style={{ paddingTop: 0 }}>
         <View
           style={{
@@ -319,6 +374,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
               <View style={{}}>
                 <Text
                   style={{
+                    color: theme.text,
                     fontSize:
                       transaction.from === FIREBASE_AUTH.currentUser.uid ||
                       transaction.to === FIREBASE_AUTH.currentUser.uid
@@ -370,7 +426,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
                 setLoading(false);
                 navigation.pop();
               } catch (error) {
-                Alert.alert("An error occured while saving transections");
+                setModalVisible2(true);
               }
             }}
             style={{

@@ -30,6 +30,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import GroupSummary from "./Pages/GroupSummary";
 import OldTransections from "./Pages/SummaryHistory";
 import TransferDetails from "./Pages/TransferDetails";
+import QRScanner from "./Pages/QRCodeScanner";
+import ScanResult from "./Pages/ScanResult";
+import Profile from "./Pages/Profile";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
@@ -50,6 +53,9 @@ export type RootStackNavigatorParamsList = {
   GroupSummary: undefined;
   OldTransections: undefined;
   TransferDetails: undefined;
+  QRScanner: undefined;
+  ScanResult: undefined;
+  Profile: undefined;
 };
 
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
@@ -85,11 +91,16 @@ const App: React.FC = () => {
             options={{ gestureEnabled: false, headerShown: false }}
           />
           <Stack.Screen
+            name="Profile"
+            component={Profile}
+            options={{ gestureEnabled: false, headerShown: false }}
+          />
+          <Stack.Screen
             name="ResetPassword"
             component={ResetPassword}
             options={{
               gestureEnabled: false,
-              headerShown: true,
+              headerShown: false,
               headerTitle: "",
             }}
           />
@@ -129,6 +140,24 @@ const App: React.FC = () => {
           <Stack.Screen
             name="AllGroupExpenses"
             component={AllGroupExpenses}
+            options={{
+              gestureEnabled: false,
+              headerShown: false,
+              headerTitle: "",
+            }}
+          />
+          <Stack.Screen
+            name="QRScanner"
+            component={QRScanner}
+            options={{
+              gestureEnabled: false,
+              headerShown: true,
+              headerTitle: "",
+            }}
+          />
+          <Stack.Screen
+            name="ScanResult"
+            component={ScanResult}
             options={{
               gestureEnabled: false,
               headerShown: false,

@@ -1,6 +1,5 @@
-// @ts-nocheck
-
-import React, { useState, useEffect } from "react";
+//@ts-nocheck
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -10,8 +9,9 @@ import {
   Dimensions,
   ScrollView,
   Button,
-  Alert,
   TouchableOpacity,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -19,12 +19,12 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ImageViewer from "react-native-image-zoom-viewer";
 import { CacheManager } from "react-native-expo-image-cache";
 
-import { serializer } from "../metro.config";
 import { MinSpacer } from "../Utils/Spacers";
 import { RootStackNavigatorParamsList } from "../App";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { LinearGradient } from "expo-linear-gradient";
+import { ThemeContext } from "../Theme/ThemeContext";
 
 // Define the MapData interface
 interface MapData {
@@ -50,6 +50,12 @@ interface ExpenseDetailsProps {
 const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
   const [loading, setLoadingStatus] = useState(true);
   const [index, setIndex] = useState(-1);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible2, setModalVisible2] = useState(false);
+
+  const [modalText, setModalText] = useState("");
+  const { theme } = useContext(ThemeContext);
+
   const [cachedImageUrl, setCachedImageUrl] = useState<string | undefined>(
     undefined
   );
@@ -101,7 +107,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
     } catch (error) {
       console.error("Error deleting element:", error);
       // Handle error
-      Alert.alert("Error", "Failed to delete element");
+      setModalVisible2(true);
     }
   };
 
@@ -127,6 +133,142 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
     if (showFullScreenImage) {
       return (
         <View style={styles.container}>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible2}
+            onRequestClose={() => {
+              setModalVisible2(!modalVisible2);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "rgba(10,10,10,0.6)",
+                flex: 1,
+                height: Dimensions.get("window").height,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: theme.primary,
+                  width: "80%",
+                  paddingTop: 50,
+                  borderRadius: 20,
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+                >
+                  Failed to delete element
+                </Text>
+                <View style={{ width: "100%", flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setModalVisible2(false);
+                    }}
+                    style={{
+                      width: "100%",
+                      height: 50,
+                      backgroundColor: theme.shadow,
+                      borderBottomLeftRadius: 20,
+                      borderBottomRightRadius: 20,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                      Close
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "rgba(10,10,10,0.6)",
+                flex: 1,
+                height: Dimensions.get("window").height,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: theme.primary,
+                  width: "80%",
+                  paddingTop: 50,
+                  borderRadius: 20,
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{ color: theme.text, fontSize: 22, paddingBottom: 5 }}
+                >
+                  Delete Expense
+                </Text>
+                <Text
+                  style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+                >
+                  Are you sure you want to delete the expense?
+                </Text>
+                <View style={{ width: "100%", flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setModalVisible(false);
+                    }}
+                    style={{
+                      width: "50%",
+                      height: 50,
+                      backgroundColor: theme.shadow,
+                      borderBottomLeftRadius: 20,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      deleteElement(mapData);
+                    }}
+                    style={{
+                      borderBottomRightRadius: 20,
+                      width: "50%",
+                      height: 50,
+                      backgroundColor: "rgb(253,60,74)",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {process ? (
+                      <ActivityIndicator
+                        size={"small"}
+                        color={"white"}
+                      ></ActivityIndicator>
+                    ) : (
+                      <Text style={{ color: theme.text, fontSize: 18 }}>
+                        Leave
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
           <View style={styles.upperContainer}>
             <>
               <ImageBackground
@@ -187,24 +329,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
               >
                 <TouchableOpacity
                   onPress={() => {
-                    Alert.alert(
-                      "Delete Expense",
-                      "Are you sure you want to delete the expense?",
-                      [
-                        {
-                          text: "Cancel",
-                          onPress: () => {},
-                        },
-                        {
-                          text: "Delete",
-                          onPress: () => {
-                            deleteElement(mapData);
-                          },
-                          style: "destructive",
-                        },
-                      ],
-                      { cancelable: true }
-                    );
+                    setModalVisible(true);
                   }}
                   activeOpacity={0.7}
                   style={{
@@ -357,24 +482,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              Alert.alert(
-                "Delete Expense",
-                "Are you sure you want to delete the expense?",
-                [
-                  {
-                    text: "Cancel",
-                    onPress: () => {},
-                  },
-                  {
-                    text: "Delete",
-                    onPress: () => {
-                      deleteElement(mapData);
-                    },
-                    style: "destructive",
-                  },
-                ],
-                { cancelable: true }
-              );
+              setModalVisible(true);
             }}
             activeOpacity={0.7}
             style={{

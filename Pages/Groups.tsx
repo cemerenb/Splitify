@@ -50,6 +50,7 @@ const Groups = () => {
     const groupIds = userData.data().groups; // Get the list of group IDs
 
     // Fetch data for each group
+
     const groups = await Promise.all(
       groupIds.map(async (groupId: string) => {
         const groupDocRef = doc(FIRESTORE_DB, "groups", groupId); // Get group doc
@@ -113,8 +114,8 @@ const Groups = () => {
           activeOpacity={0.7}
         >
           <LinearGradient
-            colors={["rgba(130, 96, 245, 1)", "rgba(221, 50, 52, 1)"]}
-            start={{ x: 0, y: 0 }}
+            colors={["#7544EC", "rgba(221, 50, 52, 1)"]}
+            start={{ x: 0.5, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{
               opacity: 1,
@@ -208,14 +209,15 @@ const Groups = () => {
             }}
           >
             <View
-              style={[
-                styles.groupContainer,
-                { backgroundColor: theme.gradientStart },
-              ]}
+              style={[styles.groupContainer, { backgroundColor: theme.card }]}
             >
-              <Ionicons name={"people-outline"} size={40} color="white" />
+              <Ionicons name={"people-outline"} size={40} color={theme.text} />
               <Text
-                style={{ fontSize: 18, paddingHorizontal: 4, color: "white" }}
+                style={{
+                  fontSize: 18,
+                  paddingHorizontal: 4,
+                  color: theme.text,
+                }}
               >
                 Join Group
               </Text>
@@ -223,14 +225,15 @@ const Groups = () => {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("CreateGroup")}>
             <View
-              style={[
-                styles.groupContainer,
-                { backgroundColor: theme.gradientStart },
-              ]}
+              style={[styles.groupContainer, { backgroundColor: theme.card }]}
             >
-              <Ionicons name={"add"} size={40} color="white" />
+              <Ionicons name={"add"} size={40} color={theme.text} />
               <Text
-                style={{ fontSize: 18, paddingHorizontal: 4, color: "white" }}
+                style={{
+                  fontSize: 18,
+                  paddingHorizontal: 4,
+                  color: theme.text,
+                }}
               >
                 Create Group
               </Text>
@@ -239,9 +242,23 @@ const Groups = () => {
         </View>
         {groupData.length == 0 ? (
           <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{
+              flex: 1,
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <Text>Don't have any group</Text>
+            <Text
+              style={{
+                width: "80%",
+                fontSize: 28,
+                color: theme.text,
+                textAlign: "center",
+              }}
+            >
+              You don'have any group yet. You can join or create a group.
+            </Text>
           </View>
         ) : (
           <View>

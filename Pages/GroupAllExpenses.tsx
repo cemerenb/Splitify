@@ -1,5 +1,4 @@
-// @ts-nocheck
-
+//@ts-nocheck
 import React, { useContext, useLayoutEffect, useState } from "react";
 import {
   View,
@@ -359,7 +358,7 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
             <View
               style={{
                 borderWidth: 1,
-                borderRadius: 20,
+                borderRadius: 200,
                 width: "75%",
 
                 flexDirection: "column",
@@ -396,12 +395,22 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                   }}
                 >
                   <TouchableOpacity
+                    style={{
+                      backgroundColor: "#B8B8B9",
+                      paddingHorizontal: 20,
+                      paddingVertical: 10,
+                      borderRadius: 20,
+                    }}
                     onPress={() => {
                       setVisibility(true);
                       console.log(visible);
                     }}
                   >
-                    <Text>{dateFirst.toDateString()}</Text>
+                    <Text style={{ color: theme.text, fontSize: 16 }}>
+                      {dateFirst.toDateString().split(" ")[2]}{" "}
+                      {dateFirst.toDateString().split(" ")[1]}{" "}
+                      {dateFirst.toDateString().split(" ")[3]}
+                    </Text>
                   </TouchableOpacity>
                   {visible && (
                     <RNDateTimePicker
@@ -447,11 +456,16 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                           setVisibility2(true);
                           console.log(visible2);
                         }}
-                        style={{ backgroundColor: "#B8B8B9", padding: 10 }}
+                        style={{
+                          backgroundColor: "#B8B8B9",
+                          paddingHorizontal: 20,
+                          paddingVertical: 10,
+                          borderRadius: 20,
+                        }}
                       >
-                        <Text>
-                          {dateLast.toDateString().split(" ")[2]}
-                          {dateLast.toDateString().split(" ")[1]}
+                        <Text style={{ color: theme.text, fontSize: 16 }}>
+                          {dateLast.toDateString().split(" ")[2]}{" "}
+                          {dateLast.toDateString().split(" ")[1]}{" "}
                           {dateLast.toDateString().split(" ")[3]}
                         </Text>
                       </TouchableOpacity>
@@ -600,17 +614,37 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                 paddingRight: 20,
               }}
             >
-              <Button
-                color={theme.text}
+              <TouchableOpacity
+                style={{
+                  backgroundColor: theme.shadow,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingHorizontal: 15,
+                  borderRadius: 20,
+                  width: 70,
+                  height: 30,
+                  marginRight: 10,
+                }}
                 onPress={() => {
                   setFilterActive(false);
                   setSelection(0);
                   toggleExpand();
                 }}
-                title="Clear"
-              ></Button>
-              <Button
-                color={theme.text}
+              >
+                <Text style={{ color: theme.buttonText, fontSize: 18 }}>
+                  Clear
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: theme.button,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingHorizontal: 15,
+                  borderRadius: 20,
+                  width: 70,
+                }}
                 onPress={() => {
                   setFilterActive(true);
                   console.log(dateFirst);
@@ -620,8 +654,11 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
 
                   toggleExpand();
                 }}
-                title="Filter"
-              ></Button>
+              >
+                <Text style={{ color: theme.buttonText, fontSize: 18 }}>
+                  Filter
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         ) : (
@@ -770,6 +807,9 @@ const styles = StyleSheet.create({
   },
   cardDate: {
     fontSize: 10,
+  },
+  cardName: {
+    fontSize: 14,
   },
   recentTransactionsImage: {
     height: 40,

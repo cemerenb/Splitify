@@ -8,8 +8,9 @@ import {
   Image,
   Dimensions,
   ActivityIndicator,
+  Modal,
+  Alert,
 } from "react-native";
-import Modal from "react-native-modal";
 
 import { useContext, useLayoutEffect, useState } from "react";
 import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
@@ -22,6 +23,7 @@ import { RootStackNavigatorParamsList } from "../App";
 import * as SecureStore from "expo-secure-store";
 import React from "react";
 import { ThemeContext } from "../Theme/ThemeContext";
+import { sendEmailVerification } from "firebase/auth";
 
 export default function Login() {
   const [password, setPassword] = useState("");
@@ -34,6 +36,7 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const [count, setCount] = useState(0);
   const { theme } = useContext(ThemeContext);
+  const [processing, setProcessing] = useState(false);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -193,51 +196,133 @@ export default function Login() {
           Sign Up
         </Text>
       </Text>
-      <Modal isVisible={isModalVisible} backdropOpacity={0.2}>
-        <View style={{ height: 200, padding: 20 }}>
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 50,
-              borderRadius: 20,
-              alignItems: "center",
-              alignContent: "stretch",
-            }}
-          >
-            <Text style={{ fontSize: 20 }}>{errorMessage}</Text>
-            <MinSpacer />
-            <Button title="Close" onPress={() => setIsModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
-      <Modal isVisible={isVerificateModalVisible} backdropOpacity={0.2}>
-        <View style={{ height: 200, padding: 20 }}>
+      <Modal visible={isModalVisible} animationType="fade" transparent={true}>
+        <View
+          style={{
+            backgroundColor: "rgba(10,10,10,0.6)",
+            flex: 1,
+            height: Dimensions.get("window").height,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <View
             style={{
               backgroundColor: theme.primary,
-              padding: 50,
+              width: "80%",
+              paddingTop: 50,
               borderRadius: 20,
               alignItems: "center",
-              alignContent: "stretch",
             }}
           >
             <Text style={{ fontSize: 20, color: theme.text }}>
+              {errorMessage}
+            </Text>
+            <MinSpacer />
+            <TouchableOpacity
+              onPress={() => {
+                setIsModalVisible(false);
+              }}
+              style={{
+                width: "100%",
+                height: 50,
+                backgroundColor: theme.shadow,
+                borderBottomLeftRadius: 20,
+                borderBottomRightRadius: 20,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ color: theme.text, fontSize: 18 }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isVerificateModalVisible}
+        onRequestClose={() => {
+          setIsVerificateModalVisible(!isVerificateModalVisible);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "rgba(10,10,10,0.6)",
+            flex: 1,
+            height: Dimensions.get("window").height,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme.primary,
+              width: "80%",
+              paddingTop: 50,
+              borderRadius: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+            >
               We have sent an email for you to confirm your account. Don't
               forget to check your spam box.
             </Text>
-            <MinSpacer />
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-evenly",
-                alignSelf: "stretch",
-              }}
-            >
-              <Button title="Resend" onPress={() => setIsModalVisible(false)} />
-              <Button
-                title="Close"
-                onPress={() => setIsVerificateModalVisible(false)}
-              />
+            <View style={{ width: "100%", flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setProcessing(false);
+                  setIsVerificateModalVisible(false);
+                }}
+                style={{
+                  width: "50%",
+                  height: 50,
+                  backgroundColor: theme.shadow,
+                  borderBottomLeftRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: theme.text, fontSize: 18 }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={async () => {
+                  try {
+                    setProcessing(true);
+                    await sendEmailVerification(FIREBASE_AUTH.currentUser!);
+                    setProcessing(false);
+                    setIsVerificateModalVisible(false);
+                  } catch (error) {
+                    setProcessing(false);
+                    setIsVerificateModalVisible(false);
+                    setProcessing(false);
+                    setErrorMessage(error);
+                    console.log(error);
+                    Alert.alert("Too many request");
+                  }
+                }}
+                style={{
+                  borderBottomRightRadius: 20,
+                  width: "50%",
+                  height: 50,
+                  backgroundColor: "rgb(253,60,74)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {processing ? (
+                  <ActivityIndicator
+                    size={"small"}
+                    color={"white"}
+                  ></ActivityIndicator>
+                ) : (
+                  <Text style={{ color: theme.text, fontSize: 18 }}>
+                    Resend
+                  </Text>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
         </View>

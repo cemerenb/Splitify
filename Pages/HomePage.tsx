@@ -360,61 +360,91 @@ export default function Home() {
               flex: 1,
               justifyContent: "flex-start",
               alignItems: "center",
-              paddingTop: 70,
+              paddingTop: 60,
             }}
           >
-            <SelectDropdown
-              defaultValueByIndex={1}
-              data={selectionData}
-              onSelect={(selectedItem, index) => {
-                setSelection(index);
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                width: "100%",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ width: 70 }}></View>
+              <SelectDropdown
+                defaultValueByIndex={1}
+                data={selectionData}
+                onSelect={(selectedItem, index) => {
+                  setSelection(index);
 
-                calculateTotal();
-              }}
-              renderButton={(selectedItem, isOpened) => {
-                return (
-                  <View style={styles.dropdownButtonStyle}>
-                    <Text
-                      style={[
-                        styles.dropdownButtonTxtStyle,
-                        { color: theme.text },
-                      ]}
+                  calculateTotal();
+                }}
+                renderButton={(selectedItem, isOpened) => {
+                  return (
+                    <View style={styles.dropdownButtonStyle}>
+                      <Text
+                        style={[
+                          styles.dropdownButtonTxtStyle,
+                          { color: theme.text },
+                        ]}
+                      >
+                        {selectedItem && selectedItem.title}
+                      </Text>
+                      <Icon
+                        name={isOpened ? "chevron-up" : "chevron-down"}
+                        style={[
+                          styles.dropdownButtonArrowStyle,
+                          { color: theme.text },
+                        ]}
+                      />
+                    </View>
+                  );
+                }}
+                renderItem={(item, index, isSelected) => {
+                  return (
+                    <View
+                      style={{
+                        ...styles.dropdownItemStyle,
+                        backgroundColor: theme.primary,
+                        ...(isSelected && { backgroundColor: theme.card }),
+                      }}
                     >
-                      {selectedItem && selectedItem.title}
-                    </Text>
-                    <Icon
-                      name={isOpened ? "chevron-up" : "chevron-down"}
-                      style={[
-                        styles.dropdownButtonArrowStyle,
-                        { color: theme.text },
-                      ]}
-                    />
-                  </View>
-                );
-              }}
-              renderItem={(item, index, isSelected) => {
-                return (
-                  <View
-                    style={{
-                      ...styles.dropdownItemStyle,
-                      backgroundColor: theme.primary,
-                      ...(isSelected && { backgroundColor: theme.card }),
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownItemTxtStyle,
-                        { color: theme.text },
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
-                  </View>
-                );
-              }}
-              showsVerticalScrollIndicator={false}
-              dropdownStyle={styles.dropdownMenuStyle}
-            />
+                      <Text
+                        style={[
+                          styles.dropdownItemTxtStyle,
+                          { color: theme.text },
+                        ]}
+                      >
+                        {item.title}
+                      </Text>
+                    </View>
+                  );
+                }}
+                showsVerticalScrollIndicator={false}
+                dropdownStyle={styles.dropdownMenuStyle}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Profile");
+                }}
+                style={{
+                  height: 50,
+                  width: 50,
+                  backgroundColor: theme.button,
+                  borderRadius: 100,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 20,
+                }}
+              >
+                <Ionicons
+                  size={25}
+                  color={theme.buttonText}
+                  name="person-outline"
+                ></Ionicons>
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.totalExpensesContainer}>
               <Text style={{ fontSize: 18, color: theme.text }}>
@@ -496,21 +526,51 @@ export default function Home() {
       );
     } else {
       return (
-        <ScrollView>
+        <ScrollView style={{ backgroundColor: theme.background }}>
           <SafeAreaView>
             <MidSpacer></MidSpacer>
-            <View style={{ flexDirection: "row", paddingHorizontal: 20 }}>
-              <Text
-                style={{ fontSize: 25, fontWeight: "500", color: theme.text }}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingTop: 60,
+                paddingLeft: 20,
+                alignItems: "center",
+              }}
+            >
+              <View style={{ width: "80%", flexDirection: "row" }}>
+                <Text
+                  style={{ fontSize: 30, fontWeight: "500", color: theme.text }}
+                >
+                  Welcome
+                </Text>
+                <Text
+                  style={{ fontSize: 30, fontWeight: "300", color: theme.text }}
+                >
+                  {" "}
+                  {FIREBASE_AUTH.currentUser.displayName}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Profile");
+                }}
+                style={{
+                  height: 50,
+                  width: 50,
+                  backgroundColor: theme.button,
+                  borderRadius: 100,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 20,
+                }}
               >
-                Welcome
-              </Text>
-              <Text
-                style={{ fontSize: 25, fontWeight: "300", color: theme.text }}
-              >
-                {" "}
-                {FIREBASE_AUTH.currentUser.displayName}
-              </Text>
+                <Ionicons
+                  size={25}
+                  color={theme.buttonText}
+                  name="person-outline"
+                ></Ionicons>
+              </TouchableOpacity>
             </View>
             <MaxSpacer></MaxSpacer>
             <View>
@@ -550,11 +610,11 @@ const styles = StyleSheet.create({
     shadowColor: "000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 0,
     },
-    shadowOpacity: 0.12,
-    shadowRadius: 0.04,
-    elevation: 5,
+    shadowOpacity: 0.05,
+    shadowRadius: 0.01,
+    elevation: 1,
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
@@ -592,6 +652,8 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     paddingTop: 0,
     padding: 20,
+    paddingBottom: 30,
+    marginBottom: 30,
     alignItems: "center",
     flexDirection: "column",
     justifyContent: "flex-end",

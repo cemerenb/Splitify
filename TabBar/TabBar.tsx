@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import {
-  Alert,
   Animated,
   Dimensions,
   StyleSheet,
@@ -19,7 +18,6 @@ import Home from "../Pages/HomePage";
 import PersonalExpensEntry from "../Pages/PersonalExpensesEntry";
 import PersonalExpensesEntry from "../Pages/PersonalExpensesEntry";
 import Groups from "../Pages/Groups";
-import Stats from "../Pages/Stats";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemeContext } from "../Theme/ThemeContext";
 
@@ -42,8 +40,8 @@ const renderTabBar = ({ routeName, selectedTab, navigate }) => {
             ? "grid-outline"
             : "bar-chart"
         }
-        size={25}
-        color={routeName === selectedTab ? "#9C60D7" : "gray"}
+        size={30}
+        color={routeName === selectedTab ? "#7544EC" : "gray"}
       />
     );
   };
@@ -61,12 +59,13 @@ export const TabBar: React.FC<Props> = ({}) => (
     type="DOWN"
     style={styles.bottomBar}
     shadowStyle={[
-      styles.shawdow,
-      { shadowColor: useContext(ThemeContext).theme.shadow },
+      {
+        shadowColor: useContext(ThemeContext).theme.shadow,
+      },
     ]}
     height={75}
     circleWidth={60}
-    bgColor={useContext(ThemeContext).theme.primary}
+    bgColor={useContext(ThemeContext).theme.shadow}
     initialRouteName="homepage"
     screenOptions={{ headerShown: false }}
     borderTopLeftRight
@@ -103,19 +102,8 @@ export const TabBar: React.FC<Props> = ({}) => (
     />
     <CurvedBottomBarExpo.Screen
       name="groups"
-      position="LEFT"
+      position="RIGHT"
       component={Groups}
-    />
-    <CurvedBottomBarExpo.Screen
-      name="stats"
-      position="RIGHT"
-      component={Stats}
-    />
-
-    <CurvedBottomBarExpo.Screen
-      name="profile"
-      component={Profile}
-      position="RIGHT"
     />
   </CurvedBottomBarExpo.Navigator>
 );
@@ -125,15 +113,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  shawdow: {
-    shadowColor: "#DDDDDD",
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 5,
-  },
+
   button: {
     flex: 1,
     justifyContent: "center",
@@ -149,12 +129,12 @@ export const styles = StyleSheet.create({
     bottom: 20,
     shadowColor: "#000",
     shadowOffset: {
-      width: 0,
+      width: 1,
       height: 1,
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
-    elevation: 1,
+    elevation: 5,
   },
   imgCircle: {
     width: 30,

@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
   FlatList,
   Share,
-  Alert,
   Modal,
   Button,
   TouchableOpacity,
@@ -52,10 +51,18 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   const [ownerName, setOwnerName] = useState("");
   const [loading, setLoadingStatus] = useState(true);
   const [selection, setSelection] = useState(1);
+  const [processed, setProcessed] = useState(false);
 
   const [total, setTotal] = useState(0);
   const [admin, setAdminStatus] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible2, setModalVisible2] = useState(false);
+  const [modalVisible3, setModalVisible3] = useState(false);
+  const [modalVisible4, setModalVisible4] = useState(false);
+  const [modalVisible5, setModalVisible5] = useState(false);
+
+  const [modalText, setModalText] = useState("");
+
   const [selectedUser, setSelectedUser] = useState("");
   const { theme } = useContext(ThemeContext);
 
@@ -100,8 +107,8 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   };
 
   const transferOwnership = async (uid) => {
+    setProcessed(true);
     try {
-      setModalVisible(true);
       const docRef = doc(FIRESTORE_DB, "groups", groupId);
       await updateDoc(docRef, {
         admins: arrayUnion(uid),
@@ -114,10 +121,14 @@ const Members: React.FC<MembersProps> = ({ route }) => {
       navigation.replace("Members", { groupId: groupId });
       setModalVisible(false);
     } catch (error) {
-      Alert.alert("An error occured while transfering ownership");
+      setModalText("An error occured while transfering ownership");
+      setModalVisible4(true);
     }
+    setProcessed(false);
   };
   const makeAdmin = async (uid) => {
+    setLoadingStatus(true);
+
     setModalVisible(true);
     const docRef = doc(FIRESTORE_DB, "groups", groupId);
     await updateDoc(docRef, {
@@ -131,31 +142,46 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   };
   const revokeAdmin = async (uid) => {
     setModalVisible(true);
-    const docRef = doc(FIRESTORE_DB, "groups", groupId);
-    const admins = (await getDoc(docRef)).data().admins;
-    const updatedAdmins = admins.filter((a) => a !== uid);
-    await updateDoc(docRef, {
-      admins: updatedAdmins,
-    });
-    setAdmins(updatedAdmins);
-    // @ts-ignore
+    setLoadingStatus(true);
 
-    navigation.replace("Members", { groupId: groupId });
-    setModalVisible(false);
+    try {
+      const docRef = doc(FIRESTORE_DB, "groups", groupId);
+      const admins = (await getDoc(docRef)).data().admins;
+      const updatedAdmins = admins.filter((a) => a !== uid);
+      await updateDoc(docRef, {
+        admins: updatedAdmins,
+      });
+      setAdmins(updatedAdmins);
+      // @ts-ignore
+
+      navigation.replace("Members", { groupId: groupId });
+      setModalVisible(false);
+    } catch (error) {
+      console.log(error);
+      setModalText("An error occured");
+      setModalVisible4(true);
+    }
   };
   const deleteGroup = async () => {
-    const userUid = FIREBASE_AUTH.currentUser.uid;
-    const personalDocRef = doc(FIRESTORE_DB, "personal", userUid);
-    const groups = (await getDoc(personalDocRef)).data().groups;
+    setProcessed(true);
+    for (let index = 0; index < members.length; index++) {
+      const element = members[index];
+      console.log(element);
 
-    const udpatedGroups = groups.filter((g) => g !== groupId);
-    const data = {
-      groups: udpatedGroups,
-    };
-    await updateDoc(personalDocRef, data);
+      const personalDocRef = doc(FIRESTORE_DB, "personal", element);
+      const groups = (await getDoc(personalDocRef)).data().groups;
+
+      const udpatedGroups = groups.filter((g) => g !== groupId);
+      const data = {
+        groups: udpatedGroups,
+      };
+      await updateDoc(personalDocRef, data);
+    }
+
     const docRef = doc(FIRESTORE_DB, "groups", groupId);
     await deleteDoc(docRef);
     navigation.pop(2);
+    setProcessed(false);
   };
 
   const kickUser = async (uid) => {
@@ -186,11 +212,13 @@ const Members: React.FC<MembersProps> = ({ route }) => {
       // @ts-ignore
       navigation.replace("Members", { groupId: groupId });
     } catch (error) {
-      Alert.alert("An error occured");
+      setModalText("An error occured");
+      setModalVisible4(true);
     }
   };
 
   const leaveGroup = async () => {
+    setProcessed(true);
     const userUid = FIREBASE_AUTH.currentUser.uid;
     const personalDocRef = doc(FIRESTORE_DB, "personal", userUid);
     const groups = (await getDoc(personalDocRef)).data().groups;
@@ -223,7 +251,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
       await updateDoc(docRef, newData);
       await updateDoc(personalDocRef, newGroups);
     }
-
+    setProcessed(false);
     navigation.pop(2);
   };
 
@@ -251,7 +279,8 @@ const Members: React.FC<MembersProps> = ({ route }) => {
         // dismissed
       }
     } catch (error: any) {
-      Alert.alert(error.message);
+      setModalText(error.message);
+      setModalVisible4(true);
     }
   };
 
@@ -259,6 +288,10 @@ const Members: React.FC<MembersProps> = ({ route }) => {
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
 
   useEffect(() => {
+    for (let index = 0; index < members.length; index++) {
+      const element = members[index];
+      console.log(element);
+    }
     getMemberNames();
   }, [members]);
   useLayoutEffect(() => {
@@ -304,6 +337,304 @@ const Members: React.FC<MembersProps> = ({ route }) => {
         style={{ backgroundColor: theme.background, paddingTop: 50, flex: 1 }}
       >
         <ScrollView>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible4}
+            onRequestClose={() => {
+              setModalVisible4(!modalVisible4);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "rgba(10,10,10,0.6)",
+                flex: 1,
+                height: Dimensions.get("window").height,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: theme.primary,
+                  width: "80%",
+                  paddingTop: 50,
+                  borderRadius: 20,
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+                >
+                  {modalText}
+                </Text>
+                <View style={{ width: "100%", flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setModalVisible4(false);
+                    }}
+                    style={{
+                      width: "100%",
+                      height: 50,
+                      backgroundColor: theme.shadow,
+                      borderBottomLeftRadius: 20,
+                      borderBottomRightRadius: 20,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                      Close
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible5}
+            onRequestClose={() => {
+              setModalVisible5(!modalVisible5);
+              setModalVisible(true);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "rgba(10,10,10,0.6)",
+                flex: 1,
+                height: Dimensions.get("window").height,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: theme.primary,
+                  width: "80%",
+                  paddingTop: 50,
+                  borderRadius: 20,
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+                >
+                  Are you sure you want to transfer ownership?
+                </Text>
+                <View style={{ width: "100%", flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setModalVisible5(false);
+                      setModalVisible(true);
+                    }}
+                    style={{
+                      width: "50%",
+                      height: 50,
+                      backgroundColor: theme.shadow,
+                      borderBottomLeftRadius: 20,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await transferOwnership(selectedUser);
+                      setModalVisible(true);
+                    }}
+                    style={{
+                      borderBottomRightRadius: 20,
+                      width: "50%",
+                      height: 50,
+                      backgroundColor: "rgb(253,60,74)",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {processed ? (
+                      <ActivityIndicator
+                        size={"small"}
+                        color={"white"}
+                      ></ActivityIndicator>
+                    ) : (
+                      <Text style={{ color: theme.text, fontSize: 18 }}>
+                        Transfer
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible2}
+            onRequestClose={() => {
+              setModalVisible2(!modalVisible2);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "rgba(10,10,10,0.6)",
+                flex: 1,
+                height: Dimensions.get("window").height,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: theme.primary,
+                  width: "80%",
+                  paddingTop: 50,
+                  borderRadius: 20,
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{ color: theme.text, fontSize: 22, paddingBottom: 5 }}
+                >
+                  Leave Group
+                </Text>
+                <Text
+                  style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+                >
+                  Are you sure you want to leave the group?
+                </Text>
+                <View style={{ width: "100%", flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setModalVisible2(false);
+                    }}
+                    style={{
+                      width: "50%",
+                      height: 50,
+                      backgroundColor: theme.shadow,
+                      borderBottomLeftRadius: 20,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      leaveGroup();
+                    }}
+                    style={{
+                      borderBottomRightRadius: 20,
+                      width: "50%",
+                      height: 50,
+                      backgroundColor: "rgb(253,60,74)",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {processed ? (
+                      <ActivityIndicator
+                        size={"small"}
+                        color={"white"}
+                      ></ActivityIndicator>
+                    ) : (
+                      <Text style={{ color: theme.text, fontSize: 18 }}>
+                        Leave
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible3}
+            onRequestClose={() => {
+              setModalVisible3(!modalVisible3);
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "rgba(10,10,10,0.6)",
+                flex: 1,
+                height: Dimensions.get("window").height,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: theme.primary,
+                  width: "80%",
+                  paddingTop: 50,
+                  borderRadius: 20,
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{ color: theme.text, fontSize: 22, paddingBottom: 5 }}
+                >
+                  Delete Group
+                </Text>
+                <Text
+                  style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+                >
+                  Are you sure you want to delete the group?
+                </Text>
+                <View style={{ width: "100%", flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setModalVisible3(false);
+                    }}
+                    style={{
+                      width: "50%",
+                      height: 50,
+                      backgroundColor: theme.shadow,
+                      borderBottomLeftRadius: 20,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      deleteGroup();
+                    }}
+                    style={{
+                      borderBottomRightRadius: 20,
+                      width: "50%",
+                      height: 50,
+                      backgroundColor: "rgb(253,60,74)",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {processed ? (
+                      <ActivityIndicator
+                        size={"small"}
+                        color={"white"}
+                      ></ActivityIndicator>
+                    ) : (
+                      <Text style={{ color: theme.text, fontSize: 18 }}>
+                        Delete
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
           <Modal
             visible={modalVisible}
             transparent={true}
@@ -353,20 +684,8 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                   <TouchableOpacity
                     onPress={() => {
                       if (selectedUser == ownerUid) {
-                        Alert.alert(
-                          "",
-                          "You cannot kick group owner",
-                          [
-                            {
-                              text: "Okay",
-                              onPress: () => {
-                                setModalVisible(false);
-                              },
-                              style: "cancel",
-                            },
-                          ],
-                          { cancelable: true }
-                        );
+                        setModalText("You cannot kick group owner");
+                        setModalVisible4(true);
                       } else {
                         kickUser(selectedUser);
                       }
@@ -393,20 +712,10 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                   <TouchableOpacity
                     onPress={() => {
                       if (selectedUser == ownerUid) {
-                        Alert.alert(
-                          "",
-                          "You cannot change the group owner's permissions",
-                          [
-                            {
-                              text: "Okay",
-                              onPress: () => {
-                                setModalVisible(false);
-                              },
-                              style: "cancel",
-                            },
-                          ],
-                          { cancelable: true }
+                        setModalText(
+                          "You cannot change the group owner's permissions"
                         );
+                        setModalVisible4(true);
                       } else {
                         admins.includes(selectedUser)
                           ? revokeAdmin(selectedUser)
@@ -437,25 +746,11 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                         }}
                       ></View>
                       <TouchableOpacity
-                        onPress={async () => {
-                          Alert.alert(
-                            "",
-                            "Are you sure you want to transfer ownership?",
-                            [
-                              {
-                                text: "Cancel",
-                                onPress: () => {},
-                              },
-                              {
-                                text: "Transfer",
-                                onPress: async () => {
-                                  await transferOwnership(selectedUser);
-                                },
-                                style: "default",
-                              },
-                            ],
-                            { cancelable: true }
-                          );
+                        onPress={() => {
+                          console.log("girdi");
+                          setModalVisible(false);
+
+                          setModalVisible5(true);
                         }}
                         style={{
                           flexDirection: "row",
@@ -523,7 +818,8 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                   paddingVertical: 15,
                 }}
                 onPress={() => {
-                  onShare();
+                  //@ts-ignore
+                  navigation.navigate("QRScanner", { groupId: groupId });
                 }}
               >
                 <Ionicons
@@ -539,13 +835,13 @@ const Members: React.FC<MembersProps> = ({ route }) => {
               </TouchableOpacity>
               <View
                 style={{
-                  height: 0.3,
-                  width: "100%",
-                  backgroundColor: theme.text,
-                  flexDirection: "row",
-                  justifyContent: "center",
+                  height: 0.4,
+                  width: Dimensions.get("window").width - 60,
+                  paddingLeft: 20,
+                  marginLeft: 10,
+                  backgroundColor: theme.shadow,
                 }}
-              ></View>
+              />
               <TouchableOpacity
                 style={{
                   flexDirection: "row",
@@ -687,7 +983,9 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       paddingVertical: 20,
                     }}
                   >
-                    <Text style={{ fontSize: 20 }}>{memberNames[index]}</Text>
+                    <Text style={{ fontSize: 20, color: theme.text }}>
+                      {memberNames[index]}
+                    </Text>
                     {members[index] == ownerUid ? (
                       <View
                         style={{
@@ -762,43 +1060,9 @@ const Members: React.FC<MembersProps> = ({ route }) => {
               }}
               onPress={() => {
                 if (members.length == 1) {
-                  Alert.alert(
-                    "Delete Group",
-                    "Are you sure you want to delete the group?",
-                    [
-                      {
-                        text: "Cancel",
-                        onPress: () => {},
-                      },
-                      {
-                        text: "Delete",
-                        onPress: () => {
-                          deleteGroup();
-                        },
-                        style: "destructive",
-                      },
-                    ],
-                    { cancelable: true }
-                  );
+                  setModalVisible3(true);
                 } else {
-                  Alert.alert(
-                    "Leave Group",
-                    "Are you sure you want to leave the group?",
-                    [
-                      {
-                        text: "Cancel",
-                        onPress: () => {},
-                      },
-                      {
-                        text: "Leave",
-                        onPress: () => {
-                          leaveGroup();
-                        },
-                        style: "destructive",
-                      },
-                    ],
-                    { cancelable: true }
-                  );
+                  setModalVisible2(true);
                 }
               }}
             >
@@ -820,6 +1084,39 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 {members.length == 1 ? "Delete Group" : "Leave Group"}
               </Text>
             </TouchableOpacity>
+            {members.length > 1 && ownerUid == FIREBASE_AUTH.currentUser.uid ? (
+              <View style={{ marginTop: 20 }}>
+                <TouchableOpacity
+                  style={{
+                    borderRadius: 20,
+
+                    backgroundColor: theme.primary,
+                    flexDirection: "row",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    paddingHorizontal: 20,
+                    paddingVertical: 15,
+                  }}
+                  onPress={() => {
+                    setModalVisible3(true);
+                  }}
+                >
+                  <Ionicons
+                    color={"white"}
+                    name="close-outline"
+                    size={30}
+                  ></Ionicons>
+
+                  <Text
+                    style={{ color: "white", fontSize: 20, paddingLeft: 10 }}
+                  >
+                    Delete Group
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View></View>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>

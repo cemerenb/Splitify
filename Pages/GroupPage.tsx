@@ -246,7 +246,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
               }}
             >
               <Ionicons
-                size={15}
+                size={10}
                 color={theme.reverse}
                 name="checkmark-outline"
               ></Ionicons>
@@ -450,7 +450,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
         style={{
           alignItems: "center",
           backgroundColor: theme.background,
-          paddingTop: 40,
+          paddingTop: 20,
         }}
       >
         <MaxSpacer></MaxSpacer>
@@ -463,29 +463,35 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
           }}
         >
           <TouchableOpacity
-            style={[styles.homeIcon, { backgroundColor: theme.card }]}
+            style={[styles.homeIcon, { backgroundColor: theme.button }]}
             onPress={() => {
               navigation.navigate("TabBar");
             }}
           >
             <Ionicons
               name="home-outline"
-              color={theme.text}
+              color={theme.buttonText}
               size={26}
             ></Ionicons>
           </TouchableOpacity>
-          <View style={[styles.nameContainer, { backgroundColor: theme.card }]}>
+          <View
+            style={[styles.nameContainer, { backgroundColor: theme.button }]}
+          >
             <View style={{ paddingLeft: 10 }}>
               <Text
                 style={{
                   fontSize: 30 - groupName.length / 2,
-                  color: theme.text,
+                  color: theme.buttonText,
                 }}
               >
                 {groupName}
               </Text>
               <Text
-                style={{ fontWeight: "300", fontSize: 12, color: theme.text }}
+                style={{
+                  fontWeight: "300",
+                  fontSize: 12,
+                  color: theme.buttonText,
+                }}
               >
                 {ownerName}'s group
               </Text>
@@ -502,12 +508,12 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                 borderRadius: 18,
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: theme.gradientStart,
+                backgroundColor: theme.primary,
               }}
             >
               <Ionicons
                 name="people-outline"
-                color={"white"}
+                color={theme.text}
                 size={30}
               ></Ionicons>
             </TouchableOpacity>
@@ -681,6 +687,9 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                     )}
                   />
                 </View>
+                <View
+                  style={{ height: Dimensions.get("window").height / 6 }}
+                ></View>
               </View>
             ) : (
               <View></View>
@@ -692,6 +701,8 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             // @ts-ignore
             navigation.navigate("GroupExpensesEntry", {
               groupId: groupId,
+              membersMap: namesMap,
+              members: members,
             });
           }}
           style={{
@@ -699,7 +710,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             alignItems: "center",
             justifyContent: "space-between",
             position: "absolute",
-            bottom: 80,
+            bottom: 60,
             right: 20,
             height: 50,
             backgroundColor: theme.button,
@@ -734,7 +745,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.12,
     shadowRadius: 0.04,
-    elevation: 5,
+    elevation: 0.3,
     width: "100%",
     flexDirection: "row",
     alignItems: "center",

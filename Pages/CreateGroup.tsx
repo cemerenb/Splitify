@@ -15,8 +15,8 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -32,7 +32,8 @@ export default function CreateGroup() {
   const [loading, setLoadingStatus] = useState(false);
   const [groups, setGroups] = useState([]);
   const { theme } = useContext(ThemeContext);
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalText, setModalText] = useState("");
   const selectionData = [
     { title: "Home" },
     { title: "Work" },
@@ -79,9 +80,11 @@ export default function CreateGroup() {
         members: [uid],
         admins: [uid],
         ownerUid: uid,
-        expenses: [{}],
+        expenses: [],
         type: selection,
         processedExpenses: [],
+        transactions: [],
+        memberNames: [],
       };
       await setDoc(docRef, data);
 
@@ -99,6 +102,58 @@ export default function CreateGroup() {
   };
   return (
     <View style={{ flex: 1 }}>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "rgba(10,10,10,0.6)",
+            flex: 1,
+            height: Dimensions.get("window").height,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme.primary,
+              width: "80%",
+              paddingTop: 50,
+              borderRadius: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+            >
+              {modalText}
+            </Text>
+            <View style={{ width: "100%", flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(false);
+                }}
+                style={{
+                  width: "100%",
+                  height: 50,
+                  backgroundColor: theme.shadow,
+                  borderBottomLeftRadius: 20,
+                  borderBottomRightRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.textArea}>
         <Text style={{ fontSize: 50, color: "white" }}>Create Group</Text>
       </View>
@@ -190,14 +245,15 @@ export default function CreateGroup() {
                 FIREBASE_AUTH.currentUser.uid
               );
               if (response == 1) {
-                await Alert.alert("Group created successfully");
                 navigation.replace("TabBar");
               } else {
-                Alert.alert("An error occured");
+                setModalText("An error occured");
+                setModalVisible(true);
               }
               setLoadingStatus(false);
             } else {
-              Alert.alert("You have to enter the group name");
+              setModalText("You have to enter the group name");
+              setModalVisible(true);
             }
           }}
         >
@@ -219,10 +275,10 @@ export default function CreateGroup() {
                 style={{
                   flex: 1,
                   justifyContent: "center",
-                  backgroundColor: theme.background,
+                  backgroundColor: "transparent",
                 }}
               >
-                <ActivityIndicator size="small" color={theme.gradientStart} />
+                <ActivityIndicator size="small" color={"white"} />
               </View>
             ) : (
               <Text style={{ color: "white", fontSize: 20 }}>Create Group</Text>
