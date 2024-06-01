@@ -84,7 +84,7 @@ export default function CreateGroup() {
         type: selection,
         processedExpenses: [],
         transactions: [],
-        memberNames: [],
+        memberNames: {},
       };
       await setDoc(docRef, data);
 
@@ -129,7 +129,11 @@ export default function CreateGroup() {
             }}
           >
             <Text
-              style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+              style={{
+                color: theme.text,
+                fontSize: Dimensions.get("window").width / 26,
+                paddingBottom: 40,
+              }}
             >
               {modalText}
             </Text>
@@ -148,14 +152,28 @@ export default function CreateGroup() {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                <Text
+                  style={{
+                    color: theme.text,
+                    fontSize: Dimensions.get("window").width / 26,
+                  }}
+                >
+                  Close
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
       <View style={styles.textArea}>
-        <Text style={{ fontSize: 50, color: "white" }}>Create Group</Text>
+        <Text
+          style={{
+            fontSize: Dimensions.get("window").width / 8,
+            color: "white",
+          }}
+        >
+          Create Group
+        </Text>
       </View>
 
       <View style={[styles.bottomSheet, { backgroundColor: theme.background }]}>
@@ -165,10 +183,10 @@ export default function CreateGroup() {
               color: theme.text,
               backgroundColor: theme.primary,
               marginVertical: 40,
-              fontSize: 18,
+              fontSize: Dimensions.get("window").width / 24,
               textAlignVertical: "center",
-              lineHeight: 25,
-              height: 65,
+              lineHeight: Dimensions.get("window").width / 24,
+              height: Dimensions.get("window").height / 15,
               width: Dimensions.get("window").width - 40,
               borderRadius: 10,
               borderColor: "gray",
@@ -260,7 +278,7 @@ export default function CreateGroup() {
           <View
             style={{
               marginVertical: 50,
-              height: 65,
+              height: Dimensions.get("window").height / 15,
               borderWidth: StyleSheet.hairlineWidth,
               borderRadius: 10,
               alignSelf: "center",
@@ -281,7 +299,14 @@ export default function CreateGroup() {
                 <ActivityIndicator size="small" color={"white"} />
               </View>
             ) : (
-              <Text style={{ color: "white", fontSize: 20 }}>Create Group</Text>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: Dimensions.get("window").width / 24,
+                }}
+              >
+                Create Group
+              </Text>
             )}
           </View>
         </TouchableOpacity>
@@ -324,7 +349,7 @@ const styles = StyleSheet.create({
   },
   dropdownButtonTxtStyle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: Dimensions.get("window").width / 24,
     fontWeight: "500",
     color: "#151E26",
   },
@@ -355,7 +380,7 @@ const styles = StyleSheet.create({
   },
   dropdownButtonStyle: {
     width: Dimensions.get("window").width - 40,
-    height: 65,
+    height: Dimensions.get("window").height / 15,
     backgroundColor: "transparent",
     borderRadius: 10,
     borderWidth: 1,

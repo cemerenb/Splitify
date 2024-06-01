@@ -295,7 +295,7 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
         style={{
           alignContent: "center",
           backgroundColor: theme.background,
-          paddingTop: Platform.OS === "android" ? 50 : 50,
+          paddingTop: Dimensions.get("window").width / 14,
           flex: 1,
         }}
       >
@@ -664,7 +664,7 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
         ) : (
           <View></View>
         )}
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <FlatList
             scrollEnabled={false}
             style={{ width: "100%", paddingHorizontal: 20 }}

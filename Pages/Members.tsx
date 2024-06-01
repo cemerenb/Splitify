@@ -51,7 +51,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   const [ownerName, setOwnerName] = useState("");
   const [loading, setLoadingStatus] = useState(true);
   const [selection, setSelection] = useState(1);
-  const [processed, setProcessed] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   const [total, setTotal] = useState(0);
   const [admin, setAdminStatus] = useState(false);
@@ -107,7 +107,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   };
 
   const transferOwnership = async (uid) => {
-    setProcessed(true);
+    setProcessing(true);
     try {
       const docRef = doc(FIRESTORE_DB, "groups", groupId);
       await updateDoc(docRef, {
@@ -124,7 +124,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
       setModalText("An error occured while transfering ownership");
       setModalVisible4(true);
     }
-    setProcessed(false);
+    setProcessing(false);
   };
   const makeAdmin = async (uid) => {
     setLoadingStatus(true);
@@ -163,7 +163,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
     }
   };
   const deleteGroup = async () => {
-    setProcessed(true);
+    setProcessing(true);
     for (let index = 0; index < members.length; index++) {
       const element = members[index];
       console.log(element);
@@ -181,7 +181,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
     const docRef = doc(FIRESTORE_DB, "groups", groupId);
     await deleteDoc(docRef);
     navigation.pop(2);
-    setProcessed(false);
+    setProcessing(false);
   };
 
   const kickUser = async (uid) => {
@@ -218,7 +218,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   };
 
   const leaveGroup = async () => {
-    setProcessed(true);
+    setProcessing(true);
     const userUid = FIREBASE_AUTH.currentUser.uid;
     const personalDocRef = doc(FIRESTORE_DB, "personal", userUid);
     const groups = (await getDoc(personalDocRef)).data().groups;
@@ -251,7 +251,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
       await updateDoc(docRef, newData);
       await updateDoc(personalDocRef, newGroups);
     }
-    setProcessed(false);
+    setProcessing(false);
     navigation.pop(2);
   };
 
@@ -334,7 +334,11 @@ const Members: React.FC<MembersProps> = ({ route }) => {
   } else if (memberNames.length === members.length && members.length > 0) {
     return (
       <SafeAreaView
-        style={{ backgroundColor: theme.background, paddingTop: 50, flex: 1 }}
+        style={{
+          backgroundColor: theme.background,
+          paddingTop: Dimensions.get("window").width / 14,
+          flex: 1,
+        }}
       >
         <ScrollView>
           <Modal
@@ -456,7 +460,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       justifyContent: "center",
                     }}
                   >
-                    {processed ? (
+                    {processing ? (
                       <ActivityIndicator
                         size={"small"}
                         color={"white"}
@@ -538,7 +542,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       justifyContent: "center",
                     }}
                   >
-                    {processed ? (
+                    {processing ? (
                       <ActivityIndicator
                         size={"small"}
                         color={"white"}
@@ -620,7 +624,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       justifyContent: "center",
                     }}
                   >
-                    {processed ? (
+                    {processing ? (
                       <ActivityIndicator
                         size={"small"}
                         color={"white"}
@@ -695,10 +699,15 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       justifyContent: "space-between",
                       alignItems: "center",
                       paddingHorizontal: 20,
-                      paddingVertical: 20,
+                      height: Dimensions.get("window").height / 14,
                     }}
                   >
-                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                    <Text
+                      style={{
+                        color: theme.text,
+                        fontSize: Dimensions.get("window").width / 24,
+                      }}
+                    >
                       Kick User
                     </Text>
                   </TouchableOpacity>
@@ -727,10 +736,15 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       justifyContent: "space-between",
                       alignItems: "center",
                       paddingHorizontal: 20,
-                      paddingVertical: 20,
+                      height: Dimensions.get("window").height / 14,
                     }}
                   >
-                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                    <Text
+                      style={{
+                        color: theme.text,
+                        fontSize: Dimensions.get("window").width / 24,
+                      }}
+                    >
                       {admins.includes(selectedUser)
                         ? "Revoke Admin"
                         : "Make Admin"}
@@ -757,10 +771,15 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                           justifyContent: "space-between",
                           alignItems: "center",
                           paddingHorizontal: 20,
-                          paddingVertical: 20,
+                          height: Dimensions.get("window").height / 14,
                         }}
                       >
-                        <Text style={{ color: theme.text, fontSize: 18 }}>
+                        <Text
+                          style={{
+                            color: theme.text,
+                            fontSize: Dimensions.get("window").width / 24,
+                          }}
+                        >
                           Transfer Ownership
                         </Text>
                       </TouchableOpacity>
@@ -815,7 +834,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                   justifyContent: "flex-start",
                   alignItems: "center",
                   paddingHorizontal: 20,
-                  paddingVertical: 15,
+                  height: Dimensions.get("window").height / 14,
                 }}
                 onPress={() => {
                   //@ts-ignore
@@ -839,7 +858,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                   width: Dimensions.get("window").width - 60,
                   paddingLeft: 20,
                   marginLeft: 10,
-                  backgroundColor: theme.shadow,
+                  backgroundColor: theme.background,
                 }}
               />
               <TouchableOpacity
@@ -848,7 +867,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                   justifyContent: "flex-start",
                   alignItems: "center",
                   paddingHorizontal: 20,
-                  paddingVertical: 15,
+                  height: Dimensions.get("window").height / 14,
                 }}
                 onPress={() => {
                   onShare();
@@ -897,12 +916,11 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 >
                   <View
                     style={{
-                      height: 55,
                       flexDirection: "row",
                       justifyContent: "space-between",
                       alignItems: "center",
                       paddingHorizontal: 20,
-                      paddingVertical: 10,
+                      height: Dimensions.get("window").height / 14,
                     }}
                   >
                     <Text style={{ color: theme.text, fontSize: 20 }}>
@@ -980,7 +998,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       justifyContent: "space-between",
                       alignItems: "center",
                       paddingHorizontal: 20,
-                      paddingVertical: 20,
+                      height: Dimensions.get("window").height / 14,
                     }}
                   >
                     <Text style={{ fontSize: 20, color: theme.text }}>
@@ -1027,7 +1045,9 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                           paddingHorizontal: 10,
                         }}
                       >
-                        <Text style={{ fontSize: 16 }}>Admin</Text>
+                        <Text style={{ fontSize: 16, color: theme.text }}>
+                          Admin
+                        </Text>
                       </View>
                     ) : (
                       <View></View>
@@ -1056,7 +1076,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 justifyContent: "flex-start",
                 alignItems: "center",
                 paddingHorizontal: 20,
-                paddingVertical: 15,
+                height: Dimensions.get("window").height / 14,
               }}
               onPress={() => {
                 if (members.length == 1) {
@@ -1095,20 +1115,20 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                     justifyContent: "flex-start",
                     alignItems: "center",
                     paddingHorizontal: 20,
-                    paddingVertical: 15,
+                    height: Dimensions.get("window").height / 14,
                   }}
                   onPress={() => {
                     setModalVisible3(true);
                   }}
                 >
                   <Ionicons
-                    color={"white"}
+                    color={theme.text}
                     name="close-outline"
                     size={30}
                   ></Ionicons>
 
                   <Text
-                    style={{ color: "white", fontSize: 20, paddingLeft: 10 }}
+                    style={{ color: theme.text, fontSize: 20, paddingLeft: 10 }}
                   >
                     Delete Group
                   </Text>
@@ -1137,7 +1157,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: Dimensions.get("window").width * 0.8,
     paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingBottom: 30,
     backgroundColor: "white",
     borderRadius: 20,
     justifyContent: "center",

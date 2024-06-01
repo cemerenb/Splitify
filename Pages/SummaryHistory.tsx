@@ -94,7 +94,7 @@ const OldTransections: React.FC<OldTransectionsProps> = ({ route }) => {
         backgroundColor: theme.background,
         flex: 1,
         paddingHorizontal: 20,
-        paddingTop: 60,
+        paddingTop: Dimensions.get("window").width / 14,
       }}
     >
       <View style={{ paddingTop: 0 }}>

@@ -52,7 +52,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
   const [index, setIndex] = useState(-1);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
-
+  const [processing, setProcessing] = useState(false);
   const [modalText, setModalText] = useState("");
   const { theme } = useContext(ThemeContext);
 
@@ -78,6 +78,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
     return newDate;
   };
   const deleteElement = async (elementToDelete) => {
+    setProcessing(true);
     try {
       // Get a reference to the document containing the array
       const docRef = doc(
@@ -101,12 +102,15 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
 
         console.log("Element deleted successfully");
         navigation.replace("TabBar");
+        setProcessing(false);
       } else {
         console.log("Document does not exist");
+        setProcessing(false);
       }
     } catch (error) {
       console.error("Error deleting element:", error);
       // Handle error
+      setProcessing(false);
       setModalVisible2(true);
     }
   };
@@ -132,7 +136,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
   if (mapData.imageUrl != null) {
     if (showFullScreenImage) {
       return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
           <Modal
             animationType="fade"
             transparent={true}
@@ -160,7 +164,11 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
                 }}
               >
                 <Text
-                  style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+                  style={{
+                    color: theme.text,
+                    fontSize: Dimensions.get("window").width / 26,
+                    paddingBottom: 40,
+                  }}
                 >
                   Failed to delete element
                 </Text>
@@ -179,7 +187,12 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
                       justifyContent: "center",
                     }}
                   >
-                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                    <Text
+                      style={{
+                        color: theme.text,
+                        fontSize: Dimensions.get("window").width / 26,
+                      }}
+                    >
                       Close
                     </Text>
                   </TouchableOpacity>
@@ -214,12 +227,20 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
                 }}
               >
                 <Text
-                  style={{ color: theme.text, fontSize: 22, paddingBottom: 5 }}
+                  style={{
+                    color: theme.text,
+                    fontSize: Dimensions.get("window").width / 18,
+                    paddingBottom: 5,
+                  }}
                 >
                   Delete Expense
                 </Text>
                 <Text
-                  style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+                  style={{
+                    color: theme.text,
+                    fontSize: Dimensions.get("window").width / 26,
+                    paddingBottom: 40,
+                  }}
                 >
                   Are you sure you want to delete the expense?
                 </Text>
@@ -237,7 +258,12 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
                       justifyContent: "center",
                     }}
                   >
-                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                    <Text
+                      style={{
+                        color: theme.text,
+                        fontSize: Dimensions.get("window").width / 26,
+                      }}
+                    >
                       Cancel
                     </Text>
                   </TouchableOpacity>
@@ -254,14 +280,19 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
                       justifyContent: "center",
                     }}
                   >
-                    {process ? (
+                    {processing ? (
                       <ActivityIndicator
                         size={"small"}
                         color={"white"}
                       ></ActivityIndicator>
                     ) : (
-                      <Text style={{ color: theme.text, fontSize: 18 }}>
-                        Leave
+                      <Text
+                        style={{
+                          color: theme.text,
+                          fontSize: Dimensions.get("window").width / 26,
+                        }}
+                      >
+                        Delete
                       </Text>
                     )}
                   </TouchableOpacity>
@@ -280,7 +311,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
                   width: "50%",
                   alignItems: "flex-start",
                   paddingLeft: 20,
-                  marginTop: 70,
+                  marginTop: Dimensions.get("window").height / 15,
                 }}
               >
                 <TouchableOpacity
@@ -333,7 +364,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
                   }}
                   activeOpacity={0.7}
                   style={{
-                    marginTop: 70,
+                    marginTop: Dimensions.get("window").height / 15,
                     marginRight: 20,
                     alignItems: "flex-end",
                   }}
@@ -417,7 +448,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text
                   style={{
-                    fontSize: Dimensions.get("window").width / 14,
+                    fontSize: Dimensions.get("window").width / 15,
                     color: "white",
                   }}
                 >
@@ -440,15 +471,116 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
     }
   } else {
     return (
-      <View>
+      <View style={{ backgroundColor: theme.background }}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "rgba(10,10,10,0.6)",
+              flex: 1,
+              height: Dimensions.get("window").height,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: theme.primary,
+                width: "80%",
+                paddingTop: 50,
+                borderRadius: 20,
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 18,
+                  paddingBottom: 5,
+                }}
+              >
+                Delete Expense
+              </Text>
+              <Text
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 26,
+                  paddingBottom: 40,
+                }}
+              >
+                Are you sure you want to delete the expense?
+              </Text>
+              <View style={{ width: "100%", flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setModalVisible(false);
+                  }}
+                  style={{
+                    width: "50%",
+                    height: 50,
+                    backgroundColor: theme.shadow,
+                    borderBottomLeftRadius: 20,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: theme.text,
+                      fontSize: Dimensions.get("window").width / 26,
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    deleteElement(mapData);
+                  }}
+                  style={{
+                    borderBottomRightRadius: 20,
+                    width: "50%",
+                    height: 50,
+                    backgroundColor: "rgb(253,60,74)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {processing ? (
+                    <ActivityIndicator
+                      size={"small"}
+                      color={"white"}
+                    ></ActivityIndicator>
+                  ) : (
+                    <Text
+                      style={{
+                        color: theme.text,
+                        fontSize: Dimensions.get("window").width / 26,
+                      }}
+                    >
+                      Delete
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
         <LinearGradient
           colors={["rgba(221, 50, 52, 1)", "rgba(130, 67, 255, 1)"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={{
             height: 200,
+            paddingTop: Dimensions.get("window").height / 15,
             paddingLeft: 20,
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "space-between",
             flexDirection: "row",
           }}
@@ -464,7 +596,6 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
                 width: 80,
                 paddingHorizontal: 5,
                 borderRadius: 9,
-                marginBottom: -20,
                 justifyContent: "center",
                 alignItems: "center",
                 flexDirection: "row",
@@ -512,7 +643,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <ScrollView style={{ width: "70%", paddingRight: 15 }}>
+            <ScrollView style={{ width: "50%", paddingRight: 15 }}>
               <Text style={styles.subTitle}>Details</Text>
               <Text style={styles.text}>{mapData.note}</Text>
 
@@ -540,7 +671,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ route }) => {
               </Text>
               <MinSpacer></MinSpacer>
             </ScrollView>
-            <View style={{ width: "35%", alignItems: "flex-end" }}>
+            <View style={{ width: "40%", alignItems: "flex-end" }}>
               <Text
                 style={{
                   fontSize: Dimensions.get("window").width / 14,
@@ -594,10 +725,11 @@ const styles = StyleSheet.create({
   subTitle: {
     fontSize: 12,
     marginBottom: 5,
+    fontWeight: "700",
     color: "white",
   },
   text: {
-    fontSize: 16,
+    fontSize: Dimensions.get("window").width / 30,
     marginBottom: 10,
     color: "white",
   },

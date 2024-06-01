@@ -248,7 +248,7 @@ export default function SeeAll() {
       <View
         style={{
           flex: 1,
-          paddingTop: Platform.OS === "android" ? StatusBarManager.HEIGHT : 50,
+          paddingTop: Dimensions.get("window").width / 12,
           backgroundColor: theme.background,
         }}
       >
@@ -567,17 +567,37 @@ export default function SeeAll() {
                 paddingRight: 20,
               }}
             >
-              <Button
-                color={theme.text}
+              <TouchableOpacity
+                style={{
+                  backgroundColor: theme.shadow,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingHorizontal: 15,
+                  borderRadius: 20,
+                  width: 70,
+                  height: 30,
+                  marginRight: 10,
+                }}
                 onPress={() => {
                   setFilterActive(false);
                   setSelection(0);
                   toggleExpand();
                 }}
-                title="Clear"
-              ></Button>
-              <Button
-                color={theme.text}
+              >
+                <Text style={{ color: theme.buttonText, fontSize: 18 }}>
+                  Clear
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: theme.button,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingHorizontal: 15,
+                  borderRadius: 20,
+                  width: 70,
+                }}
                 onPress={() => {
                   setFilterActive(true);
                   console.log(dateFirst);
@@ -587,8 +607,11 @@ export default function SeeAll() {
 
                   toggleExpand();
                 }}
-                title="Filter"
-              ></Button>
+              >
+                <Text style={{ color: theme.buttonText, fontSize: 18 }}>
+                  Filter
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         ) : (

@@ -50,6 +50,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaterialIcons } from "@expo/vector-icons";
+import { ScrollView } from "react-native-gesture-handler";
 
 type RootStackParamList = {
   GroupExpensesEntry: { groupId: string; membersMap: Array; members: Array };
@@ -135,7 +136,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.1,
+      quality: 0.2,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -150,7 +151,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.1,
+      quality: 0.2,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -317,7 +318,9 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                <Text style={{ color: theme.buttonText, fontSize: 18 }}>
+                  Close
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -372,19 +375,32 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                   setMembersModalVisible(false);
                 }}
               >
-                <Text style={{ fontSize: 16, color: theme.text }}>Close</Text>
+                <Text style={{ fontSize: 16, color: theme.buttonText }}>
+                  Close
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
       <View style={styles.priceArea}>
-        <Text style={{ color: "rgb(252,252,252)", fontSize: 18 }}>
+        <Text
+          style={{
+            color: "rgb(252,252,252)",
+            fontSize: Dimensions.get("window").width / 20,
+          }}
+        >
           {" "}
           How much?
         </Text>
         <View style={{ flex: 1, flexDirection: "row", alignContent: "center" }}>
-          <Text style={{ fontSize: 40, color: "white", lineHeight: 80 }}>
+          <Text
+            style={{
+              fontSize: Dimensions.get("window").width / 10,
+              color: "white",
+              lineHeight: Dimensions.get("window").width / 5,
+            }}
+          >
             ₺
           </Text>
 
@@ -392,7 +408,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
             <TextInput
               style={{
                 color: "white",
-                fontSize: 80,
+                fontSize: Dimensions.get("window").width / 5.5,
                 lineHeight: 80,
                 height: 90,
               }}
@@ -408,226 +424,273 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
       </View>
 
       <View style={[styles.bottomSheet, { backgroundColor: theme.background }]}>
-        <MidSpacer></MidSpacer>
-        <Text
-          style={{
-            color: theme.text,
-            fontSize: 13,
-            paddingBottom: 5,
-          }}
-        >
-          Note
-        </Text>
-        <TextInput
-          style={{
-            fontSize: 18,
-            justifyContent: "center",
-            color: theme.text,
-            backgroundColor: theme.primary,
-            lineHeight: 20,
-            height: 65,
-            width: Dimensions.get("window").width - 40,
-            borderRadius: 10,
-            borderColor: "gray",
-            borderWidth: 1,
-            padding: 15,
-          }}
-          maxLength={300}
-          multiline={true}
-          placeholderTextColor={theme.text}
-          value={note}
-          onChangeText={setNote}
-          keyboardType="default"
-        />
-        <Text
-          style={{ textAlign: "right", marginBottom: 0, color: theme.text }}
-        >
-          {note.length}/300
-        </Text>
-        <Text
-          style={{
-            color: theme.text,
-            fontSize: 13,
-            paddingBottom: 5,
-          }}
-        >
-          Category
-        </Text>
-        <SelectDropdown
-          defaultValueByIndex={0}
-          data={selectionData}
-          onSelect={(selectedItem, index) => {
-            setSelection(index);
-          }}
-          renderButton={(selectedItem, isOpened) => {
-            return (
-              <View
-                style={[
-                  styles.dropdownButtonStyle,
-                  { backgroundColor: theme.primary },
-                ]}
-              >
-                <Text
-                  style={[styles.dropdownButtonTxtStyle, { color: theme.text }]}
-                >
-                  {selectedItem && selectedItem.title}
-                </Text>
-                <Icon
-                  name={isOpened ? "chevron-up" : "chevron-down"}
-                  style={[
-                    styles.dropdownButtonArrowStyle,
-                    { color: theme.text },
-                  ]}
-                />
-              </View>
-            );
-          }}
-          renderItem={(item, index, isSelected) => {
-            return (
-              <View
-                style={{
-                  ...styles.dropdownItemStyle,
-                  backgroundColor: theme.primary,
-                  ...(isSelected && { backgroundColor: theme.card }),
-                }}
-              >
-                <Text
-                  style={[styles.dropdownItemTxtStyle, { color: theme.text }]}
-                >
-                  {item.title}
-                </Text>
-              </View>
-            );
-          }}
-          showsVerticalScrollIndicator={false}
-          dropdownStyle={styles.dropdownMenuStyle}
-        />
-        <Text
-          style={{
-            color: theme.text,
-            fontSize: 13,
-            paddingTop: 10,
-            paddingBottom: 5,
-          }}
-        >
-          Participants
-        </Text>
-        <TouchableOpacity
-          onPress={() => {
-            setMembersModalVisible(true);
-          }}
-          style={{
-            width: "100%",
-            height: 65,
-            borderRadius: 10,
-            borderWidth: 0.4,
-            backgroundColor: theme.primary,
-            justifyContent: "center",
-            paddingLeft: 10,
-          }}
-        >
-          {everyoneSelected ? (
-            <Text style={{ color: theme.text, fontSize: 18 }}>Everyone</Text>
-          ) : selectedUserIds.length == 1 ? (
-            <Text style={{ color: theme.text, fontSize: 18 }}>You</Text>
-          ) : (
-            <Text style={{ color: theme.text, fontSize: 18 }}>
-              You and {selectedUserIds.length - 1} members
-            </Text>
-          )}
-        </TouchableOpacity>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <MidSpacer></MidSpacer>
 
-        {imageUri && (
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: imageUri }} style={styles.image} />
-            <TouchableOpacity
-              onPress={() => {
-                setImage(null);
-                setResultCode(false);
-              }}
-              style={[
-                styles.removeIcon,
-                {
-                  backgroundColor: theme.text,
-                  borderWidth: 1,
-                  borderColor: theme.reverse,
-                },
-              ]}
-            >
-              <Ionicons name="close" color={theme.reverse} size={20}></Ionicons>
-            </TouchableOpacity>
-          </View>
-        )}
-        {imageUri ? (
-          <View></View>
-        ) : (
+          <TextInput
+            style={{
+              fontSize: Dimensions.get("window").width / 25,
+              justifyContent: "center",
+              color: theme.text,
+              backgroundColor: theme.primary,
+              lineHeight: 20,
+              height: Dimensions.get("window").height / 15,
+              width: Dimensions.get("window").width - 40,
+              borderRadius: 10,
+              borderColor: "gray",
+              borderWidth: 1,
+              padding: 15,
+            }}
+            maxLength={300}
+            multiline={true}
+            placeholder="Note"
+            placeholderTextColor={theme.text}
+            value={note}
+            onChangeText={setNote}
+            keyboardType="default"
+          />
+          <Text
+            style={{ textAlign: "right", marginBottom: 0, color: theme.text }}
+          >
+            {note.length}/300
+          </Text>
+          <Text
+            style={{
+              color: theme.text,
+              fontSize: 13,
+              paddingBottom: 5,
+            }}
+          >
+            Category
+          </Text>
+          <SelectDropdown
+            defaultValueByIndex={0}
+            data={selectionData}
+            onSelect={(selectedItem, index) => {
+              setSelection(index);
+            }}
+            renderButton={(selectedItem, isOpened) => {
+              return (
+                <View
+                  style={[
+                    styles.dropdownButtonStyle,
+                    { backgroundColor: theme.primary },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.dropdownButtonTxtStyle,
+                      { color: theme.text },
+                    ]}
+                  >
+                    {selectedItem && selectedItem.title}
+                  </Text>
+                  <Icon
+                    name={isOpened ? "chevron-up" : "chevron-down"}
+                    style={[
+                      styles.dropdownButtonArrowStyle,
+                      { color: theme.text },
+                    ]}
+                  />
+                </View>
+              );
+            }}
+            renderItem={(item, index, isSelected) => {
+              return (
+                <View
+                  style={{
+                    ...styles.dropdownItemStyle,
+                    backgroundColor: theme.primary,
+                    ...(isSelected && { backgroundColor: theme.card }),
+                  }}
+                >
+                  <Text
+                    style={[styles.dropdownItemTxtStyle, { color: theme.text }]}
+                  >
+                    {item.title}
+                  </Text>
+                </View>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+            dropdownStyle={styles.dropdownMenuStyle}
+          />
+          <Text
+            style={{
+              color: theme.text,
+              fontSize: 13,
+              paddingTop: 10,
+              paddingBottom: 5,
+            }}
+          >
+            Participants
+          </Text>
           <TouchableOpacity
             onPress={() => {
-              setModalVisible(true);
+              setMembersModalVisible(true);
+            }}
+            style={{
+              borderWidth: 1,
+              borderColor: "grey",
+              width: "100%",
+              height: Dimensions.get("window").height / 15,
+              borderRadius: 10,
+              borderWidth: 0.4,
+              backgroundColor: theme.primary,
+              justifyContent: "center",
+              paddingLeft: 10,
+            }}
+          >
+            {everyoneSelected ? (
+              <Text
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 25,
+                }}
+              >
+                Everyone
+              </Text>
+            ) : selectedUserIds.length == 1 ? (
+              <Text
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 25,
+                }}
+              >
+                You
+              </Text>
+            ) : (
+              <Text
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 25,
+                }}
+              >
+                You and {selectedUserIds.length - 1} members
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          {imageUri && (
+            <View style={styles.imageContainer}>
+              <Image source={{ uri: imageUri }} style={styles.image} />
+              <TouchableOpacity
+                onPress={() => {
+                  setImage(null);
+                  setResultCode(false);
+                }}
+                style={[
+                  styles.removeIcon,
+                  {
+                    backgroundColor: theme.text,
+                    borderWidth: 1,
+                    borderColor: theme.reverse,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="close"
+                  color={theme.reverse}
+                  size={20}
+                ></Ionicons>
+              </TouchableOpacity>
+            </View>
+          )}
+          {imageUri ? (
+            <View></View>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(true);
+              }}
+            >
+              <View
+                style={[
+                  styles.rectangle,
+                  { backgroundColor: theme.primary, borderColor: theme.text },
+                ]}
+              >
+                <Icon
+                  name="attachment"
+                  style={{
+                    fontSize: Dimensions.get("window").width / 20,
+                    paddingRight: 20,
+                    color: theme.text,
+                  }}
+                ></Icon>
+
+                <Text
+                  style={[
+                    styles.addImageText,
+                    {
+                      color: theme.text,
+                      fontSize: Dimensions.get("window").width / 25,
+                    },
+                  ]}
+                >
+                  Add attachment
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          {imageUri ? (
+            <View>
+              <MaxSpacer></MaxSpacer>
+              <MidSpacer></MidSpacer>
+              <MidSpacer></MidSpacer>
+              <MidSpacer></MidSpacer>
+              <MidSpacer></MidSpacer>
+            </View>
+          ) : (
+            <View></View>
+          )}
+          <MinSpacer></MinSpacer>
+          <TouchableOpacity
+            onPress={async () => {
+              setLoadingStatus(true);
+              await handleAddExpense();
+              setLoadingStatus(false);
             }}
           >
             <View
-              style={[
-                styles.rectangle,
-                { backgroundColor: theme.primary, borderColor: theme.text },
-              ]}
+              style={{
+                height: Dimensions.get("window").height / 15,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderRadius: 10,
+                alignSelf: "center",
+                justifyContent: "center",
+                width: Dimensions.get("window").width - 40,
+                alignItems: "center",
+                backgroundColor: "rgb(253,60,74)",
+              }}
             >
-              <Icon
-                name="attachment"
-                style={{ fontSize: 30, paddingRight: 20, color: theme.text }}
-              ></Icon>
-
-              <Text style={[styles.addImageText, { color: theme.text }]}>
-                Add attachment
-              </Text>
+              {loading ? (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    backgroundColor: "rgb(253,60,74)",
+                  }}
+                >
+                  <ActivityIndicator size="small" color={theme.buttonText} />
+                </View>
+              ) : (
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: Dimensions.get("window").width / 24,
+                  }}
+                >
+                  Add Expense
+                </Text>
+              )}
             </View>
           </TouchableOpacity>
-        )}
-        {imageUri ? (
-          <View>
-            <MaxSpacer></MaxSpacer>
-            <MidSpacer></MidSpacer>
-            <MidSpacer></MidSpacer>
-          </View>
-        ) : (
-          <View></View>
-        )}
-        <MinSpacer></MinSpacer>
-        <TouchableOpacity
-          onPress={async () => {
-            setLoadingStatus(true);
-            await handleAddExpense();
-            setLoadingStatus(false);
-          }}
-        >
-          <View
-            style={{
-              height: 65,
-              marginTop: 50,
-              borderWidth: StyleSheet.hairlineWidth,
-              borderRadius: 10,
-              alignSelf: "center",
-              justifyContent: "center",
-              width: Dimensions.get("window").width - 40,
-              alignItems: "center",
-              backgroundColor: "rgb(253,60,74)",
-            }}
-          >
-            {loading ? (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  backgroundColor: "rgb(253,60,74)",
-                }}
-              >
-                <ActivityIndicator size="small" color={theme.buttonText} />
-              </View>
-            ) : (
-              <Text style={{ color: "white", fontSize: 20 }}>Add Expense</Text>
-            )}
-          </View>
-        </TouchableOpacity>
+          <MaxSpacer></MaxSpacer>
+          <MaxSpacer></MaxSpacer>
+          <MaxSpacer></MaxSpacer>
+          <MaxSpacer></MaxSpacer>
+        </ScrollView>
       </View>
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
@@ -750,7 +813,7 @@ const styles = StyleSheet.create({
   rectangle: {
     flexDirection: "row",
     width: Dimensions.get("window").width - 40,
-    height: 65,
+    height: Dimensions.get("window").height / 15,
     borderRadius: 10,
     backgroundColor: "white",
     alignContent: "center",
@@ -760,7 +823,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1,
     borderStyle: "dashed",
-    marginTop: 20,
+    marginTop: 30,
     marginBottom: 70,
   },
   addImageText: {
@@ -819,7 +882,7 @@ const styles = StyleSheet.create({
   },
   dropdownButtonTxtStyle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: Dimensions.get("window").width / 25,
     fontWeight: "500",
     color: "#151E26",
   },
@@ -850,7 +913,7 @@ const styles = StyleSheet.create({
   },
   dropdownButtonStyle: {
     width: Dimensions.get("window").width - 40,
-    height: 65,
+    height: Dimensions.get("window").height / 15,
     backgroundColor: "transparent",
     borderRadius: 10,
     borderWidth: 1,

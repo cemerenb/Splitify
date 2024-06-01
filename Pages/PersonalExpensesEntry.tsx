@@ -84,7 +84,7 @@ export default function PersonalExpensEntry() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.05,
+      quality: 0.3,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -99,7 +99,7 @@ export default function PersonalExpensEntry() {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       aspect: [9, 16],
-      quality: 0.05,
+      quality: 0.3,
     });
 
     setResultCode(result.assets[0].fileSize > 0);
@@ -229,12 +229,23 @@ export default function PersonalExpensEntry() {
         </View>
       </Modal>
       <View style={styles.priceArea}>
-        <Text style={{ color: "rgb(252,252,252)", fontSize: 18 }}>
+        <Text
+          style={{
+            color: "rgb(252,252,252)",
+            fontSize: Dimensions.get("window").width / 20,
+          }}
+        >
           {" "}
           How much?
         </Text>
         <View style={{ flex: 1, flexDirection: "row", alignContent: "center" }}>
-          <Text style={{ fontSize: 40, color: "white", lineHeight: 80 }}>
+          <Text
+            style={{
+              fontSize: Dimensions.get("window").width / 10,
+              color: "white",
+              lineHeight: Dimensions.get("window").width / 5,
+            }}
+          >
             ₺
           </Text>
 
@@ -242,7 +253,7 @@ export default function PersonalExpensEntry() {
             <TextInput
               style={{
                 color: "white",
-                fontSize: 80,
+                fontSize: Dimensions.get("window").width / 5.5,
                 lineHeight: 80,
                 height: 90,
               }}
@@ -261,12 +272,12 @@ export default function PersonalExpensEntry() {
         <MidSpacer></MidSpacer>
         <TextInput
           style={{
-            fontSize: 18,
+            fontSize: Dimensions.get("window").width / 25,
             justifyContent: "center",
             color: theme.text,
             backgroundColor: theme.primary,
             lineHeight: 20,
-            height: 65,
+            height: Dimensions.get("window").height / 15,
             width: Dimensions.get("window").width - 40,
             borderRadius: 10,
             borderColor: "gray",
@@ -282,7 +293,13 @@ export default function PersonalExpensEntry() {
           keyboardType="default"
         />
         <Text
-          style={{ textAlign: "right", marginBottom: 20, color: theme.text }}
+          style={{
+            textAlign: "right",
+            marginTop: 2,
+            marginBottom: 15,
+            color: theme.text,
+            fontSize: Dimensions.get("window").width / 37,
+          }}
         >
           {note.length}/300
         </Text>
@@ -333,7 +350,7 @@ export default function PersonalExpensEntry() {
               </View>
             );
           }}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
           dropdownStyle={styles.dropdownMenuStyle}
         />
 
@@ -374,10 +391,22 @@ export default function PersonalExpensEntry() {
             >
               <Icon
                 name="attachment"
-                style={{ fontSize: 30, paddingRight: 20, color: theme.text }}
+                style={{
+                  fontSize: Dimensions.get("window").width / 20,
+                  paddingRight: 10,
+                  color: theme.text,
+                }}
               ></Icon>
 
-              <Text style={[styles.addImageText, { color: theme.text }]}>
+              <Text
+                style={[
+                  styles.addImageText,
+                  {
+                    color: theme.text,
+                    fontSize: Dimensions.get("window").width / 25,
+                  },
+                ]}
+              >
                 Add attachment
               </Text>
             </View>
@@ -402,7 +431,7 @@ export default function PersonalExpensEntry() {
         >
           <View
             style={{
-              height: 65,
+              height: Dimensions.get("window").height / 15,
               marginTop: 50,
               borderWidth: StyleSheet.hairlineWidth,
               borderRadius: 10,
@@ -418,13 +447,20 @@ export default function PersonalExpensEntry() {
                 style={{
                   flex: 1,
                   justifyContent: "center",
-                  backgroundColor: theme.background,
+                  backgroundColor: "transparent",
                 }}
               >
-                <ActivityIndicator size="large" color={theme.gradientStart} />
+                <ActivityIndicator size="small" color={"white"} />
               </View>
             ) : (
-              <Text style={{ color: "white", fontSize: 20 }}>Add Expense</Text>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: Dimensions.get("window").width / 24,
+                }}
+              >
+                Add Expense
+              </Text>
             )}
           </View>
         </TouchableOpacity>
@@ -432,7 +468,7 @@ export default function PersonalExpensEntry() {
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View
-            style={[styles.modalContent, { backgroundColor: theme.primary }]}
+            style={[styles.modalContent, { backgroundColor: theme.shadow }]}
           >
             <View
               style={{
@@ -517,7 +553,7 @@ const styles = StyleSheet.create({
   rectangle: {
     flexDirection: "row",
     width: Dimensions.get("window").width - 40,
-    height: 65,
+    height: Dimensions.get("window").height / 15,
     borderRadius: 10,
     backgroundColor: "white",
     alignContent: "center",
@@ -527,7 +563,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1,
     borderStyle: "dashed",
-    marginTop: 20,
+    marginTop: Dimensions.get("window").height / 50,
     marginBottom: 20,
   },
   addImageText: {
@@ -563,7 +599,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   imageContainer: {
-    marginTop: 20,
+    marginTop: Dimensions.get("window").height / 50,
     position: "relative",
   },
   image: {
@@ -586,7 +622,7 @@ const styles = StyleSheet.create({
   },
   dropdownButtonTxtStyle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: Dimensions.get("window").width / 25,
     fontWeight: "500",
     color: "#151E26",
   },
@@ -611,13 +647,13 @@ const styles = StyleSheet.create({
   },
   dropdownItemTxtStyle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: Dimensions.get("window").width / 25,
     fontWeight: "500",
     color: "#151E26",
   },
   dropdownButtonStyle: {
     width: Dimensions.get("window").width - 40,
-    height: 65,
+    height: Dimensions.get("window").height / 15,
     backgroundColor: "transparent",
     borderRadius: 10,
     borderWidth: 1,
@@ -631,7 +667,7 @@ const styles = StyleSheet.create({
   priceArea: {
     paddingHorizontal: 20,
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.2,
+    height: Dimensions.get("window").height * 0.24,
     top: Dimensions.get("window").height * 0.05,
 
     justifyContent: "center",

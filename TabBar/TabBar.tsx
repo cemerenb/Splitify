@@ -40,8 +40,8 @@ const renderTabBar = ({ routeName, selectedTab, navigate }) => {
             ? "grid-outline"
             : "bar-chart"
         }
-        size={30}
-        color={routeName === selectedTab ? "#7544EC" : "gray"}
+        size={25}
+        color={routeName === selectedTab ? "#C43762" : "gray"}
       />
     );
   };
@@ -60,12 +60,12 @@ export const TabBar: React.FC<Props> = ({}) => (
     style={styles.bottomBar}
     shadowStyle={[
       {
-        shadowColor: useContext(ThemeContext).theme.shadow,
+        shadowColor: useContext(ThemeContext).theme.bottomBar,
       },
     ]}
     height={75}
     circleWidth={60}
-    bgColor={useContext(ThemeContext).theme.shadow}
+    bgColor={useContext(ThemeContext).theme.bottomBar}
     initialRouteName="homepage"
     screenOptions={{ headerShown: false }}
     borderTopLeftRight

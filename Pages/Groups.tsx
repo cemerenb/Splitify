@@ -19,7 +19,7 @@ import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { LinearGradient } from "expo-linear-gradient";
-import { MaxSpacer } from "../Utils/Spacers";
+import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
 import { ThemeContext } from "../Theme/ThemeContext";
 
 // Define the type for group data
@@ -120,7 +120,6 @@ const Groups = () => {
             style={{
               opacity: 1,
               width: Dimensions.get("window").width - 40,
-              height: 200,
               borderRadius: 20,
             }}
           >
@@ -128,7 +127,7 @@ const Groups = () => {
               <Image
                 style={{
                   borderRadius: 20,
-                  height: 130,
+                  height: Dimensions.get("window").height / 8,
                   width: Dimensions.get("window").width - 40,
                 }}
                 source={getImageSource(imageSource)}
@@ -136,31 +135,42 @@ const Groups = () => {
               <View
                 style={{
                   flex: 1,
-                  alignItems: "flex-end",
+                  alignItems: "center",
                   justifyContent: "space-between",
                   flexDirection: "row",
-                  height: 100,
                 }}
               >
                 <View
-                  style={{ padding: 20, flexDirection: "column", height: 80 }}
+                  style={{
+                    paddingHorizontal: 20,
+                    paddingVertical: 14,
+                    flexDirection: "column",
+                  }}
                 >
-                  <Text style={styles.cardTitle}>{groupName}</Text>
+                  <Text
+                    style={[
+                      styles.cardTitle,
+                      { fontSize: Dimensions.get("window").width / 25 },
+                    ]}
+                  >
+                    {groupName}
+                  </Text>
                   <Text style={styles.cardSubTitle}>{ownerName}'s group</Text>
                 </View>
                 <View
                   style={{
                     flexDirection: "row",
+                    justifyContent: "center",
                     alignItems: "center",
-                    height: 80,
                   }}
                 >
                   <Ionicons name="people-outline" size={24} color={"white"} />
                   <Text
                     style={{
                       color: "white",
-                      fontSize: 20,
-                      paddingHorizontal: 10,
+                      fontSize: Dimensions.get("window").width / 25,
+                      paddingRight: 10,
+                      paddingLeft: 4,
                     }}
                   >
                     {memberCount}
@@ -192,7 +202,7 @@ const Groups = () => {
         style={{
           flex: 1,
           backgroundColor: theme.background,
-          paddingTop: 50,
+          paddingTop: Dimensions.get("window").width / 14,
         }}
       >
         <MaxSpacer></MaxSpacer>
@@ -209,12 +219,22 @@ const Groups = () => {
             }}
           >
             <View
-              style={[styles.groupContainer, { backgroundColor: theme.card }]}
+              style={[
+                styles.groupContainer,
+                {
+                  backgroundColor: theme.card,
+                  height: Dimensions.get("window").width / 6.5,
+                },
+              ]}
             >
-              <Ionicons name={"people-outline"} size={40} color={theme.text} />
+              <Ionicons
+                name={"people-outline"}
+                size={Dimensions.get("window").width / 15}
+                color={theme.text}
+              />
               <Text
                 style={{
-                  fontSize: 18,
+                  fontSize: Dimensions.get("window").width / 25,
                   paddingHorizontal: 4,
                   color: theme.text,
                 }}
@@ -225,12 +245,22 @@ const Groups = () => {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("CreateGroup")}>
             <View
-              style={[styles.groupContainer, { backgroundColor: theme.card }]}
+              style={[
+                styles.groupContainer,
+                {
+                  backgroundColor: theme.card,
+                  height: Dimensions.get("window").width / 6.5,
+                },
+              ]}
             >
-              <Ionicons name={"add"} size={40} color={theme.text} />
+              <Ionicons
+                name={"add"}
+                size={Dimensions.get("window").width / 15}
+                color={theme.text}
+              />
               <Text
                 style={{
-                  fontSize: 18,
+                  fontSize: Dimensions.get("window").width / 25,
                   paddingHorizontal: 4,
                   color: theme.text,
                 }}
@@ -262,7 +292,9 @@ const Groups = () => {
           </View>
         ) : (
           <View>
-            <MaxSpacer></MaxSpacer>
+            <View
+              style={{ height: Dimensions.get("window").width / 30 }}
+            ></View>
             <FlatList
               style={{ paddingHorizontal: 20 }}
               contentContainerStyle={{

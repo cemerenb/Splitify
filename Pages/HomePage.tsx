@@ -24,6 +24,7 @@ import {
   Appearance,
   useColorScheme,
   Button,
+  Platform,
 } from "react-native";
 
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
@@ -217,11 +218,12 @@ export default function Home() {
     return (
       <TouchableOpacity
         onPress={onPress}
-        style={[styles.card, { backgroundColor: theme.card }]}
+        style={[styles.card, { backgroundColor: theme.seeAll }]}
       >
         <View
           style={{
-            flex: 2,
+            flex: 3,
+            paddingLeft: 10,
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
@@ -231,57 +233,84 @@ export default function Home() {
             {imageSource == 1 ? (
               <Ionicons
                 name="receipt-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").height / 22,
+                }}
               ></Ionicons>
             ) : imageSource == 2 ? (
               <Ionicons
                 name="fast-food-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").height / 22,
+                }}
               ></Ionicons>
             ) : imageSource == 3 ? (
               <Ionicons
                 name="medical-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").height / 22,
+                }}
               ></Ionicons>
             ) : imageSource == 4 ? (
               <Ionicons
                 name="balloon-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").height / 22,
+                }}
               ></Ionicons>
             ) : imageSource == 5 ? (
               <Ionicons
                 name="bag-handle-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").height / 22,
+                }}
               ></Ionicons>
             ) : imageSource == 6 ? (
               <Ionicons
                 name="book-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").height / 22,
+                }}
               ></Ionicons>
             ) : imageSource == 7 ? (
               <Ionicons
                 name="train-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").height / 22,
+                }}
               ></Ionicons>
             ) : imageSource == 8 ? (
               <Ionicons
                 name="man-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").height / 22,
+                }}
               ></Ionicons>
             ) : (
               <Ionicons
                 name="cash-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").height / 22,
+                }}
               ></Ionicons>
             )}
           </View>
         </View>
         <View
           style={{
-            flex: 5,
+            flex: 13,
             flexDirection: "column",
             justifyContent: "flex-start",
-            paddingHorizontal: 20,
+            paddingLeft: 20,
           }}
         >
           <Text style={[styles.cardTitle, { color: theme.text }]}>
@@ -303,14 +332,17 @@ export default function Home() {
               ? "Personal Care"
               : "Miscellaneous"}
           </Text>
+
           {description.length > 40 ? (
             <Text style={[styles.cardDescription, { color: theme.text }]}>
               {description.slice(0, 40)}...
             </Text>
-          ) : (
+          ) : description.lenght > 0 ? (
             <Text style={[styles.cardDescription, { color: theme.text }]}>
               {description}
             </Text>
+          ) : (
+            <View></View>
           )}
           <Text style={[styles.cardDate, { color: theme.text }]}>
             {day + "/" + month + "/" + year}
@@ -318,13 +350,22 @@ export default function Home() {
         </View>
         <View
           style={{
+            flex: 7,
             alignItems: "flex-end",
             flexDirection: "column",
             justifyContent: "flex-start",
-            paddingHorizontal: 20,
+            paddingRight: 20,
           }}
         >
-          <Text style={[styles.cardPrice, { color: theme.text }]}>
+          <Text
+            style={[
+              styles.cardPrice,
+              {
+                color: theme.text,
+                fontSize: Dimensions.get("window").width / 20,
+              },
+            ]}
+          >
             {price}₺
           </Text>
         </View>
@@ -360,7 +401,7 @@ export default function Home() {
               flex: 1,
               justifyContent: "flex-start",
               alignItems: "center",
-              paddingTop: 60,
+              paddingTop: Dimensions.get("window").width / 13,
             }}
           >
             <View
@@ -450,7 +491,9 @@ export default function Home() {
               <Text style={{ fontSize: 18, color: theme.text }}>
                 Total Expenses
               </Text>
-              <Text style={{ fontSize: 55, color: theme.text }}>{total}₺</Text>
+              <Text style={{ fontSize: 55, color: theme.text }}>
+                {total.toLocaleString()}₺
+              </Text>
             </View>
 
             <LineChart
@@ -533,19 +576,27 @@ export default function Home() {
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
-                paddingTop: 60,
+                paddingTop: 50,
                 paddingLeft: 20,
                 alignItems: "center",
               }}
             >
               <View style={{ width: "80%", flexDirection: "row" }}>
                 <Text
-                  style={{ fontSize: 30, fontWeight: "500", color: theme.text }}
+                  style={{
+                    fontSize: Dimensions.get("window").width / 20,
+                    fontWeight: "500",
+                    color: theme.text,
+                  }}
                 >
                   Welcome
                 </Text>
                 <Text
-                  style={{ fontSize: 30, fontWeight: "300", color: theme.text }}
+                  style={{
+                    fontSize: Dimensions.get("window").width / 20,
+                    fontWeight: "300",
+                    color: theme.text,
+                  }}
                 >
                   {" "}
                   {FIREBASE_AUTH.currentUser.displayName}
@@ -586,7 +637,7 @@ export default function Home() {
               <Text
                 style={{
                   color: theme.text,
-                  fontSize: 25,
+                  fontSize: Dimensions.get("window").width / 20,
                   height: 200,
                   flex: 1,
                   alignContent: "center",
@@ -606,7 +657,8 @@ export default function Home() {
 const styles = StyleSheet.create({
   card: {
     borderRadius: 10,
-    padding: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 5,
     shadowColor: "000",
     shadowOffset: {
       width: 0,
@@ -622,8 +674,8 @@ const styles = StyleSheet.create({
 
   cardTitle: {
     width: Dimensions.get("window").width * 0.5,
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: Dimensions.get("window").width / 23,
+    fontWeight: "500",
     marginBottom: 1,
   },
   cardPrice: {
@@ -632,9 +684,9 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   cardDescription: {
-    marginVertical: 4,
-    fontSize: 14,
-    lineHeight: 15,
+    marginVertical: 2,
+    fontSize: Dimensions.get("window").width / 35,
+    lineHeight: Dimensions.get("window").width / 30,
   },
   cardDate: {
     fontSize: 10,

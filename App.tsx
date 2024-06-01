@@ -33,6 +33,7 @@ import TransferDetails from "./Pages/TransferDetails";
 import QRScanner from "./Pages/QRCodeScanner";
 import ScanResult from "./Pages/ScanResult";
 import Profile from "./Pages/Profile";
+import DeleteAccount from "./Pages/DeleteAccount";
 
 export type RootStackNavigatorParamsList = {
   Login: undefined;
@@ -56,6 +57,7 @@ export type RootStackNavigatorParamsList = {
   QRScanner: undefined;
   ScanResult: undefined;
   Profile: undefined;
+  DeleteAccount: undefined;
 };
 
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
@@ -122,6 +124,14 @@ const App: React.FC = () => {
             }}
           />
           <Stack.Screen
+            name="DeleteAccount"
+            component={DeleteAccount}
+            options={{
+              gestureEnabled: false,
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
             name="TransferDetails"
             component={TransferDetails}
             options={{
@@ -151,7 +161,7 @@ const App: React.FC = () => {
             component={QRScanner}
             options={{
               gestureEnabled: false,
-              headerShown: true,
+              headerShown: false,
               headerTitle: "",
             }}
           />

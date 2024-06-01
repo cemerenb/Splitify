@@ -99,7 +99,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ route }) => {
         style={{
           backgroundColor: theme.background,
           justifyContent: "center",
-          paddingVertical: 30,
+          paddingVertical: Dimensions.get("window").width / 14,
         }}
       >
         <Modal
@@ -244,7 +244,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ route }) => {
                 }}
               >
                 <Text style={{ fontSize: 30, color: theme.text }}>{name}</Text>
-                <Text>{uid}</Text>
+                <Text style={{ color: theme.text }}>{uid}</Text>
               </View>
             </View>
             <View

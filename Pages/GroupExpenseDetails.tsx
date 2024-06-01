@@ -170,7 +170,11 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                 }}
               >
                 <Text
-                  style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+                  style={{
+                    color: theme.text,
+                    fontSize: Dimensions.get("window").width / 26,
+                    paddingBottom: 40,
+                  }}
                 >
                   Failed to delete element
                 </Text>
@@ -189,7 +193,12 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                       justifyContent: "center",
                     }}
                   >
-                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                    <Text
+                      style={{
+                        color: theme.text,
+                        fontSize: Dimensions.get("window").width / 26,
+                      }}
+                    >
                       Close
                     </Text>
                   </TouchableOpacity>
@@ -224,12 +233,20 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                 }}
               >
                 <Text
-                  style={{ color: theme.text, fontSize: 22, paddingBottom: 5 }}
+                  style={{
+                    color: theme.text,
+                    fontSize: Dimensions.get("window").width / 18,
+                    paddingBottom: 5,
+                  }}
                 >
                   Delete Expense
                 </Text>
                 <Text
-                  style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+                  style={{
+                    color: theme.text,
+                    fontSize: Dimensions.get("window").width / 26,
+                    paddingBottom: 40,
+                  }}
                 >
                   Are you sure you want to delete the expense?
                 </Text>
@@ -247,7 +264,12 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                       justifyContent: "center",
                     }}
                   >
-                    <Text style={{ color: theme.text, fontSize: 18 }}>
+                    <Text
+                      style={{
+                        color: theme.text,
+                        fontSize: Dimensions.get("window").width / 26,
+                      }}
+                    >
                       Cancel
                     </Text>
                   </TouchableOpacity>
@@ -270,7 +292,12 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                         color={"white"}
                       ></ActivityIndicator>
                     ) : (
-                      <Text style={{ color: theme.text, fontSize: 18 }}>
+                      <Text
+                        style={{
+                          color: theme.text,
+                          fontSize: Dimensions.get("window").width / 26,
+                        }}
+                      >
                         Delete
                       </Text>
                     )}
@@ -486,7 +513,11 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
               }}
             >
               <Text
-                style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 26,
+                  paddingBottom: 40,
+                }}
               >
                 Failed to delete element
               </Text>

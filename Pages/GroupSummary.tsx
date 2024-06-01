@@ -16,6 +16,7 @@ import {
   ActivityIndicator,
   Dimensions,
   ScrollView,
+  Modal,
 } from "react-native";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { RouteProp, useNavigation } from "@react-navigation/native";
@@ -226,7 +227,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
         backgroundColor: theme.background,
         flex: 1,
         paddingHorizontal: 20,
-        paddingTop: 60,
+        paddingTop: Dimensions.get("window").width / 14,
       }}
     >
       <Modal

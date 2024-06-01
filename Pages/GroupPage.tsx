@@ -111,7 +111,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
           break;
         }
       }
-      console.log(allNamesExist);
+      console.log("all exist: " + allNamesExist);
 
       // If any name is missing, fetch all names from Firestore
       if (!allNamesExist) {
@@ -167,9 +167,6 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
   }) => {
     imageSource = parseInt(imageSource);
 
-    const day = date.split("T")[0].split("-")[2];
-    const month = date.split("T")[0].split("-")[1];
-    const year = date.split("T")[0].split("-")[0];
     return (
       <TouchableOpacity
         onPress={onPress}
@@ -177,7 +174,8 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
       >
         <View
           style={{
-            flex: 2,
+            flex: 3,
+            paddingLeft: 10,
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
@@ -187,47 +185,74 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             {imageSource == 1 ? (
               <Ionicons
                 name="receipt-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 12,
+                }}
               ></Ionicons>
             ) : imageSource == 2 ? (
               <Ionicons
                 name="fast-food-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 12,
+                }}
               ></Ionicons>
             ) : imageSource == 3 ? (
               <Ionicons
                 name="medical-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 12,
+                }}
               ></Ionicons>
             ) : imageSource == 4 ? (
               <Ionicons
                 name="balloon-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 12,
+                }}
               ></Ionicons>
             ) : imageSource == 5 ? (
               <Ionicons
                 name="bag-handle-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 12,
+                }}
               ></Ionicons>
             ) : imageSource == 6 ? (
               <Ionicons
                 name="book-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 12,
+                }}
               ></Ionicons>
             ) : imageSource == 7 ? (
               <Ionicons
                 name="train-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 12,
+                }}
               ></Ionicons>
             ) : imageSource == 8 ? (
               <Ionicons
                 name="man-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 12,
+                }}
               ></Ionicons>
             ) : (
               <Ionicons
                 name="cash-outline"
-                style={{ color: theme.text, fontSize: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 12,
+                }}
               ></Ionicons>
             )}
           </View>
@@ -257,10 +282,10 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
         </View>
         <View
           style={{
-            flex: 5,
+            flex: 13,
             flexDirection: "column",
             justifyContent: "flex-start",
-            paddingHorizontal: 20,
+            paddingLeft: 20,
           }}
         >
           <Text style={[styles.cardTitle, { color: theme.text }]}>
@@ -294,20 +319,25 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
           <Text style={[styles.cardName, { color: theme.text }]}>
             {namesMap[createdBy] || "Unknown"}
           </Text>
-
-          <Text style={[styles.cardDate, { color: theme.text }]}>
-            {day + "/" + month + "/" + year}
-          </Text>
         </View>
         <View
           style={{
+            flex: 7,
             alignItems: "flex-end",
             flexDirection: "column",
-            justifyContent: "flex-start",
-            paddingHorizontal: 20,
+            justifyContent: "flex-end",
+            paddingRight: 20,
           }}
         >
-          <Text style={[styles.cardPrice, { color: theme.text }]}>
+          <Text
+            style={[
+              styles.cardPrice,
+              {
+                color: theme.text,
+                fontSize: Dimensions.get("window").width / 20,
+              },
+            ]}
+          >
             {price}₺
           </Text>
         </View>
@@ -450,7 +480,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
         style={{
           alignItems: "center",
           backgroundColor: theme.background,
-          paddingTop: 20,
+          paddingTop: Dimensions.get("window").width / 14,
         }}
       >
         <MaxSpacer></MaxSpacer>
@@ -480,7 +510,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             <View style={{ paddingLeft: 10 }}>
               <Text
                 style={{
-                  fontSize: 30 - groupName.length / 2,
+                  fontSize: Dimensions.get("window").width / 24,
                   color: theme.buttonText,
                 }}
               >
@@ -489,7 +519,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
               <Text
                 style={{
                   fontWeight: "300",
-                  fontSize: 12,
+                  fontSize: Dimensions.get("window").width / 35,
                   color: theme.buttonText,
                 }}
               >
@@ -710,9 +740,9 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             alignItems: "center",
             justifyContent: "space-between",
             position: "absolute",
-            bottom: 60,
+            bottom: 50,
             right: 20,
-            height: 50,
+            height: Dimensions.get("window").height / 18,
             backgroundColor: theme.button,
             borderRadius: 100,
           }}
@@ -721,11 +751,18 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             style={{
               flexDirection: "row",
               alignItems: "center",
+              justifyContent: "center",
               paddingHorizontal: 15,
             }}
           >
-            <Icon name="plus" size={30} color={theme.buttonText} />
-            <Text style={{ color: theme.buttonText }}>Add Expense</Text>
+            <Text
+              style={{
+                color: theme.buttonText,
+                fontSize: Dimensions.get("window").width / 30,
+              }}
+            >
+              Add Expense
+            </Text>
           </View>
         </TouchableOpacity>
       </SafeAreaView>

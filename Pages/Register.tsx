@@ -149,7 +149,13 @@ export default function Register() {
           <View style={[styles.inputStyle, { backgroundColor: theme.primary }]}>
             <TextInput
               placeholderTextColor={theme.text}
-              style={[styles.inputText, { color: theme.text }]}
+              style={[
+                styles.inputText,
+                {
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 28,
+                },
+              ]}
               placeholder="Full Name"
               onChangeText={setFullName}
               value={fullName}
@@ -173,7 +179,13 @@ export default function Register() {
                 this.thirdTextInput.focus();
               }}
               placeholderTextColor={theme.text}
-              style={[styles.inputText, { color: theme.text }]}
+              style={[
+                styles.inputText,
+                {
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 28,
+                },
+              ]}
               placeholder="Email"
               onChangeText={setEmail}
               value={email}
@@ -193,7 +205,13 @@ export default function Register() {
                 this.fourthTextInput.focus();
               }}
               placeholderTextColor={theme.text}
-              style={[styles.inputText, { color: theme.text }]}
+              style={[
+                styles.inputText,
+                {
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 28,
+                },
+              ]}
               placeholder="Password"
               onChangeText={setPassword}
               value={password}
@@ -202,7 +220,7 @@ export default function Register() {
             />
             <MaterialCommunityIcons
               name={!showPassword ? "eye-off" : "eye"}
-              size={24}
+              size={Dimensions.get("window").width / 20}
               color="#aaa"
               style={styles.icon}
               onPress={toggleShowPassword}
@@ -216,7 +234,13 @@ export default function Register() {
               }}
               placeholderTextColor={theme.text}
               returnKeyType="done"
-              style={[styles.inputText, { color: theme.text }]}
+              style={[
+                styles.inputText,
+                {
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 28,
+                },
+              ]}
               placeholder="Confirm Password"
               onChangeText={setConfirmPassword}
               value={confirmPassword}
@@ -225,7 +249,7 @@ export default function Register() {
             />
             <MaterialCommunityIcons
               name={!showConfirmPassword ? "eye-off" : "eye"}
-              size={24}
+              size={Dimensions.get("window").width / 20}
               color="#aaa"
               style={styles.icon}
               onPress={toggleShowConfirmPassword}
@@ -244,19 +268,34 @@ export default function Register() {
                 ></ActivityIndicator>
               </View>
             ) : (
-              <Text style={{ fontSize: 22, color: theme.buttonText }}>
+              <Text
+                style={{
+                  fontSize: Dimensions.get("window").width / 24,
+                  color: theme.buttonText,
+                }}
+              >
                 Sign Up
               </Text>
             )}
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ fontSize: 16, color: theme.text, paddingRight: 5 }}>
+          <Text
+            style={{
+              fontSize: Dimensions.get("window").width / 30,
+              color: theme.text,
+              paddingRight: 5,
+            }}
+          >
             Already have an account?
           </Text>
           <Text
             onPress={() => navigation.goBack()}
-            style={{ color: theme.button, margin: 5, fontSize: 16 }}
+            style={{
+              color: theme.button,
+              margin: 5,
+              fontSize: Dimensions.get("window").width / 30,
+            }}
           >
             Login
           </Text>
@@ -385,7 +424,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   header: {
-    fontSize: 60,
+    fontSize: Dimensions.get("window").width / 7,
     fontWeight: "300",
   },
   loginArea: {
@@ -399,6 +438,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3f3f3",
     borderRadius: 8,
     paddingHorizontal: 14,
+    height: Dimensions.get("window").height / 15,
   },
   inputText: {
     flex: 1,
@@ -416,7 +456,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "80%",
-    height: 55,
+    height: Dimensions.get("window").height / 15,
     borderRadius: 10,
   },
   button: {

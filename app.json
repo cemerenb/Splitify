@@ -11,8 +11,8 @@
         }
       ]
     ],
-    "name": "splitify",
-    "slug": "splitify",
+    "name": "splite",
+    "slug": "splite",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./icon.png",
@@ -30,7 +30,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "cemerenb.splitify.com"
+      "bundleIdentifier": "cemerenb.splite.com"
     },
     "android": {
       "adaptiveIcon": {
@@ -40,7 +40,7 @@
       "splash":{"image": "./splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#252833"},
-      "package": "cemerenb.splitify.com"
+      "package": "cemerenb.splite.com"
     },
     "web": {
       "favicon": "../assets/favicon.png"

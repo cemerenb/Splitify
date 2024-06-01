@@ -154,7 +154,14 @@ export default function JoinPage() {
         </View>
       </Modal>
       <View style={styles.textArea}>
-        <Text style={{ fontSize: 50, color: "white" }}>Join a Group</Text>
+        <Text
+          style={{
+            fontSize: Dimensions.get("window").width / 8,
+            color: "white",
+          }}
+        >
+          Join a Group
+        </Text>
       </View>
 
       <View style={[styles.bottomSheet, { backgroundColor: theme.background }]}>
@@ -162,10 +169,10 @@ export default function JoinPage() {
           <TextInput
             style={{
               marginVertical: 40,
-              fontSize: 18,
+              fontSize: Dimensions.get("window").width / 25,
               textAlignVertical: "center",
-              lineHeight: 25,
-              height: 65,
+              lineHeight: Dimensions.get("window").width / 25,
+              height: Dimensions.get("window").height / 15,
               width: Dimensions.get("window").width - 40,
               borderRadius: 10,
               backgroundColor: theme.primary,
@@ -192,7 +199,7 @@ export default function JoinPage() {
           <View
             style={{
               marginVertical: 50,
-              height: 65,
+              height: Dimensions.get("window").height / 15,
               borderWidth: StyleSheet.hairlineWidth,
               borderRadius: 10,
               alignSelf: "center",
@@ -213,7 +220,14 @@ export default function JoinPage() {
                 <ActivityIndicator size="small" color={theme.buttonText} />
               </View>
             ) : (
-              <Text style={{ color: "white", fontSize: 20 }}>Join Group</Text>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: Dimensions.get("window").width / 24,
+                }}
+              >
+                Join Group
+              </Text>
             )}
           </View>
         </TouchableOpacity>

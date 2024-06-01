@@ -120,7 +120,13 @@ export default function Login() {
       <View style={styles.loginarea}>
         <View style={[styles.inputStyle, { backgroundColor: theme.primary }]}>
           <TextInput
-            style={[styles.inputText, { color: theme.text }]}
+            style={[
+              styles.inputText,
+              {
+                color: theme.text,
+                fontSize: Dimensions.get("window").width / 28,
+              },
+            ]}
             keyboardType="email-address"
             placeholder="Email"
             placeholderTextColor={theme.text}
@@ -143,7 +149,13 @@ export default function Login() {
             }}
             placeholderTextColor={theme.text}
             returnKeyType="done"
-            style={[styles.inputText, { color: theme.text }]}
+            style={[
+              styles.inputText,
+              {
+                color: theme.text,
+                fontSize: Dimensions.get("window").width / 28,
+              },
+            ]}
             secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
@@ -151,7 +163,7 @@ export default function Login() {
           />
           <MaterialCommunityIcons
             name={!showPassword ? "eye-off" : "eye"}
-            size={24}
+            size={Dimensions.get("window").width / 20}
             color="#aaa"
             style={styles.icon}
             onPress={toggleShowPassword}
@@ -159,7 +171,10 @@ export default function Login() {
         </View>
         <View style={styles.forgotPassword}>
           <Text
-            style={{ color: theme.text }}
+            style={{
+              color: theme.text,
+              fontSize: Dimensions.get("window").width / 30,
+            }}
             onPress={() => {
               navigation.navigate("ResetPassword");
             }}
@@ -185,14 +200,32 @@ export default function Login() {
               <ActivityIndicator size="small" color={theme.buttonText} />
             </View>
           ) : (
-            <Text style={{ fontSize: 20, color: theme.buttonText }}>Login</Text>
+            <Text
+              style={{
+                fontSize: Dimensions.get("window").width / 24,
+                color: theme.buttonText,
+              }}
+            >
+              Login
+            </Text>
           )}
         </TouchableOpacity>
       </View>
       <Text></Text>
-      <Text style={[styles.signUp, { color: theme.text }]}>
+      <Text
+        style={[
+          styles.signUp,
+          { color: theme.text, fontSize: Dimensions.get("window").width / 30 },
+        ]}
+      >
         Don't have an account?{" "}
-        <Text onPress={onHandlePress} style={{ color: theme.button }}>
+        <Text
+          onPress={onHandlePress}
+          style={{
+            color: theme.button,
+            fontSize: Dimensions.get("window").width / 30,
+          }}
+        >
           Sign Up
         </Text>
       </Text>
@@ -358,6 +391,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3f3f3",
     borderRadius: 8,
     paddingHorizontal: 14,
+    height: Dimensions.get("window").height / 15,
   },
   header: {
     fontSize: 80,
@@ -367,7 +401,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgb(180,24,113)",
     width: "80%",
-    height: 55,
+    height: Dimensions.get("window").height / 15,
     borderRadius: 10,
   },
   signUp: {
