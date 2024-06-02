@@ -64,7 +64,7 @@ i //for ios
 ## Visit Splite on Play Store
 Click [here](https://play.google.com/store/apps/details?id=cemerenb.splitify.com)
 ## Images
-<img src="https://github.com/cemerenb/splitify/assets/82811515/1fc5e7aa-a069-483c-bece-4f8f0f3895de" width="450">
-<img src="https://github.com/cemerenb/splitify/assets/82811515/04a1b908-a3d2-4d84-8fed-0ef771d5b3b2" width="450">
-<img src="https://github.com/cemerenb/splitify/assets/82811515/f0ac6f39-7e65-4da1-9cc4-ca9dd70edd02" width="450">
-<img src="https://github.com/cemerenb/splitify/assets/82811515/38ebcc99-fb0e-4e7f-b723-8f7e5f4a9094" width="450">
+<img src="https://github.com/cemerenb/splitify/assets/82811515/1fc5e7aa-a069-483c-bece-4f8f0f3895de" width="350">
+<img src="https://github.com/cemerenb/splitify/assets/82811515/04a1b908-a3d2-4d84-8fed-0ef771d5b3b2" width="350">
+<img src="https://github.com/cemerenb/splitify/assets/82811515/f0ac6f39-7e65-4da1-9cc4-ca9dd70edd02" width="350">
+<img src="https://github.com/cemerenb/splitify/assets/82811515/38ebcc99-fb0e-4e7f-b723-8f7e5f4a9094" width="350">
