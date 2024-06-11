@@ -51,57 +51,84 @@ export default function Register() {
   // Function to toggle confirm password visibility
   const toggleShowConfirmPassword = () =>
     setShowConfirmPassword(!showConfirmPassword);
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
 
+  const validatePassword = (password: string) => {
+    // At least 6 characters, one uppercase letter, one lowercase letter, one number, and one special character
+    const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
+    return re.test(String(password));
+  };
   // Function to handle sign up
   const signUp = async () => {
     setLoading(true);
 
     // Check if passwords match
     if (password === confirmPassword) {
-      try {
-        // Create user with email and password
-        const response = await createUserWithEmailAndPassword(
-          FIREBASE_AUTH,
-          email,
-          password
-        );
-        await updateProfile(FIREBASE_AUTH.currentUser, {
-          displayName: fullName,
-        });
-        if (response) {
-          console.log(FIREBASE_AUTH.currentUser);
-          console.log(FIREBASE_AUTH.currentUser.displayName);
+      console.log(fullName.length);
 
-          // Send email verification
-          sendEmailVerification(FIREBASE_AUTH.currentUser!);
-          // Create document in Firestore
-          createDocument(FIREBASE_AUTH.currentUser!.uid);
-          setModalVisible(true);
-        }
-      } catch (error: any) {
-        console.log(error);
-
-        // Set error message based on error code
-        switch (error.code) {
-          case "auth/email-already-in-use":
-            setErrorMessage("Email already in use");
-            break;
-          case "auth/missing-email":
-            setErrorMessage("Please enter an email");
-            break;
-          case "auth/invalid-email":
-            setErrorMessage("Please enter a valid email");
-            break;
-          case "auth/missing-password":
-            setErrorMessage("Please enter a valid password");
-            break;
-          default:
-            setErrorMessage("An error occurred");
-            break;
-        }
+      if (fullName.length == 0) {
+        setErrorMessage("Please enter a full name");
         setIsModalVisible(true);
-      } finally {
         setLoading(false);
+      } else if (!validateEmail(email)) {
+        setErrorMessage("Invalid email format.");
+        setIsModalVisible(true);
+        setLoading(false);
+      } else if (!validatePassword(password)) {
+        setErrorMessage(
+          "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character."
+        );
+        setIsModalVisible(true);
+        setLoading(false);
+      } else {
+        try {
+          // Create user with email and password
+          const response = await createUserWithEmailAndPassword(
+            FIREBASE_AUTH,
+            email,
+            password
+          );
+          await updateProfile(FIREBASE_AUTH.currentUser, {
+            displayName: fullName,
+          });
+          if (response) {
+            console.log(FIREBASE_AUTH.currentUser);
+            console.log(FIREBASE_AUTH.currentUser.displayName);
+
+            // Send email verification
+            sendEmailVerification(FIREBASE_AUTH.currentUser!);
+            // Create document in Firestore
+            createDocument(FIREBASE_AUTH.currentUser!.uid);
+            setModalVisible(true);
+          }
+        } catch (error: any) {
+          console.log(error);
+
+          // Set error message based on error code
+          switch (error.code) {
+            case "auth/email-already-in-use":
+              setErrorMessage("Email already in use");
+              break;
+            case "auth/missing-email":
+              setErrorMessage("Please enter an email");
+              break;
+            case "auth/invalid-email":
+              setErrorMessage("Please enter a valid email");
+              break;
+            case "auth/missing-password":
+              setErrorMessage("Please enter a valid password");
+              break;
+            default:
+              setErrorMessage("An error occurred");
+              break;
+          }
+          setIsModalVisible(true);
+        } finally {
+          setLoading(false);
+        }
       }
     } else {
       setErrorMessage("Passwords do not match");
@@ -133,18 +160,29 @@ export default function Register() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <ScrollView
+      showsVerticalScrollIndicator={false}
       style={{
         flex: 1,
+
         height: Dimensions.get("window").height * 1.5,
         backgroundColor: theme.background,
       }}
     >
       <View style={[styles.container, { backgroundColor: theme.background }]}>
-        <Text style={[styles.header, { color: theme.text }]}>
-          Sign Up to Splitify
-        </Text>
+        <View style={{ height: Dimensions.get("window").height / 20 }}></View>
+        <View
+          style={{
+            width: Dimensions.get("window").width,
+            paddingHorizontal: 30,
+            paddingTop: 10,
+          }}
+        >
+          <Text style={[styles.header, { color: theme.text }]}>
+            Sign Up to Splitify
+          </Text>
+        </View>
+        <View style={{ height: Dimensions.get("window").height / 10 }}></View>
         <View style={styles.loginArea}>
           <View style={[styles.inputStyle, { backgroundColor: theme.primary }]}>
             <TextInput
@@ -256,6 +294,7 @@ export default function Register() {
             />
           </View>
         </View>
+        <View style={{ height: Dimensions.get("window").height / 10 }}></View>
         <View
           style={[styles.buttonContainer, { backgroundColor: theme.button }]}
         >
@@ -279,6 +318,7 @@ export default function Register() {
             )}
           </TouchableOpacity>
         </View>
+        <View style={{ height: Dimensions.get("window").height / 20 }}></View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Text
             style={{
@@ -327,7 +367,12 @@ export default function Register() {
               }}
             >
               <Text
-                style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: 16,
+                  paddingBottom: 40,
+                  paddingHorizontal: 10,
+                }}
               >
                 {errorMessage}
               </Text>
@@ -413,7 +458,7 @@ export default function Register() {
           </View>
         </Modal>
       </View>
-    </KeyboardAvoidingView>
+    </ScrollView>
   );
 }
 
@@ -421,10 +466,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "space-evenly",
   },
   header: {
-    fontSize: Dimensions.get("window").width / 7,
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    fontSize: Dimensions.get("window").width / 8,
+    paddingHorizontal: 10,
     fontWeight: "300",
   },
   loginArea: {
@@ -438,7 +485,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3f3f3",
     borderRadius: 8,
     paddingHorizontal: 14,
-    height: Dimensions.get("window").height / 15,
+    height: Dimensions.get("window").height / 17,
   },
   inputText: {
     flex: 1,
@@ -456,7 +503,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "80%",
-    height: Dimensions.get("window").height / 15,
+    height: Dimensions.get("window").height / 17,
     borderRadius: 10,
   },
   button: {

@@ -64,6 +64,7 @@ buck-out/
 # dependencies
 node_modules/
 
+FirebaseConfig.ts
 # Expo
 .expo/
 dist/

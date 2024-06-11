@@ -41,31 +41,56 @@ export default function Login() {
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
 
+  const validatePassword = (password: string) => {
+    // At least 6 characters, one uppercase letter, one lowercase letter, one number, and one special character
+    const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
+    return re.test(String(password));
+  };
   const signIn = async () => {
     setLoading(true);
-    try {
-      const response = await signInWithEmailAndPassword(
-        FIREBASE_AUTH,
-        email,
-        password
-      );
-      if (response) {
-        if (!FIREBASE_AUTH.currentUser.emailVerified) {
-          setIsVerificateModalVisible(true);
-        }
-        if (FIREBASE_AUTH.currentUser!.emailVerified) {
-          await SecureStore.setItemAsync("email", email);
-          await SecureStore.setItemAsync("password", password);
-          navigation.replace("TabBar");
-        }
-      }
-    } catch (error) {
-      console.error("Error while signing in:", error);
-      setErrorMessage("Error signing in. Please check your credentials.");
+    if (email.length == 0 || password.length == 0) {
+      setErrorMessage("Email or password is empty.");
       setIsModalVisible(true);
-    } finally {
       setLoading(false);
+    } else if (!validateEmail(email)) {
+      setErrorMessage("Invalid email format.");
+      setIsModalVisible(true);
+      setLoading(false);
+    } else if (!validatePassword(password)) {
+      setErrorMessage(
+        "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character."
+      );
+      setIsModalVisible(true);
+      setLoading(false);
+    } else {
+      try {
+        const response = await signInWithEmailAndPassword(
+          FIREBASE_AUTH,
+          email,
+          password
+        );
+        if (response) {
+          if (!FIREBASE_AUTH.currentUser.emailVerified) {
+            setIsVerificateModalVisible(true);
+          }
+          if (FIREBASE_AUTH.currentUser!.emailVerified) {
+            await SecureStore.setItemAsync("email", email);
+            await SecureStore.setItemAsync("password", password);
+            navigation.replace("TabBar");
+          }
+        }
+      } catch (error) {
+        console.error("Error while signing in:", error);
+        setErrorMessage("Error signing in. Please check your credentials.");
+        setIsModalVisible(true);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

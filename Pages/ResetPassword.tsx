@@ -20,6 +20,7 @@ import { FIREBASE_AUTH } from "../FirebaseConfig";
 import validator from "validator";
 import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
@@ -182,41 +183,43 @@ export default function ResetPassword() {
           </View>
         </View>
       </Modal>
-      <View style={{ paddingTop: 0 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-            }}
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+        <View style={{ paddingTop: Dimensions.get("window").height / 20 }}>
+          <View
             style={{
               flexDirection: "row",
+              justifyContent: "space-between",
               alignItems: "center",
-              paddingTop: 10,
             }}
           >
-            <Ionicons
-              name="chevron-back-outline"
-              size={30}
-              color={theme.text}
-            ></Ionicons>
-            <Text style={{ fontSize: 18, color: theme.text }}>Back</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
+              }}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingTop: 10,
+              }}
+            >
+              <Ionicons
+                name="chevron-back-outline"
+                size={30}
+                color={theme.text}
+              ></Ionicons>
+              <Text style={{ fontSize: 18, color: theme.text }}>Back</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <View
-        style={{
-          justifyContent: "space-evenly",
-          flex: 1,
-          paddingHorizontal: 20,
-        }}
-      >
-        <View style={{ flex: 4, paddingTop: 100 }}>
+        <View style={{ height: Dimensions.get("window").height / 10 }}></View>
+
+        <View
+          style={{
+            justifyContent: "space-between",
+            flex: 1,
+            paddingHorizontal: 20,
+          }}
+        >
           <View style={{ flex: 1, width: "100%" }}>
             <Text
               style={{ color: theme.text, fontSize: 50, fontWeight: "300" }}
@@ -229,60 +232,68 @@ export default function ResetPassword() {
               We will send you an email if an account exist with this email
             </Text>
           </View>
-          <MaxSpacer></MaxSpacer>
-          <View style={{ flex: 1 }}>
-            <View
-              style={[styles.inputStyle, { backgroundColor: theme.primary }]}
-            >
-              <TextInput
-                style={{
-                  flex: 1,
-                  color: theme.text,
-                  backgroundColor: theme.primary,
-                  height: 55,
-                  paddingVertical: 10,
-                  paddingRight: 10,
-                  fontSize: 18,
+          <View style={{ height: Dimensions.get("window").height / 10 }}></View>
+          <View
+            style={{
+              justifyContent: "space-between",
+              flexDirection: "column",
+              height: Dimensions.get("window").height / 3,
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <View
+                style={[styles.inputStyle, { backgroundColor: theme.primary }]}
+              >
+                <TextInput
+                  style={{
+                    flex: 1,
+                    color: theme.text,
+                    backgroundColor: theme.primary,
+                    height: 55,
+                    paddingVertical: 10,
+                    paddingRight: 10,
+                    fontSize: 18,
+                  }}
+                  keyboardType="email-address"
+                  placeholder="Email"
+                  placeholderTextColor={theme.text}
+                  onChangeText={setEmail}
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  value={email}
+                  returnKeyType="next"
+                  onSubmitEditing={() => {
+                    this.secondTextInput.focus();
+                  }}
+                />
+              </View>
+            </View>
+
+            <View style={[styles.button, { backgroundColor: theme.button }]}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (email.length < 1) {
+                    setErrorMessage("Email can't be empty");
+                    setModalVisible(true);
+                  }
+                  if (email.length > 0 && !validator.isEmail(email)) {
+                    setErrorMessage("Email is bad formatted");
+                    setModalVisible(true);
+                  }
+                  if (email.length > 0 && validator.isEmail(email)) {
+                    handleResetPassword();
+                  }
                 }}
-                keyboardType="email-address"
-                placeholder="Email"
-                placeholderTextColor={theme.text}
-                onChangeText={setEmail}
-                inputMode="email"
-                autoComplete="email"
-                autoCapitalize="none"
-                value={email}
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  this.secondTextInput.focus();
-                }}
-              />
+                style={styles.button}
+              >
+                <Text style={{ fontSize: 20, color: "white" }}>Send Email</Text>
+              </TouchableOpacity>
             </View>
           </View>
+          <View style={{ height: Dimensions.get("window").height / 10 }}></View>
         </View>
-        <View style={{ flex: 3, justifyContent: "center" }}>
-          <View style={[styles.button, { backgroundColor: theme.button }]}>
-            <TouchableOpacity
-              onPress={() => {
-                if (email.length < 1) {
-                  setErrorMessage("Email can't be empty");
-                  setModalVisible(true);
-                }
-                if (email.length > 0 && !validator.isEmail(email)) {
-                  setErrorMessage("Email is bad formatted");
-                  setModalVisible(true);
-                }
-                if (email.length > 0 && validator.isEmail(email)) {
-                  handleResetPassword();
-                }
-              }}
-              style={styles.button}
-            >
-              <Text style={{ fontSize: 20, color: "white" }}>Send Email</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -290,7 +301,6 @@ const styles = StyleSheet.create({
   button: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgb(180,24,113)",
     height: 65,
     borderRadius: 10,
   },

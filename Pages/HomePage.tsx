@@ -203,14 +203,7 @@ export default function Home() {
     }
   }, []);
 
-  const CardView = ({
-    imageSource,
-    title,
-    description,
-    onPress,
-    price,
-    date,
-  }) => {
+  const CardView = ({ imageSource, description, onPress, price, date }) => {
     imageSource = parseInt(imageSource);
     const day = date.split("T")[0].split("-")[2];
     const month = date.split("T")[0].split("-")[1];
@@ -332,17 +325,14 @@ export default function Home() {
               ? "Personal Care"
               : "Miscellaneous"}
           </Text>
-
           {description.length > 40 ? (
             <Text style={[styles.cardDescription, { color: theme.text }]}>
-              {description.slice(0, 40)}...
-            </Text>
-          ) : description.lenght > 0 ? (
-            <Text style={[styles.cardDescription, { color: theme.text }]}>
-              {description}
+              {description.toString().slice(0, 40)}...
             </Text>
           ) : (
-            <View></View>
+            <Text style={[styles.cardDescription, { color: theme.text }]}>
+              {description.toString()}
+            </Text>
           )}
           <Text style={[styles.cardDate, { color: theme.text }]}>
             {day + "/" + month + "/" + year}
@@ -550,9 +540,10 @@ export default function Home() {
                       <View style={{ height: 12 }}></View>
                       <CardView
                         imageSource={item.type}
-                        title={item.note}
                         description={item.note}
                         onPress={() => {
+                          console.log(item.note);
+
                           navigation.navigate("ExpenseDetails", item);
                         }}
                         price={item.total}

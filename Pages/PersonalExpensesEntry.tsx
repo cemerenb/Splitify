@@ -43,6 +43,7 @@ import { TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function PersonalExpensEntry() {
   const [totalPrice, setTotalPrice] = useState("");
@@ -268,7 +269,9 @@ export default function PersonalExpensEntry() {
         </View>
       </View>
 
-      <View style={[styles.bottomSheet, { backgroundColor: theme.background }]}>
+      <ScrollView
+        style={[styles.bottomSheet, { backgroundColor: theme.background }]}
+      >
         <MidSpacer></MidSpacer>
         <TextInput
           style={{
@@ -285,7 +288,7 @@ export default function PersonalExpensEntry() {
             padding: 15,
           }}
           maxLength={300}
-          multiline={true}
+          multiline={false}
           placeholderTextColor={theme.text}
           placeholder="Note"
           value={note}
@@ -351,7 +354,12 @@ export default function PersonalExpensEntry() {
             );
           }}
           showsVerticalScrollIndicator={true}
-          dropdownStyle={styles.dropdownMenuStyle}
+          dropdownStyle={{
+            backgroundColor: "transparent",
+            paddingBottom: 40,
+            marginBottom: 40,
+            borderRadius: 10,
+          }}
         />
 
         {imageUri && (
@@ -464,7 +472,7 @@ export default function PersonalExpensEntry() {
             )}
           </View>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View
@@ -633,10 +641,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     marginRight: 8,
   },
-  dropdownMenuStyle: {
-    backgroundColor: "#E9ECEF",
-    borderRadius: 10,
-  },
+
   dropdownItemStyle: {
     width: "100%",
     flexDirection: "row",

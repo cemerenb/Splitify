@@ -8,6 +8,8 @@ import {
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
+import * as ImagePicker from "expo-image-picker";
+
 type RootStackParamList = {
   QRScanner: { groupId: string };
 };
@@ -16,11 +18,18 @@ type QRScannerRouteProp = RouteProp<RootStackParamList, "QRScanner">;
 interface QRScannerProps {
   route: QRScannerRouteProp;
 }
+
 const QRScanner: React.FC<QRScannerProps> = ({ route }) => {
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
   const [permission, requestPermission] = useCameraPermissions();
   const { groupId } = route.params;
+
+  useEffect(() => {
+    if (!permission) {
+      requestPermission();
+    }
+  }, [permission]);
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -31,10 +40,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ route }) => {
     // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
-        <Text style={{ textAlign: "center" }}>
-          We need your permission to show the camera
+        <Text style={styles.text}>
+          Camera permission is required to scan QR codes
         </Text>
-        <Button onPress={requestPermission} title="grant permission" />
+        <Button title="Grant permission" onPress={requestPermission} />
       </View>
     );
   }
@@ -85,4 +94,5 @@ const styles = StyleSheet.create({
     color: "white",
   },
 });
+
 export default QRScanner;

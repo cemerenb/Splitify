@@ -115,6 +115,9 @@ export const styles = StyleSheet.create({
   },
 
   button: {
+    width: 60,
+    height: 60,
+    alignItems: "center",
     flex: 1,
     justifyContent: "center",
   },
@@ -125,7 +128,7 @@ export const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgb(222, 110, 235)",
+    backgroundColor: "transparent",
     bottom: 20,
     shadowColor: "#000",
     shadowOffset: {

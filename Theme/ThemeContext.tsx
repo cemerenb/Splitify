@@ -47,7 +47,7 @@ const themes = {
     reverse: colorScheme === "light" ? "white" : "black",
     card: colorScheme === "light" ? "#FFFFFF" : "#7544EC",
     text: colorScheme === "light" ? "#000000" : "#FFFFFF",
-    primary: colorScheme === "light" ? "white" : "#252833",
+    primary: colorScheme === "light" ? "white" : "#333746",
     secondary: colorScheme === "light" ? "#F1F1F1" : "#333746",
     third: colorScheme === "light" ? "#FFFFFF" : "#8260F5",
     shadow: colorScheme === "light" ? "#DADADA" : "#3F4457",

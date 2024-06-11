@@ -210,6 +210,7 @@ function Profile() {
               value={FIREBASE_AUTH.currentUser.uid}
               size={Dimensions.get("window").width / 2}
               logo={require("../icon.png")}
+              logoBorderRadius={30}
               logoSize={50}
             />
           </View>
@@ -393,7 +394,7 @@ function Profile() {
             style={{
               borderRadius: 20,
 
-              backgroundColor: theme.reverse,
+              backgroundColor: theme.primary,
               flexDirection: "row",
               justifyContent: "flex-start",
               alignItems: "center",
