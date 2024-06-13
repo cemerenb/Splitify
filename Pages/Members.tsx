@@ -32,6 +32,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { ThemeContext } from "../Theme/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import i18n from "../Language/i18n";
 
 type RootStackParamList = {
   Members: { groupId: string };
@@ -121,7 +122,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
       navigation.replace("Members", { groupId: groupId });
       setModalVisible(false);
     } catch (error) {
-      setModalText("An error occured while transfering ownership");
+      setModalText(i18n.errtraowner);
       setModalVisible4(true);
     }
     setProcessing(false);
@@ -158,7 +159,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
       setModalVisible(false);
     } catch (error) {
       console.log(error);
-      setModalText("An error occured");
+      setModalText(i18n.anerror);
       setModalVisible4(true);
     }
   };
@@ -212,7 +213,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
       // @ts-ignore
       navigation.replace("Members", { groupId: groupId });
     } catch (error) {
-      setModalText("An error occured");
+      setModalText(i18n.anerror);
       setModalVisible4(true);
     }
   };
@@ -379,7 +380,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                     }}
                     style={{
                       width: "100%",
-                      height: 50,
+                      height: 40,
                       backgroundColor: theme.shadow,
                       borderBottomLeftRadius: 20,
                       borderBottomRightRadius: 20,
@@ -388,7 +389,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                     }}
                   >
                     <Text style={{ color: theme.text, fontSize: 18 }}>
-                      Close
+                      {i18n.close}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -425,7 +426,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 <Text
                   style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
                 >
-                  Are you sure you want to transfer ownership?
+                  {i18n.suretotranowne}
                 </Text>
                 <View style={{ width: "100%", flexDirection: "row" }}>
                   <TouchableOpacity
@@ -443,7 +444,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                     }}
                   >
                     <Text style={{ color: theme.text, fontSize: 18 }}>
-                      Cancel
+                      {i18n.cancel}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -466,8 +467,8 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                         color={"white"}
                       ></ActivityIndicator>
                     ) : (
-                      <Text style={{ color: theme.text, fontSize: 18 }}>
-                        Transfer
+                      <Text style={{ color: theme.buttonText, fontSize: 18 }}>
+                        {i18n.transfer}
                       </Text>
                     )}
                   </TouchableOpacity>
@@ -496,7 +497,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 style={{
                   backgroundColor: theme.primary,
                   width: "80%",
-                  paddingTop: 50,
+                  paddingTop: 40,
                   borderRadius: 20,
                   alignItems: "center",
                 }}
@@ -504,12 +505,17 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 <Text
                   style={{ color: theme.text, fontSize: 22, paddingBottom: 5 }}
                 >
-                  Leave Group
+                  {i18n.leavegroup}
                 </Text>
                 <Text
-                  style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+                  style={{
+                    color: theme.text,
+                    fontSize: 14,
+                    paddingBottom: 40,
+                    paddingHorizontal: 5,
+                  }}
                 >
-                  Are you sure you want to leave the group?
+                  {i18n.suretoleave}
                 </Text>
                 <View style={{ width: "100%", flexDirection: "row" }}>
                   <TouchableOpacity
@@ -526,7 +532,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                     }}
                   >
                     <Text style={{ color: theme.text, fontSize: 18 }}>
-                      Cancel
+                      {i18n.cancel}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -549,7 +555,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       ></ActivityIndicator>
                     ) : (
                       <Text style={{ color: theme.text, fontSize: 18 }}>
-                        Leave
+                        {i18n.leave}
                       </Text>
                     )}
                   </TouchableOpacity>
@@ -586,12 +592,12 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 <Text
                   style={{ color: theme.text, fontSize: 22, paddingBottom: 5 }}
                 >
-                  Delete Group
+                  {i18n.deletegroup}
                 </Text>
                 <Text
                   style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
                 >
-                  Are you sure you want to delete the group?
+                  {i18n.suretodeletegroup}
                 </Text>
                 <View style={{ width: "100%", flexDirection: "row" }}>
                   <TouchableOpacity
@@ -608,7 +614,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                     }}
                   >
                     <Text style={{ color: theme.text, fontSize: 18 }}>
-                      Cancel
+                      {i18n.cancel}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -631,7 +637,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       ></ActivityIndicator>
                     ) : (
                       <Text style={{ color: theme.text, fontSize: 18 }}>
-                        Delete
+                        {i18n.delete}
                       </Text>
                     )}
                   </TouchableOpacity>
@@ -708,7 +714,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                         fontSize: Dimensions.get("window").width / 24,
                       }}
                     >
-                      Kick User
+                      {i18n.kickuser}
                     </Text>
                   </TouchableOpacity>
                   <View
@@ -721,9 +727,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                   <TouchableOpacity
                     onPress={() => {
                       if (selectedUser == ownerUid) {
-                        setModalText(
-                          "You cannot change the group owner's permissions"
-                        );
+                        setModalText(i18n.youcantchaownerper);
                         setModalVisible4(true);
                       } else {
                         admins.includes(selectedUser)
@@ -746,8 +750,8 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       }}
                     >
                       {admins.includes(selectedUser)
-                        ? "Revoke Admin"
-                        : "Make Admin"}
+                        ? i18n.revokeadmin
+                        : i18n.makeadmin}
                     </Text>
                   </TouchableOpacity>
                   {FIREBASE_AUTH.currentUser.uid == ownerUid ? (
@@ -780,7 +784,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                             fontSize: Dimensions.get("window").width / 24,
                           }}
                         >
-                          Transfer Ownership
+                          {i18n.transferownership}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -815,7 +819,9 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                   name="chevron-back-outline"
                   size={30}
                 ></Ionicons>
-                <Text style={{ color: theme.text, fontSize: 18 }}>Back</Text>
+                <Text style={{ color: theme.text, fontSize: 18 }}>
+                  {i18n.back}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -849,7 +855,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 <Text
                   style={{ color: theme.text, fontSize: 20, paddingLeft: 10 }}
                 >
-                  Scan QR code
+                  {i18n.scanqr}
                 </Text>
               </TouchableOpacity>
               <View
@@ -881,7 +887,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                 <Text
                   style={{ color: theme.text, fontSize: 20, paddingLeft: 10 }}
                 >
-                  Share invite code
+                  {i18n.shareinvitecode}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -952,7 +958,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                           }}
                         >
                           <Text style={{ color: "white", fontWeight: "600" }}>
-                            Owner
+                            {i18n.owner}
                           </Text>
                         </LinearGradient>
                       </View>
@@ -960,15 +966,20 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                       ownerUid != members[index] ? (
                       <View
                         style={{
-                          width: 70,
+                          width: 80,
                           flexDirection: "row",
                           justifyContent: "flex-end",
                           alignItems: "flex-end",
                           paddingHorizontal: 10,
                         }}
                       >
-                        <Text style={{ color: theme.text, fontSize: 16 }}>
-                          Admin
+                        <Text
+                          style={{
+                            color: theme.text,
+                            fontSize: Dimensions.get("window").width / 30,
+                          }}
+                        >
+                          {i18n.admin}
                         </Text>
                       </View>
                     ) : (
@@ -1029,8 +1040,14 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                             justifyContent: "center",
                           }}
                         >
-                          <Text style={{ color: "white", fontWeight: "600" }}>
-                            Owner
+                          <Text
+                            style={{
+                              color: "white",
+                              fontWeight: "600",
+                              fontSize: Dimensions.get("window").width / 30,
+                            }}
+                          >
+                            {i18n.owner}
                           </Text>
                         </LinearGradient>
                       </View>
@@ -1045,8 +1062,13 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                           paddingHorizontal: 10,
                         }}
                       >
-                        <Text style={{ fontSize: 16, color: theme.text }}>
-                          Admin
+                        <Text
+                          style={{
+                            fontSize: Dimensions.get("window").width / 30,
+                            color: theme.text,
+                          }}
+                        >
+                          {i18n.admin}
                         </Text>
                       </View>
                     ) : (
@@ -1101,7 +1123,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
               )}
 
               <Text style={{ color: "white", fontSize: 20, paddingLeft: 10 }}>
-                {members.length == 1 ? "Delete Group" : "Leave Group"}
+                {members.length == 1 ? i18n.deletegroup : i18n.leavegroup}
               </Text>
             </TouchableOpacity>
             {members.length > 1 && ownerUid == FIREBASE_AUTH.currentUser.uid ? (
@@ -1130,7 +1152,7 @@ const Members: React.FC<MembersProps> = ({ route }) => {
                   <Text
                     style={{ color: theme.text, fontSize: 20, paddingLeft: 10 }}
                   >
-                    Delete Group
+                    {i18n.deletegroup}
                   </Text>
                 </TouchableOpacity>
               </View>

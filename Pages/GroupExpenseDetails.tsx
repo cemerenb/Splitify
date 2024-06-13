@@ -25,6 +25,7 @@ import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemeContext } from "../Theme/ThemeContext";
+import i18n from "../Language/i18n";
 
 // Define the MapData interface
 interface MapData {
@@ -176,7 +177,7 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                     paddingBottom: 40,
                   }}
                 >
-                  Failed to delete element
+                  {i18n.faileddelexpense}
                 </Text>
                 <View style={{ width: "100%", flexDirection: "row" }}>
                   <TouchableOpacity
@@ -199,7 +200,7 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                         fontSize: Dimensions.get("window").width / 26,
                       }}
                     >
-                      Close
+                      {i18n.close}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -227,7 +228,7 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                 style={{
                   backgroundColor: theme.primary,
                   width: "80%",
-                  paddingTop: 50,
+                  paddingTop: 40,
                   borderRadius: 20,
                   alignItems: "center",
                 }}
@@ -239,16 +240,17 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                     paddingBottom: 5,
                   }}
                 >
-                  Delete Expense
+                  {i18n.deleteexpense}
                 </Text>
                 <Text
                   style={{
                     color: theme.text,
                     fontSize: Dimensions.get("window").width / 26,
                     paddingBottom: 40,
+                    paddingHorizontal: 10,
                   }}
                 >
-                  Are you sure you want to delete the expense?
+                  {i18n.suredeleteexpense}
                 </Text>
                 <View style={{ width: "100%", flexDirection: "row" }}>
                   <TouchableOpacity
@@ -270,7 +272,7 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                         fontSize: Dimensions.get("window").width / 26,
                       }}
                     >
-                      Cancel
+                      {i18n.cancel}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -294,11 +296,11 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                     ) : (
                       <Text
                         style={{
-                          color: theme.text,
+                          color: theme.buttonText,
                           fontSize: Dimensions.get("window").width / 26,
                         }}
                       >
-                        Delete
+                        {i18n.delete}
                       </Text>
                     )}
                   </TouchableOpacity>
@@ -354,7 +356,7 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                     <Text
                       style={{ paddingRight: 10, fontSize: 16, color: "white" }}
                     >
-                      Back
+                      {i18n.back}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -429,33 +431,33 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
               <ScrollView style={{ width: "70%", paddingRight: 15 }}>
-                <Text style={styles.subTitle}>Details</Text>
+                <Text style={styles.subTitle}>{i18n.details}</Text>
                 <Text style={styles.text}>{mapData.note}</Text>
-                <Text style={styles.subTitle}>Created By</Text>
+                <Text style={styles.subTitle}>{i18n.createdby}</Text>
                 <Text style={styles.text}>
                   {nameMap[mapData.createdBy] ?? "Unknown"}
                 </Text>
-                <Text style={styles.subTitle}>Date</Text>
+                <Text style={styles.subTitle}>{i18n.date}</Text>
                 <Text style={styles.text}>{reformatDate(mapData.date)}</Text>
-                <Text style={styles.subTitle}>Type</Text>
+                <Text style={styles.subTitle}>{i18n.type}</Text>
                 <Text style={styles.text}>
                   {mapData.type == 1
-                    ? "Utilities"
+                    ? i18n.utilites
                     : mapData.type == 2
-                    ? "Food & Groceries"
+                    ? i18n.foodgroceries
                     : mapData.type == 3
-                    ? "Healthcare"
+                    ? i18n.healthcare
                     : mapData.type == 4
-                    ? "Entertainment"
+                    ? i18n.entertainment
                     : mapData.type == 5
-                    ? "Shopping"
+                    ? i18n.shopping
                     : mapData.type == 6
-                    ? "Education"
+                    ? i18n.education
                     : mapData.type == 7
-                    ? "Transportation"
+                    ? i18n.transportations
                     : mapData.type == 8
-                    ? "Personal Care"
-                    : "Miscellaneous"}
+                    ? i18n.personalcare
+                    : i18n.miscellaneous}
                 </Text>
                 <MinSpacer></MinSpacer>
               </ScrollView>
@@ -507,7 +509,7 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
               style={{
                 backgroundColor: theme.primary,
                 width: "80%",
-                paddingTop: 50,
+                paddingTop: 40,
                 borderRadius: 20,
                 alignItems: "center",
               }}
@@ -517,9 +519,10 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                   color: theme.text,
                   fontSize: Dimensions.get("window").width / 26,
                   paddingBottom: 40,
+                  paddingHorizontal: 10,
                 }}
               >
-                Failed to delete element
+                {i18n.faileddelexpense}
               </Text>
               <View style={{ width: "100%", flexDirection: "row" }}>
                 <TouchableOpacity
@@ -536,7 +539,14 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                     justifyContent: "center",
                   }}
                 >
-                  <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                  <Text
+                    style={{
+                      color: theme.text,
+                      fontSize: Dimensions.get("window").width / 26,
+                    }}
+                  >
+                    {i18n.close}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -563,20 +573,29 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
               style={{
                 backgroundColor: theme.primary,
                 width: "80%",
-                paddingTop: 50,
+                paddingTop: 40,
                 borderRadius: 20,
                 alignItems: "center",
               }}
             >
               <Text
-                style={{ color: theme.text, fontSize: 22, paddingBottom: 5 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 18,
+                  paddingBottom: 5,
+                }}
               >
-                Delete Expense
+                {i18n.deleteexpense}
               </Text>
               <Text
-                style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+                style={{
+                  color: theme.text,
+                  fontSize: Dimensions.get("window").width / 26,
+                  paddingBottom: 40,
+                  paddingHorizontal: 5,
+                }}
               >
-                Are you sure you want to delete the expense?
+                {i18n.suredeleteexpense}
               </Text>
               <View style={{ width: "100%", flexDirection: "row" }}>
                 <TouchableOpacity
@@ -592,8 +611,13 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                     justifyContent: "center",
                   }}
                 >
-                  <Text style={{ color: theme.text, fontSize: 18 }}>
-                    Cancel
+                  <Text
+                    style={{
+                      color: theme.text,
+                      fontSize: Dimensions.get("window").width / 26,
+                    }}
+                  >
+                    {i18n.cancel}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -615,8 +639,13 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                       color={"white"}
                     ></ActivityIndicator>
                   ) : (
-                    <Text style={{ color: theme.text, fontSize: 18 }}>
-                      Delete
+                    <Text
+                      style={{
+                        color: theme.buttonText,
+                        fontSize: Dimensions.get("window").width / 26,
+                      }}
+                    >
+                      {i18n.delete}
                     </Text>
                   )}
                 </TouchableOpacity>
@@ -659,7 +688,7 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
                 style={{ fontSize: 30, color: "white" }}
               ></Ionicons>
               <Text style={{ paddingRight: 10, fontSize: 16, color: "white" }}>
-                Back
+                {i18n.back}
               </Text>
             </View>
           </TouchableOpacity>
@@ -696,34 +725,33 @@ const GroupExpenseDetails: React.FC<GroupExpenseDetailsProps> = ({ route }) => {
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <ScrollView style={{ width: "70%", paddingRight: 15 }}>
-              <Text style={styles.subTitle}>Details</Text>
+              <Text style={styles.subTitle}>{i18n.details}</Text>
               <Text style={styles.text}>{mapData.note}</Text>
-              <Text style={styles.subTitle}>Created By</Text>
+              <Text style={styles.subTitle}>{i18n.createdby}</Text>
               <Text style={styles.text}>
-                {" "}
                 {nameMap[mapData.createdBy] ?? "Unknown"}
               </Text>
-              <Text style={styles.subTitle}>Date</Text>
+              <Text style={styles.subTitle}>{i18n.date}</Text>
               <Text style={styles.text}>{reformatDate(mapData.date)}</Text>
-              <Text style={styles.subTitle}>Type</Text>
+              <Text style={styles.subTitle}>{i18n.type}</Text>
               <Text style={styles.text}>
                 {mapData.type == 1
-                  ? "Utilities"
+                  ? i18n.utilites
                   : mapData.type == 2
-                  ? "Food & Groceries"
+                  ? i18n.foodgroceries
                   : mapData.type == 3
-                  ? "Healthcare"
+                  ? i18n.healthcare
                   : mapData.type == 4
-                  ? "Entertainment"
+                  ? i18n.entertainment
                   : mapData.type == 5
-                  ? "Shopping"
+                  ? i18n.shopping
                   : mapData.type == 6
-                  ? "Education"
+                  ? i18n.education
                   : mapData.type == 7
-                  ? "Transportation"
+                  ? i18n.transportations
                   : mapData.type == 8
-                  ? "Personal Care"
-                  : "Miscellaneous"}
+                  ? i18n.personalcare
+                  : i18n.miscellaneous}
               </Text>
               <MinSpacer></MinSpacer>
             </ScrollView>

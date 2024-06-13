@@ -31,6 +31,7 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
+import i18n from "../Language/i18n";
 
 function Profile() {
   const { theme, mode, setMode } = useContext(ThemeContext);
@@ -69,7 +70,7 @@ function Profile() {
         // dismissed
       }
     } catch (error: any) {
-      Alert.alert("An error occured");
+      Alert.alert(i18n.anerror);
     }
   };
 
@@ -156,7 +157,7 @@ function Profile() {
               name="chevron-back-outline"
               size={30}
             ></Ionicons>
-            <Text style={{ color: theme.text, fontSize: 18 }}>Back</Text>
+            <Text style={{ color: theme.text, fontSize: 18 }}>{i18n.back}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -193,7 +194,7 @@ function Profile() {
             >
               {FIREBASE_AUTH.currentUser.displayName != null
                 ? FIREBASE_AUTH.currentUser.displayName
-                : "Unknown"}
+                : i18n.unknown}
             </Text>
             <Text
               style={{
@@ -284,7 +285,7 @@ function Profile() {
                 fontSize: Dimensions.get("window").width / 25,
               }}
             >
-              Theme
+              {i18n.theme}
             </Text>
             <View
               style={{
@@ -335,7 +336,7 @@ function Profile() {
                 fontSize: Dimensions.get("window").width / 25,
               }}
             >
-              Invite your friends
+              {i18n.inviteyourfri}
             </Text>
             <Ionicons
               name="chevron-forward-outline"
@@ -369,7 +370,7 @@ function Profile() {
                 fontSize: Dimensions.get("window").width / 25,
               }}
             >
-              Help
+              {i18n.help}
             </Text>
             <Ionicons
               name="chevron-forward-outline"
@@ -415,7 +416,7 @@ function Profile() {
                 paddingLeft: 10,
               }}
             >
-              Delete Account
+              {i18n.deleteaccount}
             </Text>
           </TouchableOpacity>
         </View>
@@ -456,7 +457,7 @@ function Profile() {
                 paddingLeft: 10,
               }}
             >
-              Logout
+              {i18n.logout}
             </Text>
           </TouchableOpacity>
         </View>
@@ -481,7 +482,7 @@ function Profile() {
               style={{
                 backgroundColor: theme.primary,
                 width: "80%",
-                paddingTop: 50,
+                paddingTop: 40,
                 borderRadius: 20,
                 alignItems: "center",
               }}
@@ -493,17 +494,17 @@ function Profile() {
                   paddingBottom: 5,
                 }}
               >
-                Delete Account
+                {i18n.deleteaccount}
               </Text>
               <Text
                 style={{
                   color: theme.text,
                   fontSize: Dimensions.get("window").width / 26,
+                  paddingHorizontal: 5,
                   paddingBottom: 40,
                 }}
               >
-                Are you sure you want to delete your account? This is an
-                irreversible action.
+                {i18n.suretodelacc}
               </Text>
               <View style={{ width: "100%", flexDirection: "row" }}>
                 <TouchableOpacity
@@ -526,7 +527,7 @@ function Profile() {
                       fontSize: Dimensions.get("window").width / 26,
                     }}
                   >
-                    Cancel
+                    {i18n.cancel}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -551,11 +552,12 @@ function Profile() {
                   ) : (
                     <Text
                       style={{
-                        color: theme.text,
+                        paddingHorizontal: 5,
+                        color: theme.buttonText,
                         fontSize: Dimensions.get("window").width / 26,
                       }}
                     >
-                      Delete Account
+                      {i18n.deleteaccount}
                     </Text>
                   )}
                 </TouchableOpacity>

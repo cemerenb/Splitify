@@ -22,6 +22,7 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { ThemeContext } from "../Theme/ThemeContext";
+import i18n from "../Language/i18n";
 
 export default function JoinPage() {
   const [inviteCode, setInviteCode] = useState("");
@@ -147,7 +148,9 @@ export default function JoinPage() {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                <Text style={{ color: theme.text, fontSize: 18 }}>
+                  {i18n.close}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -160,7 +163,7 @@ export default function JoinPage() {
             color: "white",
           }}
         >
-          Join a Group
+          {i18n.joinagroup}
         </Text>
       </View>
 
@@ -183,7 +186,7 @@ export default function JoinPage() {
               padding: 10,
             }}
             maxLength={25}
-            placeholder="Invite Code"
+            placeholder={i18n.invitecode}
             placeholderTextColor={theme.text}
             value={inviteCode}
             onChangeText={setInviteCode}
@@ -226,7 +229,7 @@ export default function JoinPage() {
                   fontSize: Dimensions.get("window").width / 24,
                 }}
               >
-                Join Group
+                {i18n.joingroup}
               </Text>
             )}
           </View>

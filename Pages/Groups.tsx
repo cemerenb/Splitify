@@ -21,6 +21,7 @@ import { RootStackNavigatorParamsList } from "../App";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
 import { ThemeContext } from "../Theme/ThemeContext";
+import i18n from "../Language/i18n";
 
 // Define the type for group data
 type Group = {
@@ -155,7 +156,10 @@ const Groups = () => {
                   >
                     {groupName}
                   </Text>
-                  <Text style={styles.cardSubTitle}>{ownerName}'s group</Text>
+                  <Text style={styles.cardSubTitle}>
+                    {ownerName}
+                    {i18n.sgroup}
+                  </Text>
                 </View>
                 <View
                   style={{
@@ -239,7 +243,7 @@ const Groups = () => {
                   color: theme.text,
                 }}
               >
-                Join Group
+                {i18n.joingroup}
               </Text>
             </View>
           </TouchableOpacity>
@@ -265,7 +269,7 @@ const Groups = () => {
                   color: theme.text,
                 }}
               >
-                Create Group
+                {i18n.creategroup}
               </Text>
             </View>
           </TouchableOpacity>
@@ -287,7 +291,7 @@ const Groups = () => {
                 textAlign: "center",
               }}
             >
-              You don'have any group yet. You can join or create a group.
+              {i18n.youdonthavegro}
             </Text>
           </View>
         ) : (

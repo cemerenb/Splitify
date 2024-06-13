@@ -44,6 +44,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ScrollView } from "react-native-gesture-handler";
+import i18n from "../Language/i18n";
 
 export default function PersonalExpensEntry() {
   const [totalPrice, setTotalPrice] = useState("");
@@ -114,15 +115,15 @@ export default function PersonalExpensEntry() {
     const status = ImagePicker.requestCameraPermissionsAsync();
   });
   const selectionData = [
-    { title: "Utilities" },
-    { title: "Food & Groceries" },
-    { title: "Healthcare" },
-    { title: "Entertainment" },
-    { title: "Shopping" },
-    { title: "Education" },
-    { title: "Transportation" },
-    { title: "Personal Care" },
-    { title: "Miscellaneous" },
+    { title: i18n.utilites },
+    { title: i18n.foodgroceries },
+    { title: i18n.healthcare },
+    { title: i18n.entertainment },
+    { title: i18n.shopping },
+    { title: i18n.education },
+    { title: i18n.transportations },
+    { title: i18n.personalcare },
+    { title: i18n.miscellaneous },
   ];
   const handleAddExpense = async () => {
     if (parseInt(totalPrice) > 0) {
@@ -156,13 +157,13 @@ export default function PersonalExpensEntry() {
         navigation.replace("TabBar");
       } catch (error) {
         console.error("Error creating document: ", error);
-        setModalText("Failed to create document. Please try again.");
+        setModalText(i18n.failedtocredoc);
         setModalVisible2(true);
       } finally {
         setLoadingStatus(false);
       }
     } else {
-      setModalText("You must enter the spending amount");
+      setModalText(i18n.youmustentspeamo);
       setModalVisible2(true);
     }
   };
@@ -223,7 +224,9 @@ export default function PersonalExpensEntry() {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                <Text style={{ color: theme.text, fontSize: 18 }}>
+                  {i18n.close}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -237,7 +240,7 @@ export default function PersonalExpensEntry() {
           }}
         >
           {" "}
-          How much?
+          {i18n.howmuch}
         </Text>
         <View style={{ flex: 1, flexDirection: "row", alignContent: "center" }}>
           <Text
@@ -290,7 +293,7 @@ export default function PersonalExpensEntry() {
           maxLength={300}
           multiline={false}
           placeholderTextColor={theme.text}
-          placeholder="Note"
+          placeholder={i18n.note}
           value={note}
           onChangeText={setNote}
           keyboardType="default"
@@ -415,7 +418,7 @@ export default function PersonalExpensEntry() {
                   },
                 ]}
               >
-                Add attachment
+                {i18n.addimage}
               </Text>
             </View>
           </TouchableOpacity>
@@ -467,7 +470,7 @@ export default function PersonalExpensEntry() {
                   fontSize: Dimensions.get("window").width / 24,
                 }}
               >
-                Add Expense
+                {i18n.addexpense}
               </Text>
             )}
           </View>
@@ -499,7 +502,7 @@ export default function PersonalExpensEntry() {
                     size={35}
                   ></Ionicons>
                   <Text style={[styles.modalOption, { color: theme.text }]}>
-                    Gallery
+                    {i18n.gallery}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -516,7 +519,7 @@ export default function PersonalExpensEntry() {
                     size={35}
                   ></Ionicons>
                   <Text style={[styles.modalOption, { color: theme.text }]}>
-                    Camera
+                    {i18n.camera}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -536,7 +539,7 @@ export default function PersonalExpensEntry() {
                 }}
               >
                 <Text style={{ color: theme.reverse, fontSize: 16 }}>
-                  Cancel
+                  {i18n.cancel}
                 </Text>
               </View>
             </TouchableOpacity>

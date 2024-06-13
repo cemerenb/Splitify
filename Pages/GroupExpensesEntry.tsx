@@ -51,6 +51,7 @@ import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
+import i18n from "../Language/i18n";
 
 type RootStackParamList = {
   GroupExpensesEntry: { groupId: string; membersMap: Array; members: Array };
@@ -165,15 +166,15 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
     const status = ImagePicker.requestCameraPermissionsAsync();
   });
   const selectionData = [
-    { title: "Utilities" },
-    { title: "Food & Groceries" },
-    { title: "Healthcare" },
-    { title: "Entertainment" },
-    { title: "Shopping" },
-    { title: "Education" },
-    { title: "Transportation" },
-    { title: "Personal Care" },
-    { title: "Miscellaneous" },
+    { title: i18n.utilites },
+    { title: i18n.foodgroceries },
+    { title: i18n.healthcare },
+    { title: i18n.entertainment },
+    { title: i18n.shopping },
+    { title: i18n.education },
+    { title: i18n.transportations },
+    { title: i18n.personalcare },
+    { title: i18n.miscellaneous },
   ];
   const handleAddExpense = async () => {
     if (parseInt(totalPrice) > 0) {
@@ -211,19 +212,19 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
         navigation.pop();
       } catch (error) {
         console.error("Error creating document: ", error);
-        setModalText("Failed to create document. Please try again.");
+        setModalText(i18n.failedtocredoc);
         setModalVisible2(true);
       } finally {
         setLoadingStatus(false);
       }
     } else {
-      setModalText("You must enter the spending amount");
+      setModalText(i18n.youmustentspeamo);
       setModalVisible2(true);
     }
   };
   const options = [
-    { label: "Everyone", value: true },
-    { label: "Select", value: false },
+    { label: i18n.everyone, value: true },
+    { label: i18n.select, value: false },
   ];
   const renderUserItem = ({ item }) => {
     const uid = item[0];
@@ -319,7 +320,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                 }}
               >
                 <Text style={{ color: theme.buttonText, fontSize: 18 }}>
-                  Close
+                  {i18n.close}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -376,7 +377,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                 }}
               >
                 <Text style={{ fontSize: 16, color: theme.buttonText }}>
-                  Close
+                  {i18n.close}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -391,7 +392,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
           }}
         >
           {" "}
-          How much?
+          {i18n.howmuch}
         </Text>
         <View style={{ flex: 1, flexDirection: "row", alignContent: "center" }}>
           <Text
@@ -443,7 +444,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
             }}
             maxLength={300}
             multiline={true}
-            placeholder="Note"
+            placeholder={i18n.note}
             placeholderTextColor={theme.text}
             value={note}
             onChangeText={setNote}
@@ -461,7 +462,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
               paddingBottom: 5,
             }}
           >
-            Category
+            {i18n.type}
           </Text>
           <SelectDropdown
             defaultValueByIndex={0}
@@ -523,7 +524,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
               paddingBottom: 5,
             }}
           >
-            Participants
+            {i18n.participants}
           </Text>
           <TouchableOpacity
             onPress={() => {
@@ -548,7 +549,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                   fontSize: Dimensions.get("window").width / 25,
                 }}
               >
-                Everyone
+                {i18n.everyone}
               </Text>
             ) : selectedUserIds.length == 1 ? (
               <Text
@@ -557,7 +558,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                   fontSize: Dimensions.get("window").width / 25,
                 }}
               >
-                You
+                {i18n.you}
               </Text>
             ) : (
               <Text
@@ -566,7 +567,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                   fontSize: Dimensions.get("window").width / 25,
                 }}
               >
-                You and {selectedUserIds.length - 1} members
+                {i18n.youand} {selectedUserIds.length - 1} {""} {i18n.members}
               </Text>
             )}
           </TouchableOpacity>
@@ -628,7 +629,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                     },
                   ]}
                 >
-                  Add attachment
+                  {i18n.addimage}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -681,7 +682,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                     fontSize: Dimensions.get("window").width / 24,
                   }}
                 >
-                  Add Expense
+                  {i18n.addexpense}
                 </Text>
               )}
             </View>
@@ -724,7 +725,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                     size={35}
                   ></Ionicons>
                   <Text style={[styles.modalOption, { color: theme.text }]}>
-                    Gallery
+                    {i18n.gallery}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -749,7 +750,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                     size={35}
                   ></Ionicons>
                   <Text style={[styles.modalOption, { color: theme.text }]}>
-                    Camera
+                    {i18n.camera}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -769,7 +770,7 @@ const GroupExpensesEntry: React.FC<GroupExpensesEntryProps> = ({ route }) => {
                 }}
               >
                 <Text style={{ color: theme.reverse, fontSize: 16 }}>
-                  Cancel
+                  {i18n.cancel}
                 </Text>
               </View>
             </TouchableOpacity>

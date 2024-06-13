@@ -25,6 +25,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { ThemeContext } from "../Theme/ThemeContext";
+import i18n from "../Language/i18n";
 
 export default function CreateGroup() {
   const [groupName, setGroupName] = useState("");
@@ -35,12 +36,12 @@ export default function CreateGroup() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalText, setModalText] = useState("");
   const selectionData = [
-    { title: "Home" },
-    { title: "Work" },
-    { title: "Friends" },
-    { title: "Social Club" },
-    { title: "School" },
-    { title: "Other" },
+    { title: i18n.home },
+    { title: i18n.work },
+    { title: i18n.friends },
+    { title: i18n.socialclub },
+    { title: i18n.school },
+    { title: i18n.other },
   ];
   const navigation =
     useNavigation<StackNavigationProp<RootStackNavigatorParamsList>>();
@@ -158,7 +159,7 @@ export default function CreateGroup() {
                     fontSize: Dimensions.get("window").width / 26,
                   }}
                 >
-                  Close
+                  {i18n.close}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -172,7 +173,7 @@ export default function CreateGroup() {
             color: "white",
           }}
         >
-          Create Group
+          {i18n.creategroup}
         </Text>
       </View>
 
@@ -195,7 +196,7 @@ export default function CreateGroup() {
               padding: 10,
             }}
             maxLength={25}
-            placeholder="Group Name"
+            placeholder={i18n.groupname}
             placeholderTextColor={theme.text}
             value={groupName}
             onChangeText={setGroupName}
@@ -265,12 +266,12 @@ export default function CreateGroup() {
               if (response == 1) {
                 navigation.replace("TabBar");
               } else {
-                setModalText("An error occured");
+                setModalText(i18n.anerror);
                 setModalVisible(true);
               }
               setLoadingStatus(false);
             } else {
-              setModalText("You have to enter the group name");
+              setModalText(i18n.entergroupname);
               setModalVisible(true);
             }
           }}
@@ -305,7 +306,7 @@ export default function CreateGroup() {
                   fontSize: Dimensions.get("window").width / 24,
                 }}
               >
-                Create Group
+                {i18n.creategroup}
               </Text>
             )}
           </View>

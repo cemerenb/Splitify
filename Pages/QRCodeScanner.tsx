@@ -9,6 +9,7 @@ import { RouteProp, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import * as ImagePicker from "expo-image-picker";
+import i18n from "../Language/i18n";
 
 type RootStackParamList = {
   QRScanner: { groupId: string };
@@ -38,12 +39,12 @@ const QRScanner: React.FC<QRScannerProps> = ({ route }) => {
 
   if (!permission.granted) {
     // Camera permissions are not granted yet.
+    // to-do
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>
-          Camera permission is required to scan QR codes
-        </Text>
-        <Button title="Grant permission" onPress={requestPermission} />
+        <Text style={styles.text}>{i18n.cameraperreq}</Text>
+
+        <Button title={i18n.grantper} onPress={requestPermission} />
       </View>
     );
   }

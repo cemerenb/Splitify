@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, NativeModules, Platform } from "react-native";
 import {
   NavigationContainer,
   DefaultTheme,
@@ -34,7 +34,7 @@ import QRScanner from "./Pages/QRCodeScanner";
 import ScanResult from "./Pages/ScanResult";
 import Profile from "./Pages/Profile";
 import DeleteAccount from "./Pages/DeleteAccount";
-
+import i18n from "./Language/i18n";
 export type RootStackNavigatorParamsList = {
   Login: undefined;
   Register: undefined;
@@ -63,6 +63,20 @@ export type RootStackNavigatorParamsList = {
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
 
 const App: React.FC = () => {
+  console.log("dil");
+
+  let deviceLanguage =
+    Platform.OS === "ios"
+      ? NativeModules.SettingsManager.settings.AppleLocale
+      : NativeModules.I18nManager.localeIdentifier;
+  console.log(deviceLanguage);
+  AsyncStorage.setItem("lg", deviceLanguage);
+  if (deviceLanguage === undefined) {
+    // iOS 13 workaround, take first of AppleLanguages array
+    deviceLanguage = NativeModules.SettingsManager.settings.AppleLanguages[0];
+    console.log(deviceLanguage);
+  }
+
   const [themeData, setThemeData] = useState(0);
   const { theme } = useContext(ThemeContext);
 
@@ -194,7 +208,7 @@ const App: React.FC = () => {
                 borderColor: "transparent",
               },
               gestureEnabled: false,
-              headerBackTitle: "Back",
+              headerBackTitle: i18n.back,
               headerBackTitleStyle: { fontWeight: "500" },
               headerTintColor: "white",
               headerTitle: "",
@@ -240,7 +254,7 @@ const App: React.FC = () => {
                 borderColor: "transparent",
               },
               gestureEnabled: false,
-              headerBackTitle: "Back",
+              headerBackTitle: i18n.back,
               headerBackTitleStyle: { fontWeight: "500" },
               headerTintColor: "white",
               headerTitle: "",
@@ -266,10 +280,10 @@ const App: React.FC = () => {
                 borderColor: "transparent",
               },
               gestureEnabled: false,
-              headerBackTitle: "Back",
+              headerBackTitle: i18n.back,
               headerBackTitleStyle: { fontWeight: "500" },
               headerTintColor: "white",
-              headerTitle: "Group Expense",
+              headerTitle: i18n.groupexpense,
               headerTitleStyle: {
                 fontSize: 20,
                 color: "white",
@@ -288,10 +302,10 @@ const App: React.FC = () => {
                 borderColor: "transparent",
               },
               gestureEnabled: false,
-              headerBackTitle: "Back",
+              headerBackTitle: i18n.back,
               headerBackTitleStyle: { fontWeight: "500" },
               headerTintColor: "white",
-              headerTitle: "Expense",
+              headerTitle: i18n.expense,
               headerTitleStyle: {
                 fontSize: 20,
                 color: "white",

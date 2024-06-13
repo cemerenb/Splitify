@@ -24,6 +24,8 @@ import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
+import i18n from "../Language/i18n";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RootStackParamList = {
   GroupSummary: { groupId: string; memberNames: Array };
@@ -39,6 +41,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
   const memberNames = route.params.memberNames;
   const [expenses, setExpenses] = useState([]);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
+  const [turkish, setTurkish] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -56,7 +59,12 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
 
   useEffect(() => {
     // Harcamaları çekme
-    console.log(FIREBASE_AUTH.currentUser.uid);
+
+    AsyncStorage.getItem("lg").then((value) => {
+      if (value.split("_")[0] == "tr") {
+        setTurkish(true);
+      } else [setTurkish(false)];
+    });
 
     getExpenses();
   }, [groupId]);
@@ -94,9 +102,6 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
 
     filtered.forEach((expense) => {
       const { total, createdBy, participants } = expense;
-      console.log("parti");
-
-      console.log(participants);
 
       // Her bir katılımcının borç payını hesaplayın
       const share = total / participants.length;
@@ -137,7 +142,6 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
         balance[creditor] -= payment;
       });
     });
-    console.log(transactionsList);
 
     setTransactions(transactionsList);
   };
@@ -259,7 +263,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
             <Text
               style={{ color: theme.text, fontSize: 16, paddingBottom: 40 }}
             >
-              An error occured while saving transections
+              {i18n.anerrortrans}
             </Text>
             <View style={{ width: "100%", flexDirection: "row" }}>
               <TouchableOpacity
@@ -276,7 +280,9 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                <Text style={{ color: theme.text, fontSize: 18 }}>
+                  {i18n.close}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -305,7 +311,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
               size={30}
               color={theme.text}
             ></Ionicons>
-            <Text style={{ fontSize: 18, color: theme.text }}>Back</Text>
+            <Text style={{ fontSize: 18, color: theme.text }}>{i18n.back}</Text>
           </TouchableOpacity>
           <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
             {transactions.length > 0 ? (
@@ -323,7 +329,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
                     setTransactions([]);
                   }}
                 >
-                  <Text style={{ color: theme.buttonText }}>Reset</Text>
+                  <Text style={{ color: theme.buttonText }}>{i18n.reset}</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -346,7 +352,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
                   });
                 }}
               >
-                <Text style={{ color: theme.buttonText }}>History</Text>
+                <Text style={{ color: theme.buttonText }}>{i18n.history}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -373,33 +379,66 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
               FIREBASE_AUTH.currentUser.uid
             ).map((transaction, index) => (
               <View style={{}}>
-                <Text
-                  style={{
-                    color: theme.text,
-                    fontSize:
-                      transaction.from === FIREBASE_AUTH.currentUser.uid ||
-                      transaction.to === FIREBASE_AUTH.currentUser.uid
-                        ? 30
-                        : 16,
-                    paddingBottom:
-                      transaction.from === FIREBASE_AUTH.currentUser.uid ||
-                      transaction.to === FIREBASE_AUTH.currentUser.uid
-                        ? 30
-                        : 3,
-                  }}
-                  key={index}
-                >
-                  {transaction.from === FIREBASE_AUTH.currentUser.uid
-                    ? "You"
-                    : memberNames[transaction.from]}{" "}
-                  {transaction.from === FIREBASE_AUTH.currentUser.uid
-                    ? "will give"
-                    : "gives"}{" "}
-                  {Math.round(transaction.amount)}₺ to{" "}
-                  {transaction.to === FIREBASE_AUTH.currentUser.uid
-                    ? "You"
-                    : memberNames[transaction.to]}{" "}
-                </Text>
+                {turkish ? (
+                  <Text
+                    style={{
+                      color: theme.text,
+                      fontSize:
+                        transaction.from === FIREBASE_AUTH.currentUser.uid ||
+                        transaction.to === FIREBASE_AUTH.currentUser.uid
+                          ? 30
+                          : 16,
+                      paddingBottom:
+                        transaction.from === FIREBASE_AUTH.currentUser.uid ||
+                        transaction.to === FIREBASE_AUTH.currentUser.uid
+                          ? 30
+                          : 3,
+                    }}
+                    key={index}
+                  >
+                    {transaction.from === FIREBASE_AUTH.currentUser.uid
+                      ? "Sen"
+                      : memberNames[transaction.from]}{" "}
+                    {transaction.to === FIREBASE_AUTH.currentUser.uid
+                      ? "sana"
+                      : memberNames[transaction.to]}
+                    {transaction.to === FIREBASE_AUTH.currentUser.uid
+                      ? " "
+                      : "'a "}
+                    {Math.round(transaction.amount)}₺{" "}
+                    {transaction.from === FIREBASE_AUTH.currentUser.uid
+                      ? "vereceksin"
+                      : "verecek"}{" "}
+                  </Text>
+                ) : (
+                  <Text
+                    style={{
+                      color: theme.text,
+                      fontSize:
+                        transaction.from === FIREBASE_AUTH.currentUser.uid ||
+                        transaction.to === FIREBASE_AUTH.currentUser.uid
+                          ? 30
+                          : 16,
+                      paddingBottom:
+                        transaction.from === FIREBASE_AUTH.currentUser.uid ||
+                        transaction.to === FIREBASE_AUTH.currentUser.uid
+                          ? 30
+                          : 3,
+                    }}
+                    key={index}
+                  >
+                    {transaction.from === FIREBASE_AUTH.currentUser.uid
+                      ? "You"
+                      : memberNames[transaction.from]}{" "}
+                    {transaction.from === FIREBASE_AUTH.currentUser.uid
+                      ? "will give"
+                      : "gives"}{" "}
+                    {Math.round(transaction.amount)}₺ to{" "}
+                    {transaction.to === FIREBASE_AUTH.currentUser.uid
+                      ? "You"
+                      : memberNames[transaction.to]}{" "}
+                  </Text>
+                )}
               </View>
             ))}
           </ScrollView>
@@ -449,7 +488,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
                   color={theme.buttonText}
                 ></ActivityIndicator>
               ) : (
-                <Text style={{ color: theme.buttonText }}>Save</Text>
+                <Text style={{ color: theme.buttonText }}>{i18n.save}</Text>
               )}
             </View>
           </TouchableOpacity>
@@ -457,7 +496,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
       ) : (
         <View style={{ paddingTop: 20 }}>
           <Text style={{ color: theme.text, paddingBottom: 7, paddingLeft: 2 }}>
-            First Date
+            {i18n.firstdate}
           </Text>
           <TextInput
             style={{
@@ -476,7 +515,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
             maxLength={10}
           />
           <Text style={{ color: theme.text, paddingBottom: 7, paddingLeft: 2 }}>
-            Last Date
+            {i18n.lastdate}
           </Text>
           <TextInput
             style={{
@@ -514,7 +553,7 @@ const GroupSummary: React.FC<GroupSummaryProps> = ({ route }) => {
                 await filterExpenses();
               }}
             >
-              <Text style={{ color: theme.buttonText }}>Calculate</Text>
+              <Text style={{ color: theme.buttonText }}>{i18n.calculate}</Text>
             </TouchableOpacity>
           </View>
         </View>

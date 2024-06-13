@@ -21,6 +21,7 @@ import validator from "validator";
 import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ScrollView } from "react-native-gesture-handler";
+import i18n from "../Language/i18n";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
@@ -35,9 +36,11 @@ export default function ResetPassword() {
   const handleResetPassword = async () => {
     await sendPasswordResetEmail(FIREBASE_AUTH, email)
       .then(() => {
+        setProcessing(false);
         setModalVisible2(true);
       })
       .catch((error: any) => {
+        setProcessing(false);
         setErrorMessage(error.message);
         setModalVisible(true);
         console.log(error.message);
@@ -72,60 +75,45 @@ export default function ResetPassword() {
             style={{
               backgroundColor: theme.primary,
               width: "80%",
-              paddingTop: 50,
+              paddingTop: 20,
               borderRadius: 20,
               alignItems: "center",
             }}
           >
             <Text
-              style={{ color: theme.text, fontSize: 18, paddingBottom: 40 }}
+              style={{ color: theme.text, fontSize: 18, paddingBottom: 20 }}
             >
-              Email Sent
+              {i18n.emailsent2}
             </Text>
             <Text
-              style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
+              style={{
+                color: theme.text,
+                fontSize: 14,
+                paddingBottom: 20,
+                paddingHorizontal: 10,
+              }}
             >
-              We sent you an email. Please don't forget to check spam folder
+              {i18n.forgotpassemail}
             </Text>
             <View style={{ width: "100%", flexDirection: "row" }}>
               <TouchableOpacity
                 onPress={() => {
+                  navigation.replace("Login");
                   setModalVisible2(false);
                 }}
                 style={{
-                  width: "50%",
+                  width: "100%",
                   height: 50,
                   backgroundColor: theme.shadow,
                   borderBottomLeftRadius: 20,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{ color: theme.text, fontSize: 18 }}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.replace("Login");
-                }}
-                style={{
                   borderBottomRightRadius: 20,
-                  width: "50%",
-                  height: 50,
-                  backgroundColor: "rgb(253,60,74)",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                {processing ? (
-                  <ActivityIndicator
-                    size={"small"}
-                    color={"white"}
-                  ></ActivityIndicator>
-                ) : (
-                  <Text style={{ color: theme.text, fontSize: 18 }}>
-                    Delete
-                  </Text>
-                )}
+                <Text style={{ color: theme.text, fontSize: 18 }}>
+                  {i18n.okay}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -177,7 +165,9 @@ export default function ResetPassword() {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                <Text style={{ color: theme.text, fontSize: 18 }}>
+                  {i18n.close}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -207,7 +197,9 @@ export default function ResetPassword() {
                 size={30}
                 color={theme.text}
               ></Ionicons>
-              <Text style={{ fontSize: 18, color: theme.text }}>Back</Text>
+              <Text style={{ fontSize: 18, color: theme.text }}>
+                {i18n.back}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -224,12 +216,12 @@ export default function ResetPassword() {
             <Text
               style={{ color: theme.text, fontSize: 50, fontWeight: "300" }}
             >
-              Reset Password
+              {i18n.resetpass}
             </Text>
             <Text
               style={{ color: theme.text, fontWeight: "200", width: "70%" }}
             >
-              We will send you an email if an account exist with this email
+              {i18n.resetpasssubtitle}
             </Text>
           </View>
           <View style={{ height: Dimensions.get("window").height / 10 }}></View>
@@ -249,10 +241,10 @@ export default function ResetPassword() {
                     flex: 1,
                     color: theme.text,
                     backgroundColor: theme.primary,
-                    height: 55,
+                    height: Dimensions.get("window").height / 15,
                     paddingVertical: 10,
                     paddingRight: 10,
-                    fontSize: 18,
+                    fontSize: Dimensions.get("window").width / 24,
                   }}
                   keyboardType="email-address"
                   placeholder="Email"
@@ -273,6 +265,7 @@ export default function ResetPassword() {
             <View style={[styles.button, { backgroundColor: theme.button }]}>
               <TouchableOpacity
                 onPress={() => {
+                  setProcessing(true);
                   if (email.length < 1) {
                     setErrorMessage("Email can't be empty");
                     setModalVisible(true);
@@ -287,7 +280,21 @@ export default function ResetPassword() {
                 }}
                 style={styles.button}
               >
-                <Text style={{ fontSize: 20, color: "white" }}>Send Email</Text>
+                {!processing ? (
+                  <Text
+                    style={{
+                      fontSize: Dimensions.get("window").width / 24,
+                      color: "white",
+                    }}
+                  >
+                    {i18n.sendemail}
+                  </Text>
+                ) : (
+                  <ActivityIndicator
+                    color={theme.text}
+                    size={"small"}
+                  ></ActivityIndicator>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -301,7 +308,7 @@ const styles = StyleSheet.create({
   button: {
     justifyContent: "center",
     alignItems: "center",
-    height: 65,
+    height: Dimensions.get("window").height / 15,
     borderRadius: 10,
   },
   inputStyle: {
@@ -309,8 +316,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#f3f3f3",
-    height: 65,
+    height: Dimensions.get("window").height / 15,
     borderRadius: 8,
     paddingHorizontal: 14,
+    marginBottom: 20,
   },
 });

@@ -27,6 +27,7 @@ import { RootStackNavigatorParamsList } from "../App";
 import { doc, setDoc } from "firebase/firestore";
 import { MaxSpacer, MidSpacer, MinSpacer } from "../Utils/Spacers";
 import { ThemeContext } from "../Theme/ThemeContext";
+import i18n from "../Language/i18n";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -70,17 +71,15 @@ export default function Register() {
       console.log(fullName.length);
 
       if (fullName.length == 0) {
-        setErrorMessage("Please enter a full name");
+        setErrorMessage(i18n.enterfullname);
         setIsModalVisible(true);
         setLoading(false);
       } else if (!validateEmail(email)) {
-        setErrorMessage("Invalid email format.");
+        setErrorMessage(i18n.invemafor);
         setIsModalVisible(true);
         setLoading(false);
       } else if (!validatePassword(password)) {
-        setErrorMessage(
-          "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character."
-        );
+        setErrorMessage(i18n.passwordshouldbe);
         setIsModalVisible(true);
         setLoading(false);
       } else {
@@ -110,19 +109,19 @@ export default function Register() {
           // Set error message based on error code
           switch (error.code) {
             case "auth/email-already-in-use":
-              setErrorMessage("Email already in use");
+              setErrorMessage(i18n.emailalreadyuse);
               break;
             case "auth/missing-email":
-              setErrorMessage("Please enter an email");
+              setErrorMessage(i18n.enteremail);
               break;
             case "auth/invalid-email":
-              setErrorMessage("Please enter a valid email");
+              setErrorMessage(i18n.entervalidemail);
               break;
             case "auth/missing-password":
-              setErrorMessage("Please enter a valid password");
+              setErrorMessage(i18n.entervalidpass);
               break;
             default:
-              setErrorMessage("An error occurred");
+              setErrorMessage(i18n.anerror);
               break;
           }
           setIsModalVisible(true);
@@ -131,7 +130,7 @@ export default function Register() {
         }
       }
     } else {
-      setErrorMessage("Passwords do not match");
+      setErrorMessage(i18n.passwordsnotmatching);
       setIsModalVisible(true);
       setLoading(false);
     }
@@ -179,7 +178,7 @@ export default function Register() {
           }}
         >
           <Text style={[styles.header, { color: theme.text }]}>
-            Sign Up to Splitify
+            {i18n.signuptosplite}
           </Text>
         </View>
         <View style={{ height: Dimensions.get("window").height / 10 }}></View>
@@ -194,7 +193,7 @@ export default function Register() {
                   fontSize: Dimensions.get("window").width / 28,
                 },
               ]}
-              placeholder="Full Name"
+              placeholder={i18n.fullname}
               onChangeText={setFullName}
               value={fullName}
               autoComplete="name"
@@ -250,7 +249,7 @@ export default function Register() {
                   fontSize: Dimensions.get("window").width / 28,
                 },
               ]}
-              placeholder="Password"
+              placeholder={i18n.password}
               onChangeText={setPassword}
               value={password}
               autoComplete="password"
@@ -279,7 +278,7 @@ export default function Register() {
                   fontSize: Dimensions.get("window").width / 28,
                 },
               ]}
-              placeholder="Confirm Password"
+              placeholder={i18n.confirmpassword}
               onChangeText={setConfirmPassword}
               value={confirmPassword}
               autoComplete="password"
@@ -313,7 +312,7 @@ export default function Register() {
                   color: theme.buttonText,
                 }}
               >
-                Sign Up
+                {i18n.signup}
               </Text>
             )}
           </TouchableOpacity>
@@ -327,7 +326,7 @@ export default function Register() {
               paddingRight: 5,
             }}
           >
-            Already have an account?
+            {i18n.alreadyhaveanaccount}
           </Text>
           <Text
             onPress={() => navigation.goBack()}
@@ -337,7 +336,7 @@ export default function Register() {
               fontSize: Dimensions.get("window").width / 30,
             }}
           >
-            Login
+            {i18n.login}
           </Text>
         </View>
         <Modal
@@ -391,7 +390,9 @@ export default function Register() {
                     justifyContent: "center",
                   }}
                 >
-                  <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                  <Text style={{ color: theme.text, fontSize: 18 }}>
+                    {i18n.close}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -419,7 +420,7 @@ export default function Register() {
               style={{
                 backgroundColor: theme.primary,
                 width: "80%",
-                paddingTop: 50,
+                paddingTop: 40,
                 borderRadius: 20,
                 alignItems: "center",
               }}
@@ -432,8 +433,7 @@ export default function Register() {
                   paddingHorizontal: 10,
                 }}
               >
-                We have sent an email for you to confirm your account. Don't
-                forget to check your spam box.
+                {i18n.emailsent}
               </Text>
               <View style={{ width: "100%", flexDirection: "row" }}>
                 <TouchableOpacity
@@ -451,7 +451,9 @@ export default function Register() {
                     justifyContent: "center",
                   }}
                 >
-                  <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                  <Text style={{ color: theme.text, fontSize: 18 }}>
+                    {i18n.close}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>

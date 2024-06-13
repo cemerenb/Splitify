@@ -30,6 +30,7 @@ import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemeContext } from "../Theme/ThemeContext";
+import i18n from "../Language/i18n";
 
 type RootStackParamList = {
   AllGroupExpenses: { groupId: string; memberNames: Array };
@@ -67,16 +68,16 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
     setExpanded(!expanded);
   };
   const selectionData = [
-    { title: "All" },
-    { title: "Utilities" },
-    { title: "Food & Groceries" },
-    { title: "Healthcare" },
-    { title: "Entertainment" },
-    { title: "Shopping" },
-    { title: "Education" },
-    { title: "Transportation" },
-    { title: "Personal Care" },
-    { title: "Miscellaneous" },
+    { title: i18n.all },
+    { title: i18n.utilites },
+    { title: i18n.foodgroceries },
+    { title: i18n.healthcare },
+    { title: i18n.entertainment },
+    { title: i18n.shopping },
+    { title: i18n.education },
+    { title: i18n.transportations },
+    { title: i18n.personalcare },
+    { title: i18n.miscellaneous },
   ];
   const animationStyle = expanded
     ? ({ maxHeight: 200 } as ViewStyle)
@@ -195,22 +196,22 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
         >
           <Text style={[styles.cardTitle, { color: theme.text }]}>
             {imageSource == 1
-              ? "Utilities"
+              ? i18n.utilites
               : imageSource == 2
-              ? "Food & Groceries"
+              ? i18n.foodgroceries
               : imageSource == 3
-              ? "Healthcare"
+              ? i18n.healthcare
               : imageSource == 4
-              ? "Entertainment"
+              ? i18n.entertainment
               : imageSource == 5
-              ? "Shopping"
+              ? i18n.shopping
               : imageSource == 6
-              ? "Education"
+              ? i18n.education
               : imageSource == 7
-              ? "Transportation"
+              ? i18n.transportations
               : imageSource == 8
-              ? "Personal Care"
-              : "Miscellaneous"}
+              ? i18n.personalcare
+              : i18n.miscellaneous}
           </Text>
           {description.length > 40 ? (
             <Text style={[styles.cardDescription, { color: theme.text }]}>
@@ -272,9 +273,9 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
   }, []);
 
   const options = [
-    { label: "Date", value: 0 },
-    { label: "Range", value: 1 },
-    { label: "None", value: 2 },
+    { label: i18n.date, value: 0 },
+    { label: i18n.range, value: 1 },
+    { label: i18n.none, value: 2 },
   ];
   if (loading) {
     return (
@@ -587,14 +588,14 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                   <View
                     style={{
                       ...styles.dropdownItemStyle,
-                      backgroundColor: theme.text,
-                      ...(isSelected && { backgroundColor: theme.card }),
+                      backgroundColor: theme.background,
+                      ...(isSelected && { backgroundColor: theme.button }),
                     }}
                   >
                     <Text
                       style={[
                         styles.dropdownItemTxtStyle,
-                        { color: theme.reverse },
+                        { color: isSelected ? theme.buttonText : theme.text },
                       ]}
                     >
                       {item.title}
@@ -619,7 +620,7 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                   backgroundColor: theme.shadow,
                   alignItems: "center",
                   justifyContent: "center",
-                  paddingHorizontal: 15,
+                  paddingHorizontal: 5,
                   borderRadius: 20,
                   width: 70,
                   height: 30,
@@ -631,8 +632,13 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                   toggleExpand();
                 }}
               >
-                <Text style={{ color: theme.buttonText, fontSize: 18 }}>
-                  Clear
+                <Text
+                  style={{
+                    color: theme.buttonText,
+                    fontSize: Dimensions.get("window").width / 30,
+                  }}
+                >
+                  {i18n.clear}
                 </Text>
               </TouchableOpacity>
 
@@ -641,7 +647,7 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                   backgroundColor: theme.button,
                   alignItems: "center",
                   justifyContent: "center",
-                  paddingHorizontal: 15,
+                  paddingHorizontal: 5,
                   borderRadius: 20,
                   width: 70,
                 }}
@@ -655,8 +661,13 @@ const AllGroupExpenses: React.FC<AllGroupExpensesProps> = ({ route }) => {
                   toggleExpand();
                 }}
               >
-                <Text style={{ color: theme.buttonText, fontSize: 18 }}>
-                  Filter
+                <Text
+                  style={{
+                    color: theme.buttonText,
+                    fontSize: Dimensions.get("window").width / 30,
+                  }}
+                >
+                  {i18n.filter}
                 </Text>
               </TouchableOpacity>
             </View>

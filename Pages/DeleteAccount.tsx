@@ -15,6 +15,7 @@ import { ActivityIndicator, Dimensions, View, Text } from "react-native";
 import React from "react";
 import { ThemeContext } from "../Theme/ThemeContext";
 import { MidSpacer } from "../Utils/Spacers";
+import i18n from "../Language/i18n";
 
 export default function DeleteAccount() {
   const { theme } = useContext(ThemeContext);
@@ -80,7 +81,7 @@ export default function DeleteAccount() {
       }}
     >
       <Text style={{ fontSize: 30, color: theme.text }}>
-        Account is being deleted
+        {i18n.accountdeleting}
       </Text>
       <MidSpacer></MidSpacer>
       <ActivityIndicator

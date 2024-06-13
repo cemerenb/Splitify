@@ -15,6 +15,8 @@ import { FIRESTORE_DB } from "../FirebaseConfig"; // Adjust the import as necess
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ThemeContext } from "../Theme/ThemeContext";
 import TransferDetails from "./TransferDetails";
+import i18n from "../Language/i18n";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RootStackParamList = {
   OldTransections: { groupId: string; memberNames: Array };
@@ -37,6 +39,7 @@ const OldTransections: React.FC<OldTransectionsProps> = ({ route }) => {
   const memberNames = route.params.memberNames;
   const { theme } = useContext(ThemeContext);
   const [transfer, setTransfer] = useState([]);
+  const [turkish, setTurkish] = useState(false);
 
   const fetchTransactions = async () => {
     const docRef = doc(FIRESTORE_DB, "groups", groupId);
@@ -50,6 +53,11 @@ const OldTransections: React.FC<OldTransectionsProps> = ({ route }) => {
 
   useEffect(() => {
     if (count === 0) {
+      AsyncStorage.getItem("lg").then((value) => {
+        if (value.split("_")[0] == "tr") {
+          setTurkish(true);
+        } else [setTurkish(false)];
+      });
       console.log(groupId);
       setCount(1);
       fetchTransactions();
@@ -68,16 +76,29 @@ const OldTransections: React.FC<OldTransectionsProps> = ({ route }) => {
         });
       }}
     >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text
-          style={[styles.cardTitle, { color: theme.text, fontWeight: "400" }]}
-        >
-          Created By{" "}
-        </Text>
-        <Text style={[styles.cardTitle, { color: theme.text }]}>
-          {item.creatorName}
-        </Text>
-      </View>
+      {turkish ? (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={[styles.cardTitle, { color: theme.text }]}>
+            {item.creatorName}
+          </Text>
+          <Text
+            style={[styles.cardTitle, { color: theme.text, fontWeight: "400" }]}
+          >
+            {" tarafından oluşturuldu"}
+          </Text>
+        </View>
+      ) : (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text
+            style={[styles.cardTitle, { color: theme.text, fontWeight: "400" }]}
+          >
+            Created By{" "}
+          </Text>
+          <Text style={[styles.cardTitle, { color: theme.text }]}>
+            {item.creatorName}
+          </Text>
+        </View>
+      )}
 
       <Text style={[styles.cardText, { color: theme.text }]}>
         {item.firstDate} {" - "} {item.lastDate}
@@ -120,7 +141,7 @@ const OldTransections: React.FC<OldTransectionsProps> = ({ route }) => {
               size={30}
               color={theme.text}
             />
-            <Text style={{ fontSize: 18, color: theme.text }}>Back</Text>
+            <Text style={{ fontSize: 18, color: theme.text }}>{i18n.back}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -128,7 +149,7 @@ const OldTransections: React.FC<OldTransectionsProps> = ({ route }) => {
         <View
           style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
         >
-          <Text>There are no past transactions to show</Text>
+          <Text>{i18n.therearenotransfer}</Text>
         </View>
       ) : transactions.length > 0 && !loading ? (
         <FlatList

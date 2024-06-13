@@ -18,6 +18,8 @@ import { MaxSpacer } from "../Utils/Spacers";
 import { Ionicons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
+import i18n from "../Language/i18n";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 type RootStackParamList = {
   ScanResult: { groupId: string; uid: string };
 };
@@ -27,6 +29,7 @@ interface ScanResultProps {
   route: ScanResultRouteProp;
 }
 const ScanResult: React.FC<ScanResultProps> = ({ route }) => {
+  const [turkish, setTurkish] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -74,12 +77,17 @@ const ScanResult: React.FC<ScanResultProps> = ({ route }) => {
       //@ts-ignore
       navigation.replace("Members", { groupId: groupId });
     } catch (error) {
-      setErrorMessage("An eror occured");
+      setErrorMessage(i18n.anerror);
       setModalVisible(true);
       setLoading2(false);
     }
   };
   useEffect(() => {
+    AsyncStorage.getItem("lg").then((value) => {
+      if (value.split("_")[0] == "tr") {
+        setTurkish(true);
+      } else [setTurkish(false)];
+    });
     console.log("yes");
 
     getDetails();
@@ -148,7 +156,9 @@ const ScanResult: React.FC<ScanResultProps> = ({ route }) => {
                     justifyContent: "center",
                   }}
                 >
-                  <Text style={{ color: theme.text, fontSize: 18 }}>Close</Text>
+                  <Text style={{ color: theme.text, fontSize: 18 }}>
+                    {i18n.close}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -178,7 +188,9 @@ const ScanResult: React.FC<ScanResultProps> = ({ route }) => {
                 name="chevron-back-outline"
                 size={30}
               ></Ionicons>
-              <Text style={{ color: theme.text, fontSize: 18 }}>Back</Text>
+              <Text style={{ color: theme.text, fontSize: 18 }}>
+                {i18n.back}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -195,7 +207,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ route }) => {
                 justifyContent: "center",
               }}
             >
-              <Text style={{ color: theme.buttonText }}>Scan Again</Text>
+              <Text style={{ color: theme.buttonText }}>{i18n.scanagain}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -209,27 +221,51 @@ const ScanResult: React.FC<ScanResultProps> = ({ route }) => {
             }}
           >
             <View>
-              <Text
-                style={{
-                  fontSize: 24,
-                  paddingLeft: 30,
-                  fontWeight: "300",
-                  color: theme.text,
-                }}
-              >
-                Add new user to
-              </Text>
-              <Text
-                style={{ fontSize: 50, paddingLeft: 30, color: theme.text }}
-              >
-                {groupName}
-              </Text>
+              {turkish ? (
+                <View>
+                  <Text
+                    style={{ fontSize: 50, paddingLeft: 30, color: theme.text }}
+                  >
+                    {groupName}
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      paddingLeft: 30,
+                      fontWeight: "300",
+                      color: theme.text,
+                    }}
+                  >
+                    grubuna yeni üye ekle
+                  </Text>
+                </View>
+              ) : (
+                <View>
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      paddingLeft: 30,
+                      fontWeight: "300",
+                      color: theme.text,
+                    }}
+                  >
+                    Add new user to
+                  </Text>
+                  <Text
+                    style={{ fontSize: 50, paddingLeft: 30, color: theme.text }}
+                  >
+                    {groupName}
+                  </Text>
+                </View>
+              )}
+
               <MaxSpacer></MaxSpacer>
               <MaxSpacer></MaxSpacer>
               <Text
                 style={{ fontSize: 20, paddingLeft: 30, color: theme.text }}
               >
-                User
+                {i18n.user}
               </Text>
               <View
                 style={{
@@ -303,8 +339,8 @@ const ScanResult: React.FC<ScanResultProps> = ({ route }) => {
           </View>
         ) : (
           <View>
-            <Text>For group: {groupId}</Text>
-            <Text>User Not Found</Text>
+            <Text>{groupId}</Text>
+            <Text>{i18n.usernotfound}</Text>
           </View>
         )}
       </View>

@@ -39,6 +39,7 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
 import { ThemeContext } from "../Theme/ThemeContext";
+import i18n from "../Language/i18n";
 
 export default function Home() {
   const [count, setCount] = useState(0);
@@ -64,9 +65,9 @@ export default function Home() {
     total: 0,
   };
   const selectionData = [
-    { title: "Last Week" },
-    { title: "Last Month" },
-    { title: "Last 6 Months" },
+    { title: i18n.lastweek },
+    { title: i18n.lastmonth },
+    { title: i18n.last6months },
   ];
 
   const navigation =
@@ -308,22 +309,22 @@ export default function Home() {
         >
           <Text style={[styles.cardTitle, { color: theme.text }]}>
             {imageSource == 1
-              ? "Utilities"
+              ? i18n.utilites
               : imageSource == 2
-              ? "Food & Groceries"
+              ? i18n.foodgroceries
               : imageSource == 3
-              ? "Healthcare"
+              ? i18n.healthcare
               : imageSource == 4
-              ? "Entertainment"
+              ? i18n.entertainment
               : imageSource == 5
-              ? "Shopping"
+              ? i18n.shopping
               : imageSource == 6
-              ? "Education"
+              ? i18n.education
               : imageSource == 7
-              ? "Transportation"
+              ? i18n.transportations
               : imageSource == 8
-              ? "Personal Care"
-              : "Miscellaneous"}
+              ? i18n.personalcare
+              : i18n.miscellaneous}
           </Text>
           {description.length > 40 ? (
             <Text style={[styles.cardDescription, { color: theme.text }]}>
@@ -479,7 +480,7 @@ export default function Home() {
 
             <View style={styles.totalExpensesContainer}>
               <Text style={{ fontSize: 18, color: theme.text }}>
-                Total Expenses
+                {i18n.totalexpenses}
               </Text>
               <Text style={{ fontSize: 55, color: theme.text }}>
                 {total.toLocaleString()}₺
@@ -514,7 +515,7 @@ export default function Home() {
             <View>
               <View style={styles.recentTransactionsHeader}>
                 <Text style={{ fontSize: 18, flex: 1, color: theme.text }}>
-                  Last Transactions
+                  {i18n.lastexpenses}
                 </Text>
                 <TouchableOpacity
                   style={{
@@ -527,7 +528,7 @@ export default function Home() {
                     navigation.navigate("AllExpenses");
                   }}
                 >
-                  <Text style={{ color: theme.buttonText }}>See All</Text>
+                  <Text style={{ color: theme.buttonText }}>{i18n.seeall}</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.recentTransactionsBody}>
@@ -580,7 +581,7 @@ export default function Home() {
                     color: theme.text,
                   }}
                 >
-                  Welcome
+                  {i18n.welcome}
                 </Text>
                 <Text
                   style={{
@@ -636,7 +637,7 @@ export default function Home() {
                   textAlign: "center",
                 }}
               >
-                Your spending history is clear
+                {i18n.yourspehiscle}
               </Text>
             </View>
           </SafeAreaView>

@@ -24,6 +24,8 @@ import { ThemeContext } from "../Theme/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackNavigatorParamsList } from "../App";
+import i18n from "../Language/i18n";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RootStackParamList = {
   TransferDetails: { transfer: Array; data: Array; memberNames: Array };
@@ -38,6 +40,13 @@ interface TransferDetailsProps {
 }
 
 const TransferDetails: React.FC<TransferDetailsProps> = ({ route }) => {
+  useEffect(() => {
+    AsyncStorage.getItem("lg").then((value) => {
+      if (value.split("_")[0] == "tr") {
+        setTurkish(true);
+      } else [setTurkish(false)];
+    });
+  }, []);
   const transfer = route.params.transfer;
   const memberNames = route.params.memberNames;
   const data = route.params.data;
@@ -45,6 +54,7 @@ const TransferDetails: React.FC<TransferDetailsProps> = ({ route }) => {
 
   const { theme } = useContext(ThemeContext);
   const [loading, setLoading] = useState(false);
+  const [turkish, setTurkish] = useState(false);
 
   const rearrangeTransactions = (transactions, currentUserId) => {
     // Filter transactions involving the current user
@@ -102,7 +112,7 @@ const TransferDetails: React.FC<TransferDetailsProps> = ({ route }) => {
               size={30}
               color={theme.text}
             ></Ionicons>
-            <Text style={{ fontSize: 18, color: theme.text }}>Back</Text>
+            <Text style={{ fontSize: 18, color: theme.text }}>{i18n.back}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -151,33 +161,66 @@ const TransferDetails: React.FC<TransferDetailsProps> = ({ route }) => {
           {rearrangeTransactions(transfer, FIREBASE_AUTH.currentUser.uid).map(
             (transaction, index) => (
               <View style={{ paddingLeft: 0 }}>
-                <Text
-                  style={{
-                    fontSize:
-                      transaction.from === FIREBASE_AUTH.currentUser.uid ||
-                      transaction.to === FIREBASE_AUTH.currentUser.uid
-                        ? 30
-                        : 16,
-                    paddingBottom:
-                      transaction.from === FIREBASE_AUTH.currentUser.uid ||
-                      transaction.to === FIREBASE_AUTH.currentUser.uid
-                        ? 30
-                        : 3,
-                    color: theme.text,
-                  }}
-                  key={index}
-                >
-                  {transaction.from === FIREBASE_AUTH.currentUser.uid
-                    ? "You"
-                    : memberNames[transaction.from]}{" "}
-                  {transaction.from === FIREBASE_AUTH.currentUser.uid
-                    ? "will give"
-                    : "gives"}{" "}
-                  {Math.round(transaction.amount)}₺ to{" "}
-                  {transaction.to === FIREBASE_AUTH.currentUser.uid
-                    ? "You"
-                    : memberNames[transaction.to]}{" "}
-                </Text>
+                {turkish ? (
+                  <Text
+                    style={{
+                      color: theme.text,
+                      fontSize:
+                        transaction.from === FIREBASE_AUTH.currentUser.uid ||
+                        transaction.to === FIREBASE_AUTH.currentUser.uid
+                          ? 30
+                          : 16,
+                      paddingBottom:
+                        transaction.from === FIREBASE_AUTH.currentUser.uid ||
+                        transaction.to === FIREBASE_AUTH.currentUser.uid
+                          ? 30
+                          : 3,
+                    }}
+                    key={index}
+                  >
+                    {transaction.from === FIREBASE_AUTH.currentUser.uid
+                      ? "Sen"
+                      : memberNames[transaction.from]}{" "}
+                    {transaction.to === FIREBASE_AUTH.currentUser.uid
+                      ? "sana"
+                      : memberNames[transaction.to]}
+                    {transaction.to === FIREBASE_AUTH.currentUser.uid
+                      ? " "
+                      : "'a "}
+                    {Math.round(transaction.amount)}₺{" "}
+                    {transaction.from === FIREBASE_AUTH.currentUser.uid
+                      ? "vereceksin"
+                      : "verecek"}{" "}
+                  </Text>
+                ) : (
+                  <Text
+                    style={{
+                      color: theme.text,
+                      fontSize:
+                        transaction.from === FIREBASE_AUTH.currentUser.uid ||
+                        transaction.to === FIREBASE_AUTH.currentUser.uid
+                          ? 30
+                          : 16,
+                      paddingBottom:
+                        transaction.from === FIREBASE_AUTH.currentUser.uid ||
+                        transaction.to === FIREBASE_AUTH.currentUser.uid
+                          ? 30
+                          : 3,
+                    }}
+                    key={index}
+                  >
+                    {transaction.from === FIREBASE_AUTH.currentUser.uid
+                      ? "You"
+                      : memberNames[transaction.from]}{" "}
+                    {transaction.from === FIREBASE_AUTH.currentUser.uid
+                      ? "will give"
+                      : "gives"}{" "}
+                    {Math.round(transaction.amount)}₺ to{" "}
+                    {transaction.to === FIREBASE_AUTH.currentUser.uid
+                      ? "You"
+                      : memberNames[transaction.to]}{" "}
+                  </Text>
+                )}
               </View>
             )
           )}

@@ -37,6 +37,7 @@ import * as shape from "d3-shape";
 import { Shadow, Gradient } from "../ChartAdds";
 import { useIsFocused } from "@react-navigation/native";
 import { ThemeContext } from "../Theme/ThemeContext";
+import i18n from "../Language/i18n";
 
 type RootStackParamList = {
   GroupPage: { groupId: string };
@@ -151,9 +152,9 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
   };
 
   const selectionData = [
-    { title: "Last Week" },
-    { title: "Last Month" },
-    { title: "Last 6 Months" },
+    { title: i18n.lastweek },
+    { title: i18n.lastmonth },
+    { title: i18n.last6months },
   ];
   const CardView = ({
     imageSource,
@@ -290,22 +291,22 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
         >
           <Text style={[styles.cardTitle, { color: theme.text }]}>
             {imageSource == 1
-              ? "Utilities"
+              ? i18n.utilites
               : imageSource == 2
-              ? "Food & Groceries"
+              ? i18n.foodgroceries
               : imageSource == 3
-              ? "Healthcare"
+              ? i18n.healthcare
               : imageSource == 4
-              ? "Entertainment"
+              ? i18n.entertainment
               : imageSource == 5
-              ? "Shopping"
+              ? i18n.shopping
               : imageSource == 6
-              ? "Education"
+              ? i18n.education
               : imageSource == 7
-              ? "Transportation"
+              ? i18n.transportations
               : imageSource == 8
-              ? "Personal Care"
-              : "Miscellaneous"}
+              ? i18n.personalcare
+              : i18n.miscellaneous}
           </Text>
           {description.length > 40 ? (
             <Text style={[styles.cardDescription, { color: theme.text }]}>
@@ -317,7 +318,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
             </Text>
           )}
           <Text style={[styles.cardName, { color: theme.text }]}>
-            {namesMap[createdBy] || "Unknown"}
+            {namesMap[createdBy] || i18n.unknown}
           </Text>
         </View>
         <View
@@ -456,7 +457,6 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
       calculateSixMonthData(expensesArray);
       calculateLastMonthData(expensesArray);
       calculateLastSevenDaysData(expensesArray);
-      console.log("cem");
     }
   }, [isFocused]);
 
@@ -523,7 +523,8 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                   color: theme.buttonText,
                 }}
               >
-                {ownerName}'s group
+                {ownerName}
+                {i18n.sgroup}
               </Text>
             </View>
             <TouchableOpacity
@@ -616,7 +617,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
               <Text
                 style={{ fontSize: 18, color: theme.text, paddingVertical: 40 }}
               >
-                Total Expenses
+                {i18n.totalexpenses}
               </Text>
 
               <Text style={{ fontSize: 55, color: theme.text }}>{total}₺</Text>
@@ -651,7 +652,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
               <View style={{ paddingTop: 30 }}>
                 <View style={styles.recentTransactionsHeader}>
                   <Text style={{ fontSize: 18, flex: 1, color: theme.text }}>
-                    Last Transactions
+                    {i18n.lastexpenses}
                   </Text>
                   <TouchableOpacity
                     style={{
@@ -669,7 +670,9 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                       });
                     }}
                   >
-                    <Text style={{ color: theme.buttonText }}>Summary</Text>
+                    <Text style={{ color: theme.buttonText }}>
+                      {i18n.summary}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{
@@ -686,7 +689,9 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                       });
                     }}
                   >
-                    <Text style={{ color: theme.buttonText }}>See All</Text>
+                    <Text style={{ color: theme.buttonText }}>
+                      {i18n.seeall}
+                    </Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.recentTransactionsBody}>
@@ -761,7 +766,7 @@ const GroupPage: React.FC<GroupPageProps> = ({ route }) => {
                 fontSize: Dimensions.get("window").width / 30,
               }}
             >
-              Add Expense
+              {i18n.addexpense}
             </Text>
           </View>
         </TouchableOpacity>

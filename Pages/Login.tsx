@@ -24,6 +24,7 @@ import * as SecureStore from "expo-secure-store";
 import React from "react";
 import { ThemeContext } from "../Theme/ThemeContext";
 import { sendEmailVerification } from "firebase/auth";
+import i18n from "../Language/i18n";
 
 export default function Login() {
   const [password, setPassword] = useState("");
@@ -46,25 +47,14 @@ export default function Login() {
     return re.test(String(email).toLowerCase());
   };
 
-  const validatePassword = (password: string) => {
-    // At least 6 characters, one uppercase letter, one lowercase letter, one number, and one special character
-    const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
-    return re.test(String(password));
-  };
   const signIn = async () => {
     setLoading(true);
     if (email.length == 0 || password.length == 0) {
-      setErrorMessage("Email or password is empty.");
+      setErrorMessage(i18n.emaorpaswemp);
       setIsModalVisible(true);
       setLoading(false);
     } else if (!validateEmail(email)) {
-      setErrorMessage("Invalid email format.");
-      setIsModalVisible(true);
-      setLoading(false);
-    } else if (!validatePassword(password)) {
-      setErrorMessage(
-        "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character."
-      );
+      setErrorMessage(i18n.invemafor);
       setIsModalVisible(true);
       setLoading(false);
     } else {
@@ -86,7 +76,7 @@ export default function Login() {
         }
       } catch (error) {
         console.error("Error while signing in:", error);
-        setErrorMessage("Error signing in. Please check your credentials.");
+        setErrorMessage(i18n.errsignin);
         setIsModalVisible(true);
       } finally {
         setLoading(false);
@@ -184,7 +174,7 @@ export default function Login() {
             secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
-            placeholder="Password"
+            placeholder={i18n.password}
           />
           <MaterialCommunityIcons
             name={!showPassword ? "eye-off" : "eye"}
@@ -204,7 +194,7 @@ export default function Login() {
               navigation.navigate("ResetPassword");
             }}
           >
-            Forgot Password
+            {i18n.forgotpass}
           </Text>
         </View>
       </View>
@@ -231,7 +221,7 @@ export default function Login() {
                 color: theme.buttonText,
               }}
             >
-              Login
+              {i18n.login}
             </Text>
           )}
         </TouchableOpacity>
@@ -243,7 +233,7 @@ export default function Login() {
           { color: theme.text, fontSize: Dimensions.get("window").width / 30 },
         ]}
       >
-        Don't have an account?{" "}
+        {i18n.donthaveacc}
         <Text
           onPress={onHandlePress}
           style={{
@@ -251,7 +241,7 @@ export default function Login() {
             fontSize: Dimensions.get("window").width / 30,
           }}
         >
-          Sign Up
+          {i18n.signup}
         </Text>
       </Text>
       <Modal visible={isModalVisible} animationType="fade" transparent={true}>
@@ -268,7 +258,7 @@ export default function Login() {
             style={{
               backgroundColor: theme.primary,
               width: "80%",
-              paddingTop: 50,
+              paddingTop: 40,
               borderRadius: 20,
               alignItems: "center",
             }}
@@ -291,7 +281,9 @@ export default function Login() {
                 justifyContent: "center",
               }}
             >
-              <Text style={{ color: theme.text, fontSize: 18 }}>Cancel</Text>
+              <Text style={{ color: theme.text, fontSize: 18 }}>
+                {i18n.cancel}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -325,8 +317,7 @@ export default function Login() {
             <Text
               style={{ color: theme.text, fontSize: 14, paddingBottom: 40 }}
             >
-              We have sent an email for you to confirm your account. Don't
-              forget to check your spam box.
+              {i18n.emailsent}
             </Text>
             <View style={{ width: "100%", flexDirection: "row" }}>
               <TouchableOpacity
@@ -343,7 +334,9 @@ export default function Login() {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ color: theme.text, fontSize: 18 }}>Cancel</Text>
+                <Text style={{ color: theme.text, fontSize: 18 }}>
+                  {i18n.close}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={async () => {
@@ -358,7 +351,7 @@ export default function Login() {
                     setProcessing(false);
                     setErrorMessage(error);
                     console.log(error);
-                    Alert.alert("Too many request");
+                    Alert.alert(i18n.toomanyreq);
                   }
                 }}
                 style={{
@@ -377,7 +370,7 @@ export default function Login() {
                   ></ActivityIndicator>
                 ) : (
                   <Text style={{ color: theme.text, fontSize: 18 }}>
-                    Resend
+                    {i18n.resend}
                   </Text>
                 )}
               </TouchableOpacity>
