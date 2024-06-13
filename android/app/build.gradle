@@ -83,9 +83,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'cemerenb.splitify.com'
+    namespace 'cemerenb.splite.com'
     defaultConfig {
-        applicationId 'cemerenb.splitify.com'
+        applicationId 'cemerenb.splite.com'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

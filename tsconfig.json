@@ -6,7 +6,7 @@
     
     "paths": {
       "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"],
-      "@react-trend": ["/Users/cemerenb/Desktop/splitify/node_modules/react-trend/lib/index.js"]
+      "@react-trend": ["/Users/cemerenb/Desktop/splite/node_modules/react-trend/lib/index.js"]
     }
   },
   "extends": "expo/tsconfig.base"

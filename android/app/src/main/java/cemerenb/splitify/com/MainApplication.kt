@@ -1,4 +1,4 @@
-package cemerenb.splitify.com
+package cemerenb.splite.com
 
 import android.app.Application
 import android.content.res.Configuration

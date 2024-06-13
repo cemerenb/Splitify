@@ -1,4 +1,4 @@
-rootProject.name = 'splitify'
+rootProject.name = 'splite'
 
 dependencyResolutionManagement {
   versionCatalogs {

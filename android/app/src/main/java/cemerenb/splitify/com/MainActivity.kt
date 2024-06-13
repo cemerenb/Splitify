@@ -1,4 +1,4 @@
-package cemerenb.splitify.com
+package cemerenb.splite.com
 
 import android.os.Build
 import android.os.Bundle
