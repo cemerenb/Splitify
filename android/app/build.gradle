@@ -83,7 +83,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'cemerenb.splite.com'
+    namespace "com.splite"
     defaultConfig {
         applicationId 'cemerenb.splite.com'
         minSdkVersion rootProject.ext.minSdkVersion
